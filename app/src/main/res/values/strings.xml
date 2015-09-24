@@ -1,0 +1,24 @@
+<resources>
+
+    <!-- MENU -->
+    <string name="action_settings">Play demo</string>
+    <string name="action_create">Create</string>
+
+    <!-- CREATE PROMPT -->
+    <string name="placeholder_title">Title</string>
+    <string name="placeholder_bpm">BPM</string>
+    <string name="placeholder_bar_upper">Upper bar</string>
+    <string name="placeholder_bar_lower">Lower bar</string>
+    <string name="choose_pdf">Select a pdf file</string>
+    <string name="submit">Create</string>
+
+
+    <!-- ACTIVITY TITLES -->
+    <string name="title_activity_prompt">PlayActivity</string>
+
+    <string name="dummy_button">aaaaa</string>
+
+    <!-- GLOBAL APP -->
+    <string name="app_name">Auto BPM Prompt</string>
+
+</resources>

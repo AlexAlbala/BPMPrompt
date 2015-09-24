@@ -1,0 +1,60 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".CreateActivity">
+
+    <EditText
+        android:id="@+id/create_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/placeholder_title" />
+
+    <EditText
+        android:id="@+id/create_bpm"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/placeholder_bpm"
+        android:inputType="number" />
+
+    <EditText
+        android:id="@+id/create_bar_upper"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/placeholder_bar_upper"
+        android:inputType="number" />
+
+    <EditText
+        android:id="@+id/create_bar_lower"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/placeholder_bar_lower"
+        android:inputType="number" />
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="100dp">
+
+        <!-- pdf preview -->
+        <com.joanzapata.pdfview.PDFView
+            android:id="@+id/pdfview_preview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+    </FrameLayout>
+
+    <Button
+        android:id="@+id/create_selectPdf"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/choose_pdf"
+        android:onClick="loadPDFClick"/>
+
+    <Button
+        android:id="@+id/create_submit"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/submit"
+        android:onClick="createPromptClick"/>
+</LinearLayout>
