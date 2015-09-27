@@ -51,7 +51,7 @@ public class PromptActivity extends Activity {
         currentPrompt = PromptManager.load(name, pdfview, PromptActivity.this);
         /**********************************************************************************/
 
-        currentPrompt.Play();
+        //currentPrompt.Play();
     }
 
     @Override

@@ -7,7 +7,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.a2t.autobpmprompt.R;
+import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.helpers.RealmIOHelper;
+
+import java.util.List;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -35,7 +38,10 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            List<PromptSettings> prompts = RealmIOHelper.getInstance().getAllPromptSettings(getApplicationContext());
+
             Intent i = new Intent(this, PromptActivity.class);
+            i.putExtra(getString(R.string.promptNameVariable), prompts.get(0).getName());
             startActivity(i);
             return true;
         } else if (id == R.id.action_create) {

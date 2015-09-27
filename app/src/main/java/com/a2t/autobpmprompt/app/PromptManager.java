@@ -22,7 +22,7 @@ public class PromptManager {
         Log.i(TAG, "Loading prompt " + name);
         PromptSettings settings = RealmIOHelper.getInstance().getPrompt(context, name);
 
-        Prompt p = new Prompt(pdf, name, context);
+        Prompt p = new Prompt(pdf, settings.getPdfFullPath(), context);
         p.settings = settings;
 
         return p;

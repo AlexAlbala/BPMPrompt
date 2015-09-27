@@ -106,6 +106,7 @@ public class RealmIOHelper {
     public void Debug(Context ctx){
 
         RealmResults<Marker> lm = getRealm(ctx).allObjects(Marker.class);
+        Log.i(TAG, "*********************************");
         Log.i(TAG, "FOUND " + lm.size() + " MARKERS");
         Log.i(TAG, "*********************************");
         for (Marker m : lm) {
@@ -113,6 +114,7 @@ public class RealmIOHelper {
         }
 
         RealmResults<PromptSettings> lp = getRealm(ctx).allObjects(PromptSettings.class);
+        Log.i(TAG, "*********************************");
         Log.i(TAG, "FOUND " + lp.size() + " PROMPTS");
         Log.i(TAG, "*********************************");
         for (PromptSettings ps : lp) {
@@ -120,6 +122,7 @@ public class RealmIOHelper {
         }
 
         RealmResults<SetList> ls = getRealm(ctx).allObjects(SetList.class);
+        Log.i(TAG, "*********************************");
         Log.i(TAG, "FOUND " + ls.size() + " SETLISTS");
         Log.i(TAG, "*********************************");
 
