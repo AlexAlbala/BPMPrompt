@@ -6,7 +6,7 @@
     tools:context=".CreateActivity">
 
     <EditText
-        android:id="@+id/create_title"
+        android:id="@+id/create_name"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:hint="@string/placeholder_title" />

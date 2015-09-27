@@ -21,4 +21,8 @@
     <!-- GLOBAL APP -->
     <string name="app_name">Auto BPM Prompt</string>
 
+    <!-- STATIC BUNDLE VALUES -->
+    <string name="isEditVariable">isEdit</string>
+    <string name="promptNameVariable">promptName</string>
+
 </resources>

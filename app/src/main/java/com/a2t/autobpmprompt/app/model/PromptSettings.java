@@ -16,8 +16,26 @@ public class PromptSettings extends RealmObject {
     //DATA
     private RealmList<Marker> markers;
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPdfFullPath() {
+        return pdfFullPath;
+    }
+
+    public void setPdfFullPath(String pdfFullPath) {
+        this.pdfFullPath = pdfFullPath;
+    }
+
     @PrimaryKey
-    private String pdfName;
+    private String name;
+
+    private String pdfFullPath;
 
 
     public int getCfg_bar_upper() {
@@ -50,14 +68,6 @@ public class PromptSettings extends RealmObject {
 
     public void setMarkers(RealmList<Marker> markers) {
         this.markers = markers;
-    }
-
-    public String getPdfName() {
-        return pdfName;
-    }
-
-    public void setPdfName(String pdfName) {
-        this.pdfName = pdfName;
     }
 
     public PromptSettings() {

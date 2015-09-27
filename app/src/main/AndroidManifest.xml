@@ -24,6 +24,11 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_prompt">
         </activity>
+        <activity
+        android:name=".app.CreateActivity"
+        android:configChanges="orientation|keyboardHidden|screenSize"
+        android:label="@string/title_activity_prompt">
+    </activity>
     </application>
 
 </manifest>

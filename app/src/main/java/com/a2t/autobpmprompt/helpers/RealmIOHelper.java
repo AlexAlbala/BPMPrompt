@@ -1,6 +1,7 @@
 package com.a2t.autobpmprompt.helpers;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.a2t.autobpmprompt.app.model.PromptSettings;
@@ -18,14 +19,16 @@ import io.realm.RealmResults;
 public class RealmIOHelper {
     private static RealmIOHelper INSTANCE;
     private static final String TAG = "RealmIOHelper";
+    private static SharedPreferences prefs;
 
     private RealmIOHelper(){
 
     }
 
     public static RealmIOHelper getInstance(){
-        if(INSTANCE == null)
+        if(INSTANCE == null) {
             INSTANCE = new RealmIOHelper();
+        }
 
         return INSTANCE;
     }
@@ -38,7 +41,8 @@ public class RealmIOHelper {
         Realm r = getRealm(ctx);
         r.beginTransaction();
         PromptSettings prompt = r.createObject(PromptSettings.class);
-        prompt.setPdfName(settings.getPdfName());
+        prompt.setName(settings.getName());
+        prompt.setPdfFullPath(settings.getPdfFullPath());
         prompt.setBpm(settings.getBpm());
         prompt.setCfg_bar_lower(settings.getCfg_bar_lower());
         prompt.setCfg_bar_upper(settings.getCfg_bar_upper());
@@ -71,6 +75,21 @@ public class RealmIOHelper {
         return list;
     }
 
+    public void updatePrompt(Context ctx, PromptSettings prompt){
+        Realm r = getRealm(ctx);
+        r.beginTransaction();
+
+        PromptSettings updatedPrompt = r.where(PromptSettings.class).equalTo("name", prompt.getName()).findFirst();
+        updatedPrompt.setBpm(prompt.getBpm());
+        updatedPrompt.setCfg_bar_lower(prompt.getCfg_bar_lower());
+        updatedPrompt.setCfg_bar_upper(prompt.getCfg_bar_lower());
+        updatedPrompt.setPdfFullPath(prompt.getPdfFullPath());
+        updatedPrompt.setMarkers(prompt.getMarkers());
+
+        r.commitTransaction();
+
+    }
+
     public PromptSettings getPrompt(Context ctx, String name) {
         Realm r = getRealm(ctx);
 
@@ -78,12 +97,10 @@ public class RealmIOHelper {
         RealmQuery<PromptSettings> query = r.where(PromptSettings.class);
 
         // Add query conditions:
-        query.equalTo("pdfName", name);
+        query.equalTo("name", name);
 
         // Execute the query:
-        PromptSettings p = query.findFirst();
-
-        return p;
+        return query.findFirst();
     }
 
     public void Debug(Context ctx){

@@ -1,8 +1,6 @@
 package com.a2t.autobpmprompt.app;
 
 import com.a2t.autobpmprompt.R;
-import com.a2t.autobpmprompt.app.model.PromptSettings;
-import com.a2t.autobpmprompt.helpers.RealmIOHelper;
 import com.joanzapata.pdfview.PDFView;
 
 import android.app.Activity;
@@ -31,7 +29,6 @@ public class PromptActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         //Remove title bar
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
@@ -46,13 +43,14 @@ public class PromptActivity extends Activity {
 
         pdfview = (PDFView) findViewById(R.id.pdfview);
 
+        /******************* RETRIEVE VARIABLES ********************************************/
+        this.isEdit = getIntent().getBooleanExtra(getString(R.string.isEditVariable), false);
+        String name = getIntent().getStringExtra(getString(R.string.promptNameVariable));
 
-        /******************* RETRIEVE VARIABLES *************************/
-        this.isEdit = getIntent().getBooleanExtra("edit", false);
-        String name = getIntent().getStringExtra("promptName");
-        /***************************************************************/
-
+        //Load prompt
         currentPrompt = PromptManager.load(name, pdfview, PromptActivity.this);
+        /**********************************************************************************/
+
         currentPrompt.Play();
     }
 

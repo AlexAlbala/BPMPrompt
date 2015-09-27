@@ -38,7 +38,7 @@ public class Prompt {
         currentBar = 1;
         pdf = new PDFManager(f, pdfView, context);
         settings = new PromptSettings();
-        settings.setPdfName(f.getName());
+        settings.setPdfFullPath(fullPath);
         bpmCounterTimer = new Timer();
     }
 
