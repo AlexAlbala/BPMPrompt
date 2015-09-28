@@ -1,17 +1,16 @@
-package com.a2t.autobpmprompt.app;
+package com.a2t.autobpmprompt.app.controller;
 
 import com.a2t.autobpmprompt.R;
+import com.a2t.autobpmprompt.media.Prompt;
+import com.a2t.autobpmprompt.media.PromptManager;
 import com.joanzapata.pdfview.PDFView;
 
 import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
-
-import java.util.List;
 
 
 public class PromptActivity extends Activity {

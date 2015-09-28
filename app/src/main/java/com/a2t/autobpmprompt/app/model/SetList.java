@@ -5,6 +5,11 @@ import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
 public class SetList extends RealmObject {
+    @PrimaryKey
+    private String title;
+
+    private RealmList<PromptSettings> prompts;
+
     public String getTitle() {
         return title;
     }
@@ -21,12 +26,10 @@ public class SetList extends RealmObject {
         this.prompts = prompts;
     }
 
-    private RealmList<PromptSettings> prompts;
 
     public SetList() {
 
     }
 
-    @PrimaryKey
-    private String title;
+
 }

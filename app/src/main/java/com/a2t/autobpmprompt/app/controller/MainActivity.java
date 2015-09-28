@@ -1,13 +1,17 @@
-package com.a2t.autobpmprompt.app;
+package com.a2t.autobpmprompt.app.controller;
 
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import com.a2t.autobpmprompt.R;
+import com.a2t.autobpmprompt.app.adapter.SetListAdapter;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
+import com.a2t.autobpmprompt.app.model.SetList;
 import com.a2t.autobpmprompt.helpers.RealmIOHelper;
 
 import java.util.List;
@@ -20,6 +24,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         RealmIOHelper.getInstance().Debug(getApplicationContext());
+
+        List<SetList> setLists = RealmIOHelper.getInstance().getAllSetLists(getApplicationContext());
+        ListView setListsView = (ListView) findViewById(R.id.main_setlists);
+        SetListAdapter setListAdapter = new SetListAdapter(getApplicationContext(), setLists, new SetListAdapterCallback() {
+            @Override
+            public void onPromptSelected(PromptSettings prompt, int position) {
+                Toast.makeText(getApplicationContext(), "SELECTED PROMPT " + prompt.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        setListsView.setAdapter(setListAdapter);
     }
 
     @Override

@@ -4,6 +4,7 @@
     tools:context=".MainActivity">
 
     <ListView
+        android:id="@+id/main_setlists"
         android:layout_height="fill_parent"
         android:layout_width="fill_parent" />
 </LinearLayout>

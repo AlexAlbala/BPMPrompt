@@ -1,4 +1,4 @@
-package com.a2t.autobpmprompt.app;
+package com.a2t.autobpmprompt.media;
 
 import android.app.Activity;
 import android.util.Log;

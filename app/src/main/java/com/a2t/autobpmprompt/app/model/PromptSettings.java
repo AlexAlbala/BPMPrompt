@@ -6,6 +6,11 @@ import io.realm.annotations.PrimaryKey;
 
 
 public class PromptSettings extends RealmObject {
+    @PrimaryKey
+    private String name;
+
+    private String pdfFullPath;
+
     //CONFIG
     private int cfg_bar_upper;
     private int cfg_bar_lower;
@@ -31,12 +36,6 @@ public class PromptSettings extends RealmObject {
     public void setPdfFullPath(String pdfFullPath) {
         this.pdfFullPath = pdfFullPath;
     }
-
-    @PrimaryKey
-    private String name;
-
-    private String pdfFullPath;
-
 
     public int getCfg_bar_upper() {
         return cfg_bar_upper;
