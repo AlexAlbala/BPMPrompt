@@ -11,6 +11,10 @@
     <string name="placeholder_bar_lower">Lower bar</string>
     <string name="choose_pdf">Select a pdf file</string>
     <string name="submit">Create</string>
+    <string name="select_pdf_title">Select PDF</string>
+
+    <!-- SET LISTS -->
+    <string name="first_set_list_title">Set List 1</string>
 
 
     <!-- ACTIVITY TITLES -->
@@ -24,5 +28,6 @@
     <!-- STATIC BUNDLE VALUES -->
     <string name="isEditVariable">isEdit</string>
     <string name="promptNameVariable">promptName</string>
+    <string name="setListNameVariable">promptName</string>
 
 </resources>

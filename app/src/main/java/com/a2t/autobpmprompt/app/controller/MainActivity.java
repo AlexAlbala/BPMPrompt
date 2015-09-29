@@ -16,6 +16,9 @@ import com.a2t.autobpmprompt.helpers.RealmIOHelper;
 
 import java.util.List;
 
+import io.realm.Realm;
+import io.realm.RealmList;
+
 
 public class MainActivity extends AppCompatActivity {
     @Override
@@ -26,11 +29,28 @@ public class MainActivity extends AppCompatActivity {
         RealmIOHelper.getInstance().Debug(getApplicationContext());
 
         List<SetList> setLists = RealmIOHelper.getInstance().getAllSetLists(getApplicationContext());
+        if(setLists.size() == 0){
+            SetList s = new SetList();
+            s.setTitle(getString(R.string.first_set_list_title));
+            RealmIOHelper.getInstance().insertSetList(getApplicationContext(), s);
+
+            //Set the first set list also in the local setlists list
+            s.setPrompts(new RealmList<PromptSettings>());
+            setLists.add(s);
+        }
+
         ListView setListsView = (ListView) findViewById(R.id.main_setlists);
         SetListAdapter setListAdapter = new SetListAdapter(getApplicationContext(), setLists, new SetListAdapterCallback() {
             @Override
             public void onPromptSelected(PromptSettings prompt, int position) {
                 Toast.makeText(getApplicationContext(), "SELECTED PROMPT " + prompt.toString(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCreatePromptClicked(String setList) {
+                Intent i = new Intent(getApplicationContext(), CreateActivity.class);
+                i.putExtra(getString(R.string.setListNameVariable), setList);
+                startActivity(i);
             }
         });
         setListsView.setAdapter(setListAdapter);
@@ -51,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        /*if (id == R.id.action_settings) {
             List<PromptSettings> prompts = RealmIOHelper.getInstance().getAllPromptSettings(getApplicationContext());
 
             Intent i = new Intent(this, PromptActivity.class);
@@ -62,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
             Intent i = new Intent(this, CreateActivity.class);
             startActivity(i);
             return true;
-        }
+        }*/
 
         return super.onOptionsItemSelected(item);
     }

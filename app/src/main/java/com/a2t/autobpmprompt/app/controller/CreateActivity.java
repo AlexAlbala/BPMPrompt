@@ -10,6 +10,7 @@ import android.widget.EditText;
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.media.PromptManager;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
+import com.joanzapata.pdfview.PDFView;
 
 import java.io.File;
 
@@ -22,7 +23,11 @@ public class CreateActivity extends AppCompatActivity implements PDFDialog.PDFDi
     EditText upper;
     EditText lower;
 
+    PDFView pdfPreview;
+
     File pdfFile;
+
+    String setList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +38,9 @@ public class CreateActivity extends AppCompatActivity implements PDFDialog.PDFDi
         bpm = (EditText)findViewById(R.id.create_bpm);
         upper = (EditText)findViewById(R.id.create_bar_upper);
         lower = (EditText)findViewById(R.id.create_bar_lower);
+        pdfPreview = (PDFView)findViewById(R.id.create_pdfpreview);
+
+        setList = getIntent().getStringExtra(getString(R.string.setListNameVariable));
     }
 
     public void loadPDFClick(View v){
@@ -51,6 +59,7 @@ public class CreateActivity extends AppCompatActivity implements PDFDialog.PDFDi
         promptSettings.setBpm(Integer.parseInt(bpm.getText().toString()));
         promptSettings.setCfg_bar_upper(Integer.parseInt(upper.getText().toString()));
         promptSettings.setCfg_bar_lower(Integer.parseInt(lower.getText().toString()));
+        promptSettings.setSetList(setList);
 
         PromptManager.create(getApplicationContext(), promptSettings);
 
@@ -61,6 +70,14 @@ public class CreateActivity extends AppCompatActivity implements PDFDialog.PDFDi
     public void onPDFSelected(DialogFragment dialog, String fullPath) {
         Log.i(TAG, "CLICK BACK " + fullPath);
         pdfFile = new File(fullPath);
+
+        pdfPreview.fromFile(pdfFile)
+                .defaultPage(0)
+                .pages(0)
+                .showMinimap(false)
+                .enableSwipe(false)
+                .load();
+
         dialog.dismiss();
     }
 

@@ -39,15 +39,23 @@ public class RealmIOHelper {
 
     public void insertPrompt(Context ctx, PromptSettings settings) {
         Realm r = getRealm(ctx);
-        r.beginTransaction();
-        PromptSettings prompt = r.createObject(PromptSettings.class);
-        prompt.setName(settings.getName());
-        prompt.setPdfFullPath(settings.getPdfFullPath());
-        prompt.setBpm(settings.getBpm());
-        prompt.setCfg_bar_lower(settings.getCfg_bar_lower());
-        prompt.setCfg_bar_upper(settings.getCfg_bar_upper());
-        prompt.setMarkers(settings.getMarkers());
-        r.commitTransaction();
+
+        if(settings.getSetList() != null){
+            insertPromptIntoSetList(ctx, settings, settings.getSetList());
+        } else {
+            Log.w(TAG, "¡¡ THIS MESSAGE SHOULD NEVER BE SHOWN !!!!!");
+
+            r.beginTransaction();
+            PromptSettings prompt = r.createObject(PromptSettings.class);
+            prompt.setName(settings.getName());
+            prompt.setPdfFullPath(settings.getPdfFullPath());
+            prompt.setBpm(settings.getBpm());
+            prompt.setCfg_bar_lower(settings.getCfg_bar_lower());
+            prompt.setCfg_bar_upper(settings.getCfg_bar_upper());
+            prompt.setMarkers(settings.getMarkers());
+            prompt.setSetList(settings.getSetList());
+            r.commitTransaction();
+        }
     }
 
     public void insertSetList(Context ctx, SetList setList) {
@@ -57,6 +65,16 @@ public class RealmIOHelper {
         s.setTitle(setList.getTitle());
         s.setPrompts(setList.getPrompts());
         r.commitTransaction();
+    }
+
+    public void insertPromptIntoSetList(Context ctx, PromptSettings prompt, String setList){
+        Realm r = getRealm(ctx);
+        r.beginTransaction();
+
+        SetList updatedSetList = r.where(SetList.class).equalTo("title", setList).findFirst();
+        updatedSetList.getPrompts().add(prompt);
+        r.commitTransaction();
+
     }
 
     public List<SetList> getAllSetLists(Context ctx) {

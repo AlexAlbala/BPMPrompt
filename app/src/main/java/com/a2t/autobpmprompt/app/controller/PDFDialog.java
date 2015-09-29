@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.Toast;
@@ -35,7 +36,7 @@ public class PDFDialog extends DialogFragment implements PDFSelectCallback {
         // Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout
         builder.setView(dialogView)
-                .setMessage("KEASE");
+                .setMessage(getString(R.string.select_pdf_title));
                 /*.setPositiveButton("KEASEok", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // FIRE ZE MISSILES!
@@ -53,7 +54,7 @@ public class PDFDialog extends DialogFragment implements PDFSelectCallback {
 
         List<File> pdfs = PDFFiles.findAllPDFs();
         GridView gridview = (GridView) dialogView.findViewById(R.id.dialog_gridpdf);
-        gridview.setAdapter(new PDFGridAdapter(getActivity(), pdfs, this));
+        gridview.setAdapter(new PDFGridAdapter(getActivity(), pdfs, false, this));
         return dialog;
     }
 
@@ -61,6 +62,11 @@ public class PDFDialog extends DialogFragment implements PDFSelectCallback {
     public void onPDFSelected(String fullPath, int position) {
         Toast.makeText(getActivity(), "Selected file " + fullPath, Toast.LENGTH_SHORT).show();
         mListener.onPDFSelected(PDFDialog.this, fullPath);
+    }
+
+    @Override
+    public void onCreatePDFClicked() {
+        //DO NOTHING
     }
 
     /* The activity that creates an instance of this dialog fragment must

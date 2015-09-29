@@ -39,7 +39,7 @@
 
         <!-- pdf preview -->
         <com.joanzapata.pdfview.PDFView
-            android:id="@+id/pdfview_preview"
+            android:id="@+id/create_pdfpreview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             />

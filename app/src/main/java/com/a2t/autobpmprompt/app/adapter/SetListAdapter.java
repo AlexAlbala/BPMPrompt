@@ -81,11 +81,16 @@ public class SetListAdapter extends BaseAdapter {
                 pdflist.add(new File(ps.getPdfFullPath()));
             }
 
-            PDFGridAdapter pdfAdapter = new PDFGridAdapter(mContext, pdflist, new PDFSelectCallback() {
+            PDFGridAdapter pdfAdapter = new PDFGridAdapter(mContext, pdflist, true, new PDFSelectCallback() {
                 @Override
                 public void onPDFSelected(String fullPath, int pos) {
                     Toast.makeText(mContext, "SETLISTADAPTER - FILE SELECTED " + fullPath, Toast.LENGTH_LONG).show();
                     mCallback.onPromptSelected(setList.getPrompts().get(pos), position);
+                }
+
+                @Override
+                public void onCreatePDFClicked() {
+                    mCallback.onCreatePromptClicked(setList.getTitle());
                 }
             });
 

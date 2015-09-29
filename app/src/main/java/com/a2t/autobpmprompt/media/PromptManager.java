@@ -34,14 +34,12 @@ public class PromptManager {
 
     public static boolean create(Context context, PromptSettings p) {
         RealmIOHelper r = RealmIOHelper.getInstance();
-        if (r.getPrompt(context, p.getName()) != null) {
-            Log.i(TAG, "Cannot create prompt " + p.getName() + ". Already exists");
-            return false;
-        } else {
+        //if (r.getPrompt(context, p.getName()) != null) {
+        //    Log.i(TAG, "Cannot create prompt " + p.getName() + ". Already exists");
+        //    return false;
+        //} else {
 
             Log.i(TAG, "Create prompt " + p.toString());
-
-            //TODO: Check if the file exists
             String fileName = p.getName();
             File f = new File(p.getPdfFullPath());
             String saved = null;
@@ -54,7 +52,7 @@ public class PromptManager {
                 e.printStackTrace();
                 return false;
             }
-        }
+        //}
 
         //TODO: Assert values !!!!
     }

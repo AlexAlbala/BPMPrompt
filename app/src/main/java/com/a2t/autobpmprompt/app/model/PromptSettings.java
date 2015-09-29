@@ -2,6 +2,7 @@ package com.a2t.autobpmprompt.app.model;
 
 import io.realm.RealmList;
 import io.realm.RealmObject;
+import io.realm.annotations.Ignore;
 import io.realm.annotations.PrimaryKey;
 
 
@@ -17,6 +18,19 @@ public class PromptSettings extends RealmObject {
 
     //STATE
     private int bpm;
+
+
+    //ONLY FOR INNER TRACKING... I'M NOT SURE OF THAT....
+    @Ignore
+    private String setList;
+
+    public String getSetList() {
+        return setList;
+    }
+
+    public void setSetList(String setList) {
+        this.setList = setList;
+    }
 
     //DATA
     private RealmList<Marker> markers;
