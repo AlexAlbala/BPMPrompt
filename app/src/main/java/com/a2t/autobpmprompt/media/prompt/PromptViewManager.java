@@ -3,6 +3,7 @@ package com.a2t.autobpmprompt.media.prompt;
 import android.app.Activity;
 import android.graphics.Canvas;
 import android.graphics.PixelFormat;
+import android.util.Log;
 import android.view.SurfaceView;
 import android.widget.Toast;
 
@@ -17,6 +18,7 @@ import java.util.List;
 
 
 public class PromptViewManager {
+    private static final String TAG = "PROMPTVIEWMANAGER";
     //Component View
     //https://github.com/JoanZapata/android-pdfview
 
@@ -43,7 +45,7 @@ public class PromptViewManager {
         this.LoadPDF(pdf, pdfview, floatingCanvas, activity);
     }
 
-    public static boolean LoadThumbnail(File pdfFile, PDFView pdfview){
+    public static boolean loadThumbnail(File pdfFile, PDFView pdfview) {
         pdfview.fromFile(pdfFile)
                 .defaultPage(0)
                 .pages(0)
@@ -91,16 +93,18 @@ public class PromptViewManager {
         return true;
     }
 
-    public void PrintMarkers(List<Marker> markers){
+    public void PrintMarkers(List<Marker> markers) {
 
     }
 
-    public void CenterAt(final int x, final int y) {
+    public void centerAt(final float x, final float y) {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 float _x = -1 * x * pdfview.getZoom();
                 float _y = -1 * y * pdfview.getZoom();
+
+                Log.i(TAG, "Going to move to " + x + ":" + y + " -> " + _x + ":" + _y);
 
                 pdfview.moveTo(_x, _y);
             }
@@ -142,13 +146,18 @@ public class PromptViewManager {
                 , Toast.LENGTH_LONG).show();
     }
 
-    public float getCurrentXOffset(){
+    public float getCurrentXOffset() {
         return pdfview.getCurrentXOffset();
     }
 
-    public float getCurrentYOffset(){
+    public float getCurrentYOffset() {
         return pdfview.getCurrentYOffset();
     }
+
+    public int getCurrentPage() {
+        return pdfview.getCurrentPage();
+    }
+
 
     public void ZoomIn() {
         activity.runOnUiThread(new Runnable() {
@@ -166,5 +175,22 @@ public class PromptViewManager {
                 pdfview.zoomTo(1 / 1.5F);
             }
         });
+    }
+
+    public void setCurrentPage(final int page) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                pdfview.jumpTo(page);
+            }
+        });
+    }
+
+    public void close() {
+        //pdfview.recycle();
+    }
+
+    public float getCurrentZoom() {
+        return pdfview.getZoom();
     }
 }

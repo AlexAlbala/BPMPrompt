@@ -3,6 +3,10 @@
     <!-- COMMON -->
     <string name="save_button">Save</string>
     <string name="cancel_button">Cancel</string>
+    <string name="edit_button">Edit</string>
+    <string name="delete_button">Delete</string>
+    <string name="done_button">Done</string>
+
 
 
     <!-- MENU -->
@@ -44,5 +48,10 @@
     <string name="isEditVariable">isEdit</string>
     <string name="promptNameVariable">promptName</string>
     <string name="setListNameVariable">setList</string>
+
+    <string name="xOffsetVariable">x</string>
+    <string name="yOffsetVariable">y</string>
+    <string name="pageVariable">page</string>
+
 
 </resources>

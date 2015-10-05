@@ -56,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
             setListsView = (ListView) findViewById(R.id.main_setlists);
         }
 
-        //TODO: Duplicated code :)
         SetListAdapter setListAdapter = new SetListAdapter(getApplicationContext(), setLists, new SetListAdapterCallback() {
             @Override
             public void onPromptSelected(String setList, PromptSettings prompt, int position) {
@@ -80,32 +79,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        //int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        /*if (id == R.id.action_settings) {
-            List<PromptSettings> prompts = RealmIOHelper.getInstance().getAllPromptSettings(getApplicationContext());
-
-            Intent i = new Intent(this, PromptActivity.class);
-            i.putExtra(getString(R.string.promptNameVariable), prompts.get(0).getName());
-            startActivity(i);
-            return true;
-        } else if (id == R.id.action_create) {
-            Intent i = new Intent(this, CreateActivity.class);
-            startActivity(i);
-            return true;
-        }*/
-
         return super.onOptionsItemSelected(item);
     }
 }

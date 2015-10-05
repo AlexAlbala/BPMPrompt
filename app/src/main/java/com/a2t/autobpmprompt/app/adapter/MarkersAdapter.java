@@ -1,17 +1,15 @@
 package com.a2t.autobpmprompt.app.adapter;
 
 import android.content.Context;
-import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.callback.MarkerAdapterCallback;
-import com.a2t.autobpmprompt.app.controller.MarkerDialog;
-import com.a2t.autobpmprompt.app.controller.PDFDialog;
 import com.a2t.autobpmprompt.app.model.Marker;
 
 import java.util.List;
@@ -23,7 +21,10 @@ public class MarkersAdapter extends BaseAdapter {
     private MarkerAdapterCallback mCallback;
 
     static class ViewHolderItem {
-
+        TextView markerTitle;
+        TextView markerNote;
+        TextView markerBar;
+        TextView markerBeat;
     }
 
     public MarkersAdapter(Context context, List<Marker> objects, boolean hasCreate, MarkerAdapterCallback callback) {
@@ -31,7 +32,6 @@ public class MarkersAdapter extends BaseAdapter {
         mItems = objects;
         mHasCreate = hasCreate;
         mCallback = callback;
-
     }
 
     @Override
@@ -75,6 +75,10 @@ public class MarkersAdapter extends BaseAdapter {
                 // well set up the ViewHolder
                 cellView = new ViewHolderItem();
 
+                cellView.markerTitle = (TextView)convertView.findViewById(R.id.marker_title);
+                cellView.markerNote = (TextView)convertView.findViewById(R.id.marker_note);
+                cellView.markerBar = (TextView)convertView.findViewById(R.id.marker_bar);
+                cellView.markerBeat = (TextView)convertView.findViewById(R.id.marker_beat);
 
                 // store the holder with the view.
                 convertView.setTag(cellView);
@@ -85,7 +89,10 @@ public class MarkersAdapter extends BaseAdapter {
             }
 
             if (marker != null) {
-
+                cellView.markerTitle.setText(marker.getTitle());
+                cellView.markerNote.setText(marker.getNote());
+                cellView.markerBar.setText(String.valueOf(marker.getBar()));
+                cellView.markerBeat.setText(String.valueOf(marker.getBeat()));
             }
         }
         return convertView;

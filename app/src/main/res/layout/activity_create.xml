@@ -32,30 +32,47 @@
         android:hint="@string/placeholder_bar_lower"
         android:inputType="number" />
 
-    <FrameLayout
-        android:layout_width="wrap_content"
-        android:layout_height="100dp"
-        android:layout_gravity="center_horizontal">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-        <!-- pdf preview -->
-        <com.joanzapata.pdfview.PDFView
-            android:id="@+id/create_pdfpreview"
-            android:layout_width="match_parent"
+
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            />
-    </FrameLayout>
+            android:orientation="vertical">
 
-    <Button
-        android:id="@+id/create_selectPdf"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/choose_pdf"
-        android:onClick="loadPDFClick"/>
+            <Button
+                android:id="@+id/create_selectPdf"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/choose_pdf"
+                android:onClick="loadPDFClick" />
 
-    <Button
-        android:id="@+id/create_submit"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/submit"
-        android:onClick="createPromptClick"/>
+            <Button
+                android:id="@+id/create_submit"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/submit"
+                android:onClick="createPromptClick" />
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:layout_gravity="center_horizontal">
+
+            <!-- pdf preview -->
+            <com.joanzapata.pdfview.PDFView
+                android:id="@+id/create_pdfpreview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </FrameLayout>
+
+
+    </LinearLayout>
+
+
 </LinearLayout>

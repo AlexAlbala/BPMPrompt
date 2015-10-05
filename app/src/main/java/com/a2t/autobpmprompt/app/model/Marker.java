@@ -44,19 +44,19 @@ public class Marker extends RealmObject {
         this.note = note;
     }
 
-    public int getOffsetX() {
+    public float getOffsetX() {
         return offsetX;
     }
 
-    public void setOffsetX(int offsetX) {
+    public void setOffsetX(float offsetX) {
         this.offsetX = offsetX;
     }
 
-    public int getOffsetY() {
+    public float getOffsetY() {
         return offsetY;
     }
 
-    public void setOffsetY(int offsetY) {
+    public void setOffsetY(float offsetY) {
         this.offsetY = offsetY;
     }
 
@@ -74,8 +74,8 @@ public class Marker extends RealmObject {
     private int beat;
     private String title;
     private String note;
-    private int offsetX;
-    private int offsetY;
+    private float offsetX;
+    private float offsetY;
     private int page;
 
     public Marker() {

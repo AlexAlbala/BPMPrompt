@@ -1,9 +1,9 @@
 package com.a2t.autobpmprompt.media;
 
 import android.app.Activity;
-import android.util.Log;
 import android.view.SurfaceView;
 
+import com.a2t.autobpmprompt.app.callback.PromptEventsCallback;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.media.prompt.PromptViewManager;
@@ -19,6 +19,8 @@ public class Prompt {
     //Manage the markers
     //Manage the tempo
 
+    private PromptEventsCallback mCallback;
+
     private final String TAG = "PROMPT";
 
     public PromptSettings settings;
@@ -33,19 +35,7 @@ public class Prompt {
     public int currentBar;
     public int currentBeat;
 
-    /*public Prompt(PDFView pdfView, String fullPath, Activity context){
-        File f = new File(fullPath);
-        currentBeat = 0;
-        currentBar = 1;
-        pdf = new PromptViewManager(f, pdfView, context);
-        settings = new PromptSettings();
-        settings.setPdfFullPath(fullPath);
-        bpmCounterTimer = new Timer();
-
-        pdf.CenterAt(settings.getOffset_x(), settings.getOffset_y());
-    }*/
-
-    public Prompt(PDFView pdfView, SurfaceView floatingCanvas, PromptSettings _settings, Activity context){
+    public Prompt(PDFView pdfView, SurfaceView floatingCanvas, PromptSettings _settings, Activity context, PromptEventsCallback callback){
         settings = _settings;
 
         File f = new File(settings.getPdfFullPath());
@@ -53,27 +43,33 @@ public class Prompt {
         currentBar = 1;
         pdf = new PromptViewManager(f, pdfView, floatingCanvas, context);
         bpmCounterTimer = new Timer();
-        pdf.CenterAt(settings.getOffset_x(), settings.getOffset_y());
-    }
 
-    public void onBeat(){
-        Marker m = MatchMarker();
-
-        if(m != null){
-            Log.i(TAG, "Marker " + m.getTitle());
-            pdf.CenterAt(m.getOffsetX(), m.getOffsetY());
+        if(settings.getOffset_x() != 0.0f || settings.getOffset_y() != 0.0f) {
+            pdf.centerAt(settings.getOffset_x(), settings.getOffset_y());
         }
 
-        Log.i(TAG, "Bar " + currentBar + " Beat " + currentBeat);
+        this.mCallback = callback;
+
+        mCallback.onBeat(1);
+        mCallback.onBar(1);
     }
 
-    public void onBar(){
-        Log.i(TAG, "NEW BAR");
+    public void updatePosition(){
+        Marker m = matchMarker();
+
+        if(m != null){
+            if(m.getPage() != pdf.getCurrentPage()){
+                pdf.setCurrentPage(m.getPage());
+            }
+
+            pdf.centerAt(m.getOffsetX(), m.getOffsetY());
+        }
     }
 
-    public Marker MatchMarker(){
+    public Marker matchMarker(){
         for(Marker m : settings.getMarkers()){
             if(m.getBar() == currentBar && m.getBeat() == currentBeat){
+                mCallback.onMarkerMatched(m);
                 return m;
             }
         }
@@ -81,7 +77,8 @@ public class Prompt {
         return null;
     }
 
-    public void Play(){
+    public void play(){
+        mCallback.onPlay();
         bpmCounterTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -89,27 +86,41 @@ public class Prompt {
                 if(currentBeat > settings.getCfg_bar_upper()){
                     currentBar++;
                     currentBeat = 1;
-                    onBar();
+                    mCallback.onBar(currentBar);
                 }
-                onBeat();
+                updatePosition();
+                mCallback.onBeat(currentBeat);
             }
         }, 0, 60000 / settings.getBpm());
-
-
     }
 
-    public void Pause(){
-        ResetTimer();
+    public void pause(){
+        resetTimer();
+        mCallback.onPause();
     }
 
-    public void Stop(){
-        ResetTimer();
+    public void stop() {
+        resetTimer();
         currentBeat = 0;
         currentBar = 1;
+
+        mCallback.onStop();
+        mCallback.onBeat(1);
+        mCallback.onBar(1);
     }
 
-    private void ResetTimer(){
+    private void resetTimer(){
         bpmCounterTimer.cancel();
         bpmCounterTimer = new Timer();
+    }
+
+    public void close() {
+        pdf.close();
+    }
+
+    public void prepareSave() {
+        this.settings.setOffset_y((int)pdf.getCurrentXOffset());
+        this.settings.setOffset_y((int)pdf.getCurrentYOffset());
+        this.settings.setZoom(pdf.getCurrentZoom());
     }
 }

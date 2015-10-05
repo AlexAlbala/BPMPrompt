@@ -33,20 +33,62 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <LinearLayout
+            <RelativeLayout
                 android:id="@+id/top_bar"
                 android:layout_width="fill_parent"
                 android:layout_height="@dimen/activity_prompt_top_bar"
                 android:background="@android:color/transparent"
-                android:cacheColorHint="#00000000"
-                android:orientation="horizontal">
-
-                <!--<Button
+                android:cacheColorHint="#00000000">
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="KE ASE aaaa" />-->
+                    android:orientation="horizontal"
+                    android:layout_alignParentStart="true">
+                    <TextView
+                        android:id="@+id/prompt_current_bpm"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                    <TextView
+                        android:id="@+id/prompt_current_bar"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                    <TextView
+                        android:id="@+id/prompt_current_beat"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
 
-            </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentEnd="true"
+                    android:orientation="horizontal"
+                    android:gravity="end">
+                    <Button
+                        android:id="@+id/prompt_edit_top_button"
+                        style="?metaButtonBarStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/edit_button"
+                        android:onClick="switchToEdit"/>
+                    <Button
+                        android:id="@+id/prompt_done_top_button"
+                        style="?metaButtonBarStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/done_button"
+                        android:onClick="promptSave"/>
+                    <Button
+                        android:id="@+id/prompt_delete_top_button"
+                        style="?metaButtonBarStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/delete_button"/>
+                </LinearLayout>
+
+
+
+            </RelativeLayout>
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -85,32 +127,25 @@
             tools:ignore="UselessParent">
 
             <Button
-                android:id="@+id/button_prompt_play"
+                android:id="@+id/prompt_button_right_play"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/play_button"
                 android:onClick="promptPlay"/>
 
             <Button
-                android:id="@+id/button_prompt_pause"
+                android:id="@+id/prompt_button_right_pause"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/pause_button"
                 android:onClick="promptPause"/>
 
             <Button
-                android:id="@+id/button_prompt_stop"
+                android:id="@+id/prompt_button_right_stop"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/stop_button"
                 android:onClick="promptStop"/>
-
-            <Button
-                android:id="@+id/button_prompt_save"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/save_button"
-                android:onClick="promptSave"/>
 
         </LinearLayout>
     </FrameLayout>

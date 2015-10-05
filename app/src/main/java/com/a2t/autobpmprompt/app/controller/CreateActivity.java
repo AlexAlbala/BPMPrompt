@@ -80,7 +80,7 @@ public class CreateActivity extends AppCompatActivity implements PDFDialog.PDFDi
         Log.i(TAG, "CLICK BACK " + fullPath);
         pdfFile = new File(fullPath);
 
-        PromptViewManager.LoadThumbnail(pdfFile, pdfPreview);
+        PromptViewManager.loadThumbnail(pdfFile, pdfPreview);
         dialog.dismiss();
     }
 

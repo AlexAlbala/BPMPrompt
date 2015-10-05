@@ -21,8 +21,9 @@ public class MarkerDialog extends DialogFragment {
     EditText note;
     EditText bar;
     EditText beat;
-    int mX;
-    int mY;
+    float mX;
+    float mY;
+    int mPage;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -35,8 +36,9 @@ public class MarkerDialog extends DialogFragment {
         View dialogView = inflater.inflate(R.layout.dialog_marker, null);
 
         Bundle b = getArguments();
-        mX = b.getInt("x");
-        mY = b.getInt("y");
+        mX = b.getFloat(getString(R.string.xOffsetVariable));
+        mY = b.getFloat(getString(R.string.yOffsetVariable));
+        mPage = b.getInt(getString(R.string.pageVariable));
 
         // Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout
@@ -49,7 +51,7 @@ public class MarkerDialog extends DialogFragment {
                         String mNote = note.getText().toString();
                         int mBar = Integer.parseInt(bar.getText().toString());
                         int mBeat = Integer.parseInt(beat.getText().toString());
-                        mListener.onMarkerCreated(MarkerDialog.this, mTitle, mNote, mBar, mBeat, mX, mY);
+                        mListener.onMarkerCreated(MarkerDialog.this, mTitle, mNote, mBar, mBeat, mPage, mX, mY);
                     }
                 })
                 .setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
@@ -64,17 +66,13 @@ public class MarkerDialog extends DialogFragment {
         bar = (EditText)dialogView.findViewById(R.id.marker_bar);
         beat = (EditText)dialogView.findViewById(R.id.marker_beat);
 
-        AlertDialog dialog = builder.create();
-        return dialog;
+        return builder.create();
     }
 
     public interface MarkerDialogListener {
-        void onMarkerCreated(DialogFragment dialog, String title, String note, int bar, int beat, int positionX, int positionY);
+        void onMarkerCreated(DialogFragment dialog, String title, String note, int bar, int beat, int page, float positionX, float positionY);
         void onCancel(DialogFragment dialog);
     }
-
-
-
 
     // Override the Fragment.onAttach() method to instantiate the PDFDialogResultListener
     @Override

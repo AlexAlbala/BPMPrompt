@@ -99,8 +99,7 @@ public class PDFGridAdapter extends BaseAdapter {
 
             if (f != null) {
                 cellView.fileNameItem.setText(f.getName());
-
-                PromptViewManager.LoadThumbnail(f, cellView.pdfView);
+                PromptViewManager.loadThumbnail(f, cellView.pdfView);
             }
         }
 

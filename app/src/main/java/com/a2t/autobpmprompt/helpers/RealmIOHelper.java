@@ -46,17 +46,6 @@ public class RealmIOHelper {
             Log.w(TAG, "¡¡ THIS MESSAGE SHOULD NEVER BE SHOWN !!!!!");
 
             throw new UnsupportedOperationException();
-
-            /*r.beginTransaction();
-            PromptSettings prompt = r.createObject(PromptSettings.class);
-            prompt.setName(settings.getName());
-            prompt.setPdfFullPath(settings.getPdfFullPath());
-            prompt.setBpm(settings.getBpm());
-            prompt.setCfg_bar_lower(settings.getCfg_bar_lower());
-            prompt.setCfg_bar_upper(settings.getCfg_bar_upper());
-            prompt.setMarkers(settings.getMarkers());
-            prompt.setSetList(settings.getSetList());
-            r.commitTransaction();*/
         }
     }
 
@@ -98,20 +87,32 @@ public class RealmIOHelper {
     public void updatePrompt(Context ctx, PromptSettings prompt){
         Realm r = getRealm(ctx);
         r.beginTransaction();
-
         PromptSettings updatedPrompt = r.where(PromptSettings.class).equalTo("name", prompt.getName()).findFirst();
-        updatedPrompt.setBpm(prompt.getBpm());
-        updatedPrompt.setCfg_bar_lower(prompt.getCfg_bar_lower());
-        updatedPrompt.setCfg_bar_upper(prompt.getCfg_bar_lower());
-        updatedPrompt.setPdfFullPath(prompt.getPdfFullPath());
-        updatedPrompt.setMarkers(prompt.getMarkers());
-
+        CopyPromptSettings(prompt, updatedPrompt);
         r.commitTransaction();
 
     }
 
+    private void CopyMarker(Marker from, Marker to){
+        to.setId(from.getId());
+        to.setOffsetX(from.getOffsetX());
+        to.setOffsetY(from.getOffsetY());
+        to.setTitle(from.getTitle());
+        to.setNote(from.getNote());
+        to.setBar(from.getBar());
+        to.setBeat(from.getBeat());
+        to.setPage(from.getPage());
+    }
+
     private void CopyPromptSettings(PromptSettings from, PromptSettings to){
-        to.setMarkers(from.getMarkers());
+        to.setMarkers(new RealmList<Marker>());
+        for(Marker m : from.getMarkers()){
+            Marker newMarker = new Marker();
+            CopyMarker(m, newMarker);
+            to.getMarkers().add(newMarker);
+        }
+
+        //to.setMarkers(from.getMarkers());
         to.setPdfFullPath(from.getPdfFullPath());
         to.setBpm(from.getBpm());
         to.setSetList(from.getSetList());
