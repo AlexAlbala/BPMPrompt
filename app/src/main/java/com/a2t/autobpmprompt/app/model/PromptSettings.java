@@ -16,6 +16,13 @@ public class PromptSettings extends RealmObject {
     private int cfg_bar_upper;
     private int cfg_bar_lower;
 
+    private int offset_x;
+    private int offset_y;
+
+
+
+    private float zoom;
+
     //STATE
     private int bpm;
 
@@ -81,6 +88,30 @@ public class PromptSettings extends RealmObject {
 
     public void setMarkers(RealmList<Marker> markers) {
         this.markers = markers;
+    }
+
+    public int getOffset_y() {
+        return offset_y;
+    }
+
+    public void setOffset_y(int offset_y) {
+        this.offset_y = offset_y;
+    }
+
+    public int getOffset_x() {
+        return offset_x;
+    }
+
+    public void setOffset_x(int offset_x) {
+        this.offset_x = offset_x;
+    }
+
+    public float getZoom() {
+        return zoom;
+    }
+
+    public void setZoom(float zoom) {
+        this.zoom = zoom;
     }
 
     public PromptSettings() {

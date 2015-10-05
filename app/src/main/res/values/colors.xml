@@ -2,4 +2,6 @@
 
     <color name="black_overlay">#66000000</color>
 
+    <color name="click_marker_color">#ffff0000</color>
+
 </resources>

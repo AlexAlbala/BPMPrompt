@@ -45,7 +45,9 @@ public class RealmIOHelper {
         } else {
             Log.w(TAG, "¡¡ THIS MESSAGE SHOULD NEVER BE SHOWN !!!!!");
 
-            r.beginTransaction();
+            throw new UnsupportedOperationException();
+
+            /*r.beginTransaction();
             PromptSettings prompt = r.createObject(PromptSettings.class);
             prompt.setName(settings.getName());
             prompt.setPdfFullPath(settings.getPdfFullPath());
@@ -54,7 +56,7 @@ public class RealmIOHelper {
             prompt.setCfg_bar_upper(settings.getCfg_bar_upper());
             prompt.setMarkers(settings.getMarkers());
             prompt.setSetList(settings.getSetList());
-            r.commitTransaction();
+            r.commitTransaction();*/
         }
     }
 
@@ -108,6 +110,19 @@ public class RealmIOHelper {
 
     }
 
+    private void CopyPromptSettings(PromptSettings from, PromptSettings to){
+        to.setMarkers(from.getMarkers());
+        to.setPdfFullPath(from.getPdfFullPath());
+        to.setBpm(from.getBpm());
+        to.setSetList(from.getSetList());
+        to.setCfg_bar_upper(from.getCfg_bar_upper());
+        to.setCfg_bar_lower(from.getCfg_bar_lower());
+        to.setName(from.getName());
+        to.setOffset_x(from.getOffset_x());
+        to.setOffset_y(from.getOffset_y());
+        to.setZoom(from.getZoom());
+    }
+
     public PromptSettings getPrompt(Context ctx, String name) {
         Realm r = getRealm(ctx);
 
@@ -118,7 +133,11 @@ public class RealmIOHelper {
         query.equalTo("name", name);
 
         // Execute the query:
-        return query.findFirst();
+        PromptSettings fromDb =  query.findFirst();
+
+        PromptSettings returned = new PromptSettings();
+        CopyPromptSettings(fromDb, returned);
+        return returned;
     }
 
     public void Debug(Context ctx){

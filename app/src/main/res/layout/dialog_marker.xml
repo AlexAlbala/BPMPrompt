@@ -1,0 +1,36 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    android:layout_marginTop="10dp"
+    >
+
+    <EditText
+        android:id="@+id/marker_title"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/placeholder_title"
+        />
+
+    <EditText
+        android:id="@+id/marker_note"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/placeholder_note"
+        />
+
+    <EditText
+        android:id="@+id/marker_bar"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/placeholder_bar"
+        android:inputType="number" />
+
+    <EditText
+        android:id="@+id/marker_beat"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/placeholder_beat"
+        android:inputType="number" />
+</LinearLayout>

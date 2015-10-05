@@ -1,4 +1,4 @@
-package com.a2t.autobpmprompt.media.pdf;
+package com.a2t.autobpmprompt.media.prompt;
 
 import android.os.Environment;
 import android.util.Log;

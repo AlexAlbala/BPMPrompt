@@ -1,5 +1,10 @@
 <resources>
 
+    <!-- COMMON -->
+    <string name="save_button">Save</string>
+    <string name="cancel_button">Cancel</string>
+
+
     <!-- MENU -->
     <string name="action_settings">Play demo</string>
     <string name="action_create">Create</string>
@@ -13,14 +18,24 @@
     <string name="submit">Create</string>
     <string name="select_pdf_title">Select PDF</string>
 
+    <!-- MARKER DIALOG -->
+    <string name="create_marker_title">Create Marker</string>
+    <string name="placeholder_bar">Bar</string>
+    <string name="placeholder_beat">Beat</string>
+    <string name="placeholder_note">Note</string>
+
     <!-- SET LISTS -->
     <string name="first_set_list_title">Set List 1</string>
+
+    <!-- PROMPT ACTIVITY -->
+    <string name="play_button">Play</string>
+    <string name="pause_button">Pause</string>
+    <string name="stop_button">Stop</string>
 
 
     <!-- ACTIVITY TITLES -->
     <string name="title_activity_prompt">PlayActivity</string>
 
-    <string name="dummy_button">aaaaa</string>
 
     <!-- GLOBAL APP -->
     <string name="app_name">Auto BPM Prompt</string>
@@ -28,6 +43,6 @@
     <!-- STATIC BUNDLE VALUES -->
     <string name="isEditVariable">isEdit</string>
     <string name="promptNameVariable">promptName</string>
-    <string name="setListNameVariable">promptName</string>
+    <string name="setListNameVariable">setList</string>
 
 </resources>

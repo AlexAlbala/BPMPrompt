@@ -6,14 +6,14 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.Toast;
 
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.adapter.PDFGridAdapter;
-import com.a2t.autobpmprompt.media.pdf.PDFFiles;
+import com.a2t.autobpmprompt.app.callback.PDFSelectCallback;
+import com.a2t.autobpmprompt.media.prompt.PDFFiles;
 
 import java.io.File;
 import java.util.List;

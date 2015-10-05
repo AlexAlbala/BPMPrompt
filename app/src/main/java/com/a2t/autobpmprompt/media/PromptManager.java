@@ -3,6 +3,7 @@ package com.a2t.autobpmprompt.media;
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
+import android.view.SurfaceView;
 
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.helpers.RealmIOHelper;
@@ -18,14 +19,14 @@ import java.util.List;
 public class PromptManager {
     private static final String TAG = "Prompt manager";
 
-    public static Prompt load(String name, PDFView pdf, Activity context) {
+    public static Prompt load(String name, PDFView pdf, SurfaceView floatingCanvas, Activity context) {
         Log.i(TAG, "Loading prompt " + name);
         PromptSettings settings = RealmIOHelper.getInstance().getPrompt(context, name);
 
-        Prompt p = new Prompt(pdf, settings.getPdfFullPath(), context);
-        p.settings = settings;
+        //Prompt p = new Prompt(pdf, settings.getPdfFullPath(), context);
+        //p.settings = settings;
 
-        return p;
+        return new Prompt(pdf, floatingCanvas, settings, context);
     }
 
     /*public static Prompt create(String name, PDFView pdf, Activity context) {

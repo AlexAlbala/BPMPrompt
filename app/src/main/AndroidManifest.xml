@@ -22,7 +22,8 @@
         <activity
             android:name=".app.controller.PromptActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/title_activity_prompt" />
+            android:label="@string/title_activity_prompt"
+            android:theme="@style/CompatNoTitle"/>
         <activity
             android:name=".app.controller.CreateActivity"
             android:theme="@style/AppTheme"

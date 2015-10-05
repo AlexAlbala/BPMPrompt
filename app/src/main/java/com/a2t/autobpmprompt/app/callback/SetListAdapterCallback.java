@@ -1,8 +1,8 @@
-package com.a2t.autobpmprompt.app.controller;
+package com.a2t.autobpmprompt.app.callback;
 
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 
 public interface SetListAdapterCallback {
-    void onPromptSelected(PromptSettings prompt, int position);
+    void onPromptSelected(String setList, PromptSettings prompt, int position);
     void onCreatePromptClicked(String setList);
 }

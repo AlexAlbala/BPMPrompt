@@ -2,10 +2,11 @@ package com.a2t.autobpmprompt.media;
 
 import android.app.Activity;
 import android.util.Log;
+import android.view.SurfaceView;
 
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
-import com.a2t.autobpmprompt.media.pdf.PDFManager;
+import com.a2t.autobpmprompt.media.prompt.PromptViewManager;
 import com.joanzapata.pdfview.PDFView;
 
 import java.io.File;
@@ -22,24 +23,37 @@ public class Prompt {
 
     public PromptSettings settings;
 
-    public PDFManager getPdf() {
+    public PromptViewManager getPdf() {
         return pdf;
     }
 
-    PDFManager pdf;
+    PromptViewManager pdf;
     Timer bpmCounterTimer;
 
     public int currentBar;
     public int currentBeat;
 
-    public Prompt(PDFView pdfView, String fullPath, Activity context){
+    /*public Prompt(PDFView pdfView, String fullPath, Activity context){
         File f = new File(fullPath);
         currentBeat = 0;
         currentBar = 1;
-        pdf = new PDFManager(f, pdfView, context);
+        pdf = new PromptViewManager(f, pdfView, context);
         settings = new PromptSettings();
         settings.setPdfFullPath(fullPath);
         bpmCounterTimer = new Timer();
+
+        pdf.CenterAt(settings.getOffset_x(), settings.getOffset_y());
+    }*/
+
+    public Prompt(PDFView pdfView, SurfaceView floatingCanvas, PromptSettings _settings, Activity context){
+        settings = _settings;
+
+        File f = new File(settings.getPdfFullPath());
+        currentBeat = 0;
+        currentBar = 1;
+        pdf = new PromptViewManager(f, pdfView, floatingCanvas, context);
+        bpmCounterTimer = new Timer();
+        pdf.CenterAt(settings.getOffset_x(), settings.getOffset_y());
     }
 
     public void onBeat(){
@@ -85,13 +99,17 @@ public class Prompt {
     }
 
     public void Pause(){
-
+        ResetTimer();
     }
 
     public void Stop(){
-        bpmCounterTimer.cancel();
+        ResetTimer();
         currentBeat = 0;
         currentBar = 1;
+    }
 
+    private void ResetTimer(){
+        bpmCounterTimer.cancel();
+        bpmCounterTimer = new Timer();
     }
 }

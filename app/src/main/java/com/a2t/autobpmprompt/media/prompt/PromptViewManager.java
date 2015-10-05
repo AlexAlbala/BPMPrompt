@@ -1,32 +1,33 @@
-package com.a2t.autobpmprompt.media.pdf;
+package com.a2t.autobpmprompt.media.prompt;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.PointF;
+import android.graphics.PixelFormat;
+import android.view.SurfaceView;
 import android.widget.Toast;
 
+import com.a2t.autobpmprompt.app.model.Marker;
 import com.joanzapata.pdfview.PDFView;
 import com.joanzapata.pdfview.listener.OnDrawListener;
 import com.joanzapata.pdfview.listener.OnLoadCompleteListener;
 import com.joanzapata.pdfview.listener.OnPageChangeListener;
 
 import java.io.File;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.List;
 
 
-public class PDFManager {
+public class PromptViewManager {
     //Component View
     //https://github.com/JoanZapata/android-pdfview
 
     //Native:
     //https://code.google.com/p/apv/
 
-    private final float DEFAULT_ZOOM = 1.5F;
+    private final float DEFAULT_ZOOM = 1.0F;
     private String pdf;
     private PDFView pdfview;
     private Activity activity;
+    private SurfaceView floatingCanvas;
 
     public File getPdfFile() {
         return pdfFile;
@@ -34,15 +35,26 @@ public class PDFManager {
 
     private File pdfFile;
 
-    public PDFManager() {
+    private PromptViewManager() {
 
     }
 
-    public PDFManager(File pdf, PDFView pdfview, Activity activity) {
-        this.LoadPDF(pdf, pdfview, activity);
+    public PromptViewManager(File pdf, PDFView pdfview, SurfaceView floatingCanvas, Activity activity) {
+        this.LoadPDF(pdf, pdfview, floatingCanvas, activity);
     }
 
-    public boolean LoadPDF(File pdfFile, final PDFView pdfview, Activity mActivity) {
+    public static boolean LoadThumbnail(File pdfFile, PDFView pdfview){
+        pdfview.fromFile(pdfFile)
+                .defaultPage(0)
+                .pages(0)
+                .showMinimap(false)
+                .enableSwipe(false)
+                .load();
+
+        return true;
+    }
+
+    public boolean LoadPDF(File pdfFile, final PDFView pdfview, SurfaceView floatingCanvas, Activity mActivity) {
         pdfview.fromFile(pdfFile)
                 .defaultPage(1)
                 .showMinimap(false)
@@ -56,23 +68,31 @@ public class PDFManager {
                 .onLoad(new OnLoadCompleteListener() {
                     @Override
                     public void loadComplete(int i) {
-                        System.out.println("ONLOAD");
+                        //System.out.println("ONLOAD");
                         pdfview.zoomTo(DEFAULT_ZOOM);
                     }
                 })
                 .onPageChange(new OnPageChangeListener() {
                     @Override
                     public void onPageChanged(int i, int i1) {
-                        System.out.println("ONPAGECHANGE" + i + " - " + i1);
+                        //System.out.println("ONPAGECHANGE" + i + " - " + i1);
                     }
                 }).swipeVertical(true)
                 .load();
+
+        floatingCanvas.setZOrderOnTop(true);
+        floatingCanvas.getHolder().setFormat(PixelFormat.TRANSPARENT);
 
         this.pdfview = pdfview;
         this.activity = mActivity;
         this.pdf = pdfFile.getName();
         this.pdfFile = pdfFile;
+        this.floatingCanvas = floatingCanvas;
         return true;
+    }
+
+    public void PrintMarkers(List<Marker> markers){
+
     }
 
     public void CenterAt(final int x, final int y) {
@@ -110,7 +130,6 @@ public class PDFManager {
                 pdfview.moveTo(0f, y);
             }
         });
-
     }
 
     public void Debug() {
@@ -121,6 +140,14 @@ public class PDFManager {
                 "\nABSX: " + pdfview.getCurrentXOffset() / pdfview.getZoom() +
                 "\nABSY: " + pdfview.getCurrentYOffset() / pdfview.getZoom()
                 , Toast.LENGTH_LONG).show();
+    }
+
+    public float getCurrentXOffset(){
+        return pdfview.getCurrentXOffset();
+    }
+
+    public float getCurrentYOffset(){
+        return pdfview.getCurrentYOffset();
     }
 
     public void ZoomIn() {

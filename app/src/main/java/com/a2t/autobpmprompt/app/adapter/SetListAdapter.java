@@ -4,15 +4,13 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.a2t.autobpmprompt.R;
-import com.a2t.autobpmprompt.app.controller.PDFSelectCallback;
-import com.a2t.autobpmprompt.app.controller.SetListAdapterCallback;
+import com.a2t.autobpmprompt.app.callback.PDFSelectCallback;
+import com.a2t.autobpmprompt.app.callback.SetListAdapterCallback;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.app.model.SetList;
 
@@ -84,8 +82,8 @@ public class SetListAdapter extends BaseAdapter {
             PDFGridAdapter pdfAdapter = new PDFGridAdapter(mContext, pdflist, true, new PDFSelectCallback() {
                 @Override
                 public void onPDFSelected(String fullPath, int pos) {
-                    Toast.makeText(mContext, "SETLISTADAPTER - FILE SELECTED " + fullPath, Toast.LENGTH_LONG).show();
-                    mCallback.onPromptSelected(setList.getPrompts().get(pos), position);
+                    //Toast.makeText(mContext, "SETLISTADAPTER - FILE SELECTED " + fullPath, Toast.LENGTH_LONG).show();
+                    mCallback.onPromptSelected(setList.getTitle(), setList.getPrompts().get(pos), position);
                 }
 
                 @Override

@@ -1,10 +1,7 @@
 package com.a2t.autobpmprompt.app.adapter;
 
 import android.content.Context;
-import android.graphics.Canvas;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -13,7 +10,8 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.a2t.autobpmprompt.R;
-import com.a2t.autobpmprompt.app.controller.PDFSelectCallback;
+import com.a2t.autobpmprompt.app.callback.PDFSelectCallback;
+import com.a2t.autobpmprompt.media.prompt.PromptViewManager;
 import com.joanzapata.pdfview.PDFView;
 
 import java.io.File;
@@ -101,12 +99,8 @@ public class PDFGridAdapter extends BaseAdapter {
 
             if (f != null) {
                 cellView.fileNameItem.setText(f.getName());
-                cellView.pdfView.fromFile(f)
-                        .defaultPage(0)
-                        .pages(0)
-                        .showMinimap(false)
-                        .enableSwipe(false)
-                        .load();
+
+                PromptViewManager.LoadThumbnail(f, cellView.pdfView);
             }
         }
 

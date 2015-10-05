@@ -1,5 +1,6 @@
 package com.a2t.autobpmprompt.app.controller;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
@@ -10,6 +11,7 @@ import android.widget.EditText;
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.media.PromptManager;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
+import com.a2t.autobpmprompt.media.prompt.PromptViewManager;
 import com.joanzapata.pdfview.PDFView;
 
 import java.io.File;
@@ -63,7 +65,14 @@ public class CreateActivity extends AppCompatActivity implements PDFDialog.PDFDi
 
         PromptManager.create(getApplicationContext(), promptSettings);
 
-        //TODO: Launch PromptActivity in Edit mode
+        //LAUNCH PROMPT EDIT ACTIVITY
+        Intent i = new Intent(getApplicationContext(), PromptActivity.class);
+        i.putExtra(getString(R.string.promptNameVariable), promptSettings.getName());
+        i.putExtra(getString(R.string.setListNameVariable), setList);
+        i.putExtra(getString(R.string.isEditVariable), true);
+
+        //TODO: Start activity for result ? PRevent to appear this activity when back button pressed :)
+        startActivity(i);
     }
 
     @Override
@@ -71,13 +80,7 @@ public class CreateActivity extends AppCompatActivity implements PDFDialog.PDFDi
         Log.i(TAG, "CLICK BACK " + fullPath);
         pdfFile = new File(fullPath);
 
-        pdfPreview.fromFile(pdfFile)
-                .defaultPage(0)
-                .pages(0)
-                .showMinimap(false)
-                .enableSwipe(false)
-                .load();
-
+        PromptViewManager.LoadThumbnail(pdfFile, pdfPreview);
         dialog.dismiss();
     }
 

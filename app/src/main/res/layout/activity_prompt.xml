@@ -15,11 +15,12 @@
 
 
         <LinearLayout
-            android:layout_width="100dp"
+            android:layout_marginTop="@dimen/activity_prompt_top_bar"
+            android:layout_width="@dimen/activity_prompt_markers_bar"
             android:layout_height="match_parent">
 
             <ListView
-                android:id="@+id/left_bar"
+                android:id="@+id/prompt_markers"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
                 android:background="@android:color/transparent"
@@ -35,22 +36,33 @@
             <LinearLayout
                 android:id="@+id/top_bar"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/activity_prompt_top_bar"
                 android:background="@android:color/transparent"
                 android:cacheColorHint="#00000000"
                 android:orientation="horizontal">
 
-                <Button
+                <!--<Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="KE ASE aaaa" />
+                    android:text="KE ASE aaaa" />-->
 
             </LinearLayout>
 
-            <com.joanzapata.pdfview.PDFView
-                android:id="@+id/pdfview"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent">
+                <com.joanzapata.pdfview.PDFView
+                    android:id="@+id/pdfview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+
+                <SurfaceView
+                    android:id="@+id/prompt_floating_canvas"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"/>
+            </FrameLayout>
+
+
         </LinearLayout>
     </LinearLayout>
 
@@ -59,8 +71,9 @@
     <FrameLayout
         android:id="@+id/frame_content_controls"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="end|center_vertical">
+        android:layout_height="fill_parent"
+        android:layout_gravity="end"
+        android:layout_marginTop="@dimen/activity_prompt_top_bar">
 
         <LinearLayout
             android:id="@+id/fullscreen_content_controls"
@@ -72,25 +85,33 @@
             tools:ignore="UselessParent">
 
             <Button
-                android:id="@+id/dummy_button"
-                android:layout_width="wrap_content"
+                android:id="@+id/button_prompt_play"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/dummy_button" />
+                android:text="@string/play_button"
+                android:onClick="promptPlay"/>
 
             <Button
-                android:id="@+id/dummy_button2"
-                android:layout_width="wrap_content"
+                android:id="@+id/button_prompt_pause"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/dummy_button" />
+                android:text="@string/pause_button"
+                android:onClick="promptPause"/>
 
             <Button
-                android:id="@+id/dummy_button3"
-                android:layout_width="wrap_content"
+                android:id="@+id/button_prompt_stop"
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/dummy_button" />
+                android:text="@string/stop_button"
+                android:onClick="promptStop"/>
+
+            <Button
+                android:id="@+id/button_prompt_save"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/save_button"
+                android:onClick="promptSave"/>
+
         </LinearLayout>
-
-
     </FrameLayout>
-
 </FrameLayout>
