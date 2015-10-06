@@ -13,11 +13,11 @@ public class PromptSettings extends RealmObject {
     private String pdfFullPath;
 
     //CONFIG
-    private int cfg_bar_upper;
-    private int cfg_bar_lower;
+    private int cfgBarUpper;
+    private int cfgBarLower;
 
-    private int offset_x;
-    private int offset_y;
+    private float offsetX;
+    private float offsetY;
 
 
 
@@ -58,20 +58,20 @@ public class PromptSettings extends RealmObject {
         this.pdfFullPath = pdfFullPath;
     }
 
-    public int getCfg_bar_upper() {
-        return cfg_bar_upper;
+    public int getCfgBarUpper() {
+        return cfgBarUpper;
     }
 
-    public void setCfg_bar_upper(int cfg_bar_upper) {
-        this.cfg_bar_upper = cfg_bar_upper;
+    public void setCfgBarUpper(int cfgBarUpper) {
+        this.cfgBarUpper = cfgBarUpper;
     }
 
-    public int getCfg_bar_lower() {
-        return cfg_bar_lower;
+    public int getCfgBarLower() {
+        return cfgBarLower;
     }
 
-    public void setCfg_bar_lower(int cfg_bar_lower) {
-        this.cfg_bar_lower = cfg_bar_lower;
+    public void setCfgBarLower(int cfgBarLower) {
+        this.cfgBarLower = cfgBarLower;
     }
 
     public int getBpm() {
@@ -90,20 +90,20 @@ public class PromptSettings extends RealmObject {
         this.markers = markers;
     }
 
-    public int getOffset_y() {
-        return offset_y;
+    public float getOffsetY() {
+        return offsetY;
     }
 
-    public void setOffset_y(int offset_y) {
-        this.offset_y = offset_y;
+    public void setOffsetY(float offsetY) {
+        this.offsetY = offsetY;
     }
 
-    public int getOffset_x() {
-        return offset_x;
+    public float getOffsetX() {
+        return offsetX;
     }
 
-    public void setOffset_x(int offset_x) {
-        this.offset_x = offset_x;
+    public void setOffsetX(float offsetX) {
+        this.offsetX = offsetX;
     }
 
     public float getZoom() {

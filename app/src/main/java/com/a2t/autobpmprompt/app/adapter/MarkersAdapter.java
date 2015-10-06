@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.a2t.autobpmprompt.R;
@@ -17,7 +19,7 @@ import java.util.List;
 public class MarkersAdapter extends BaseAdapter {
     private Context mContext;
     private List<Marker> mItems;
-    private boolean mHasCreate;
+    private boolean mIsEdit;
     private MarkerAdapterCallback mCallback;
 
     static class ViewHolderItem {
@@ -25,18 +27,19 @@ public class MarkersAdapter extends BaseAdapter {
         TextView markerNote;
         TextView markerBar;
         TextView markerBeat;
+        ImageButton markerDelete;
     }
 
-    public MarkersAdapter(Context context, List<Marker> objects, boolean hasCreate, MarkerAdapterCallback callback) {
+    public MarkersAdapter(Context context, List<Marker> objects, boolean isEdit, MarkerAdapterCallback callback) {
         mContext = context;
         mItems = objects;
-        mHasCreate = hasCreate;
+        mIsEdit = isEdit;
         mCallback = callback;
     }
 
     @Override
     public int getCount() {
-        return mHasCreate ? mItems.size() + 1 : mItems.size();
+        return mIsEdit ? mItems.size() + 1 : mItems.size();
     }
 
     @Override
@@ -53,7 +56,7 @@ public class MarkersAdapter extends BaseAdapter {
     public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolderItem cellView;
 
-        if (mHasCreate && position == mItems.size()) {
+        if (mIsEdit && position == mItems.size()) {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.row_emptymarker, parent, false);
             Button b = (Button) convertView.findViewById(R.id.marker_create_button);
@@ -79,6 +82,7 @@ public class MarkersAdapter extends BaseAdapter {
                 cellView.markerNote = (TextView)convertView.findViewById(R.id.marker_note);
                 cellView.markerBar = (TextView)convertView.findViewById(R.id.marker_bar);
                 cellView.markerBeat = (TextView)convertView.findViewById(R.id.marker_beat);
+                cellView.markerDelete = (ImageButton)convertView.findViewById(R.id.marker_delete);
 
                 // store the holder with the view.
                 convertView.setTag(cellView);
@@ -93,6 +97,21 @@ public class MarkersAdapter extends BaseAdapter {
                 cellView.markerNote.setText(marker.getNote());
                 cellView.markerBar.setText(String.valueOf(marker.getBar()));
                 cellView.markerBeat.setText(String.valueOf(marker.getBeat()));
+
+                if(mIsEdit){
+                    cellView.markerDelete.setVisibility(View.VISIBLE);
+                    cellView.markerDelete.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            mCallback.onMarkerRemoved(marker);
+                            mItems.remove(position);
+                            notifyDataSetChanged();
+                        }
+                    });
+                } else{
+                    cellView.markerDelete.setVisibility(View.GONE);
+                }
+
             }
         }
         return convertView;

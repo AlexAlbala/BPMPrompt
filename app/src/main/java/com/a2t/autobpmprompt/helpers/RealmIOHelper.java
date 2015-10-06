@@ -116,11 +116,11 @@ public class RealmIOHelper {
         to.setPdfFullPath(from.getPdfFullPath());
         to.setBpm(from.getBpm());
         to.setSetList(from.getSetList());
-        to.setCfg_bar_upper(from.getCfg_bar_upper());
-        to.setCfg_bar_lower(from.getCfg_bar_lower());
+        to.setCfgBarUpper(from.getCfgBarUpper());
+        to.setCfgBarLower(from.getCfgBarLower());
         to.setName(from.getName());
-        to.setOffset_x(from.getOffset_x());
-        to.setOffset_y(from.getOffset_y());
+        to.setOffsetX(from.getOffsetX());
+        to.setOffsetY(from.getOffsetY());
         to.setZoom(from.getZoom());
     }
 

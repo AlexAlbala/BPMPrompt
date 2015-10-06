@@ -44,8 +44,8 @@ public class Prompt {
         pdf = new PromptViewManager(f, pdfView, floatingCanvas, context);
         bpmCounterTimer = new Timer();
 
-        if(settings.getOffset_x() != 0.0f || settings.getOffset_y() != 0.0f) {
-            pdf.centerAt(settings.getOffset_x(), settings.getOffset_y());
+        if(settings.getOffsetX() != 0.0f || settings.getOffsetY() != 0.0f) {
+            pdf.moveTo(settings.getOffsetX(), settings.getOffsetY());
         }
 
         this.mCallback = callback;
@@ -83,7 +83,7 @@ public class Prompt {
             @Override
             public void run() {
                 currentBeat++;
-                if(currentBeat > settings.getCfg_bar_upper()){
+                if(currentBeat > settings.getCfgBarUpper()){
                     currentBar++;
                     currentBeat = 1;
                     mCallback.onBar(currentBar);
@@ -119,8 +119,8 @@ public class Prompt {
     }
 
     public void prepareSave() {
-        this.settings.setOffset_y((int)pdf.getCurrentXOffset());
-        this.settings.setOffset_y((int)pdf.getCurrentYOffset());
+        this.settings.setOffsetY((int) pdf.getCurrentXOffset());
+        this.settings.setOffsetY((int) pdf.getCurrentYOffset());
         this.settings.setZoom(pdf.getCurrentZoom());
     }
 }

@@ -107,7 +107,7 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
 
         @Override
         public void onMarkerMatched(Marker match) {
-            Log.i(TAG, match.toString());
+            Log.i(TAG, "MARKER: " + match.getTitle());
         }
     };
 
@@ -197,6 +197,11 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
 
                 newFragment.setArguments(args);
                 newFragment.show(PromptActivity.this.getSupportFragmentManager(), "markercreate");
+            }
+
+            @Override
+            public void onMarkerRemoved(Marker m) {
+                //TODO: Prune database --> Remove markers without prompt parent !!
             }
         });
         markers.setAdapter(m);

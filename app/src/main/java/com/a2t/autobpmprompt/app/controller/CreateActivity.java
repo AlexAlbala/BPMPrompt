@@ -59,8 +59,8 @@ public class CreateActivity extends AppCompatActivity implements PDFDialog.PDFDi
         promptSettings.setName(name.getText().toString());
         promptSettings.setPdfFullPath(pdfFile.getAbsolutePath());
         promptSettings.setBpm(Integer.parseInt(bpm.getText().toString()));
-        promptSettings.setCfg_bar_upper(Integer.parseInt(upper.getText().toString()));
-        promptSettings.setCfg_bar_lower(Integer.parseInt(lower.getText().toString()));
+        promptSettings.setCfgBarUpper(Integer.parseInt(upper.getText().toString()));
+        promptSettings.setCfgBarLower(Integer.parseInt(lower.getText().toString()));
         promptSettings.setSetList(setList);
 
         PromptManager.create(getApplicationContext(), promptSettings);

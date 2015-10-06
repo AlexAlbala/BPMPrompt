@@ -42,7 +42,7 @@ public class PromptViewManager {
     }
 
     public PromptViewManager(File pdf, PDFView pdfview, SurfaceView floatingCanvas, Activity activity) {
-        this.LoadPDF(pdf, pdfview, floatingCanvas, activity);
+        this.loadPDF(pdf, pdfview, floatingCanvas, activity);
     }
 
     public static boolean loadThumbnail(File pdfFile, PDFView pdfview) {
@@ -56,7 +56,7 @@ public class PromptViewManager {
         return true;
     }
 
-    public boolean LoadPDF(File pdfFile, final PDFView pdfview, SurfaceView floatingCanvas, Activity mActivity) {
+    public boolean loadPDF(File pdfFile, final PDFView pdfview, SurfaceView floatingCanvas, Activity mActivity) {
         pdfview.fromFile(pdfFile)
                 .defaultPage(1)
                 .showMinimap(false)
@@ -93,11 +93,16 @@ public class PromptViewManager {
         return true;
     }
 
-    public void PrintMarkers(List<Marker> markers) {
+    public void printMarkers(List<Marker> markers) {
 
     }
 
     public void centerAt(final float x, final float y) {
+        Log.i(TAG, "Center at " + x + ":" + y);
+        moveTo(x - pdfview.getWidth() * pdfview.getZoom() / 2, y - pdfview.getHeight() * pdfview.getZoom() / 2);
+    }
+
+    public void moveTo(final float x, final float y) {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -105,17 +110,16 @@ public class PromptViewManager {
                 float _y = -1 * y * pdfview.getZoom();
 
                 Log.i(TAG, "Going to move to " + x + ":" + y + " -> " + _x + ":" + _y);
-
                 pdfview.moveTo(_x, _y);
             }
         });
     }
 
-    public void AdvanceStep() {
-        AdvanceStep(50);
+    public void advanceStep() {
+        advanceStep(50);
     }
 
-    public void AdvanceStep(final int step) {
+    public void advanceStep(final int step) {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -126,7 +130,7 @@ public class PromptViewManager {
 
     }
 
-    public void AdvanceTo(final int pos) {
+    public void advanceTo(final int pos) {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -136,7 +140,7 @@ public class PromptViewManager {
         });
     }
 
-    public void Debug() {
+    public void debug() {
         Toast.makeText(activity.getApplicationContext(), "PAGE: " + pdfview.getCurrentPage() +
                 "\nZOOM: " + pdfview.getZoom() +
                 "\nOFFSETX: " + pdfview.getCurrentXOffset() +
@@ -159,7 +163,7 @@ public class PromptViewManager {
     }
 
 
-    public void ZoomIn() {
+    public void zoomIn() {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -168,7 +172,7 @@ public class PromptViewManager {
         });
     }
 
-    public void ZoomOut() {
+    public void zoomOut() {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -193,4 +197,6 @@ public class PromptViewManager {
     public float getCurrentZoom() {
         return pdfview.getZoom();
     }
+
+
 }
