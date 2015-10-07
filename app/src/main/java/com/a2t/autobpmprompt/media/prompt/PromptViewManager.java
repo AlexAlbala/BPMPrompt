@@ -45,16 +45,76 @@ public class PromptViewManager {
         this.loadPDF(pdf, pdfview, floatingCanvas, activity);
     }
 
+//    /**
+//     * Hack because of a bug in PDFview; It crashes when you load a second PDF
+//     */
+//    public static void reinitPdfView(Context ctx, PDFView view) {
+//        ViewGroup group = (ViewGroup) view.getParent();
+//        int index = group.indexOfChild(view);
+//        group.removeView(view);
+//        view = new PDFView(ctx, null);
+//        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+//        group.addView(view, index);
+//    }
+
     public static boolean loadThumbnail(File pdfFile, PDFView pdfview) {
-        pdfview.fromFile(pdfFile)
-                .defaultPage(0)
-                .pages(0)
-                .showMinimap(false)
-                .enableSwipe(false)
-                .load();
+            pdfview.fromFile(pdfFile)
+                    .defaultPage(0)
+                    .pages(0)
+                    .showMinimap(false)
+                    .enableSwipe(false)
+                    .load();
 
         return true;
     }
+
+//    @Nullable
+//    public static Bitmap renderToBitmap(Context context, File pdfFile) {
+//        Bitmap bi = null;
+//        InputStream inStream = null;
+//
+//        try {
+//            inStream = new FileInputStream(pdfFile);
+//
+//            Log.d(TAG, "Attempting to copy this file: " + pdfFile.getAbsolutePath());
+//            bi = renderToBitmap(context, inStream);
+//        } catch (java.io.FileNotFoundException e) {
+//            e.printStackTrace();
+//        } finally {
+//            try {
+//                inStream.close();
+//            } catch (IOException e) {
+//                // do nothing because the stream has already been closed
+//            }
+//        }
+//        return bi;
+//    }
+//
+//
+//    @Nullable
+//    public static Bitmap renderToBitmap(Context context, InputStream inStream) {
+//        Bitmap bi = null;
+//        try {
+//            byte[] decode = IOUtils.toByteArray(inStream);
+//
+//            ByteBuffer buf = ByteBuffer.wrap(decode);
+//            PDFPage mPdfPage = new PDFFile(buf).getPage(0);
+//            float width = mPdfPage.getWidth();
+//            float height = mPdfPage.getHeight();
+//            RectF clip = null;
+//            bi = mPdfPage.getImage((int) (width), (int) (height), clip, true,
+//                    true);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        } finally {
+//            try {
+//                inStream.close();
+//            } catch (IOException e) {
+//                // do nothing because the stream has already been closed
+//            }
+//        }
+//        return bi;
+//    }
 
     public boolean loadPDF(File pdfFile, final PDFView pdfview, SurfaceView floatingCanvas, Activity mActivity) {
         pdfview.fromFile(pdfFile)
@@ -103,16 +163,20 @@ public class PromptViewManager {
     }
 
     public void moveTo(final float x, final float y) {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                float _x = -1 * x * pdfview.getZoom();
-                float _y = -1 * y * pdfview.getZoom();
+        if(x >= 0 && y >= 0) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    float _x = -1 * x * pdfview.getZoom();
+                    float _y = -1 * y * pdfview.getZoom();
 
-                Log.i(TAG, "Going to move to " + x + ":" + y + " -> " + _x + ":" + _y);
-                pdfview.moveTo(_x, _y);
-            }
-        });
+                    Log.i(TAG, "Going to move to " + x + ":" + y + " -> " + _x + ":" + _y);
+                    pdfview.moveTo(_x, _y);
+                }
+            });
+        } else{
+            Log.i(TAG, "Discard movement to " + x + ":" + y);
+        }
     }
 
     public void advanceStep() {
@@ -161,7 +225,6 @@ public class PromptViewManager {
     public int getCurrentPage() {
         return pdfview.getCurrentPage();
     }
-
 
     public void zoomIn() {
         activity.runOnUiThread(new Runnable() {

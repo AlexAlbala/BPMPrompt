@@ -12,4 +12,8 @@
     <dimen name="click_square_size">10dp</dimen>
     <dimen name="click_verticalline_size">15dp</dimen>
 
+    <!-- PDF THUMBNAILS -->
+    <dimen name="pdf_thumb_height">150dp</dimen>
+    <dimen name="pdf_thumb_width">100dp</dimen>
+
 </resources>

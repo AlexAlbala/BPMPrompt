@@ -3,5 +3,8 @@
     <color name="black_overlay">#66000000</color>
 
     <color name="click_marker_color">#ffff0000</color>
+    <color name="highlight_marker_color_bg">#ff000000</color>
+    <color name="highlight_marker_color_fg">#ffffffff</color>
+
 
 </resources>

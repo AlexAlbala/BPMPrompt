@@ -44,10 +44,11 @@
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:layout_alignParentStart="true">
-                    <TextView
+                    <EditText
                         android:id="@+id/prompt_current_bpm"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:inputType="number"/>
                     <TextView
                         android:id="@+id/prompt_current_bar"
                         android:layout_width="wrap_content"
@@ -79,11 +80,12 @@
                         android:text="@string/done_button"
                         android:onClick="promptSave"/>
                     <Button
-                        android:id="@+id/prompt_delete_top_button"
+                        android:id="@+id/prompt_cancel_top_button"
                         style="?metaButtonBarStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/delete_button"/>
+                        android:text="@string/cancel_button"
+                        android:onClick="cancelEdit"/>
                 </LinearLayout>
 
 

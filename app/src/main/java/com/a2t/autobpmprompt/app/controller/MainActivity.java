@@ -48,8 +48,14 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        super.onResume();
         Log.i(TAG, "onResume");
+        super.onResume();
+
+    }
+
+    @Override
+    protected void onStart(){
+        Log.i(TAG, "onStart");
         List<SetList> setLists = RealmIOHelper.getInstance().getAllSetLists(getApplicationContext());
 
         if(setListsView == null){
@@ -75,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         setListsView.setAdapter(setListAdapter);
+        super.onStart();
     }
 
     @Override

@@ -20,7 +20,7 @@ import java.util.List;
 public class PDFGridAdapter extends BaseAdapter {
     static class ViewHolderItem {
         TextView fileNameItem;
-        PDFView pdfView;
+//        PDFView pdfView;
         Button container;
     }
 
@@ -55,12 +55,12 @@ public class PDFGridAdapter extends BaseAdapter {
     }
 
     public View getView(final int position, View convertView, ViewGroup parent) {
-        ViewHolderItem cellView;
+        final ViewHolderItem cellView;
 
-        if(mAddInsertButton && position == mFiles.size()){
+        if (mAddInsertButton && position == mFiles.size()) {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.cell_emptypdf, parent, false);
-            ImageButton imgB = (ImageButton)convertView.findViewById(R.id.cell_createprompt);
+            ImageButton imgB = (ImageButton) convertView.findViewById(R.id.cell_createprompt);
 
             imgB.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -68,8 +68,7 @@ public class PDFGridAdapter extends BaseAdapter {
                     mCallback.onCreatePDFClicked();
                 }
             });
-        }
-        else {
+        } else {
             final File f = (File) getItem(position);
 
             if (convertView == null) {
@@ -79,7 +78,7 @@ public class PDFGridAdapter extends BaseAdapter {
                 // well set up the ViewHolder
                 cellView = new ViewHolderItem();
                 cellView.fileNameItem = (TextView) convertView.findViewById(R.id.cell_pdftitle);
-                cellView.pdfView = (PDFView) convertView.findViewById(R.id.cell_pdfpreview);
+//                cellView.pdfView = (PDFView) convertView.findViewById(R.id.cell_pdfpreview);
                 cellView.container = (Button) convertView.findViewById(R.id.cell_pdfbutton);
 
                 // store the holder with the view.
@@ -99,7 +98,8 @@ public class PDFGridAdapter extends BaseAdapter {
 
             if (f != null) {
                 cellView.fileNameItem.setText(f.getName());
-                PromptViewManager.loadThumbnail(f, cellView.pdfView);
+//                PromptViewManager.loadThumbnail(f, cellView.pdfView);
+//                PromptViewManager.loadThumbnail(f, mContext);
             }
         }
 

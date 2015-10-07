@@ -11,7 +11,6 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.a2t.autobpmprompt.R;
-import com.joanzapata.pdfview.PDFView;
 
 
 public class MarkerDialog extends DialogFragment {
@@ -57,7 +56,7 @@ public class MarkerDialog extends DialogFragment {
                 .setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // User cancelled the dialog
-                        mListener.onCancel(MarkerDialog.this);
+                        mListener.onMarkerCancelled(MarkerDialog.this);
                     }
                 });
 
@@ -71,7 +70,7 @@ public class MarkerDialog extends DialogFragment {
 
     public interface MarkerDialogListener {
         void onMarkerCreated(DialogFragment dialog, String title, String note, int bar, int beat, int page, float positionX, float positionY);
-        void onCancel(DialogFragment dialog);
+        void onMarkerCancelled(DialogFragment dialog);
     }
 
     // Override the Fragment.onAttach() method to instantiate the PDFDialogResultListener

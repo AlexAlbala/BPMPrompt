@@ -21,8 +21,12 @@ import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class PromptActivity extends AppCompatActivity implements MarkerDialog.MarkerDialogListener {
@@ -44,9 +48,9 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
      *******/
     TextView currentBeat;
     TextView currentBar;
-    TextView currentBpm;
+    EditText currentBpm;
     Button editTopButton;
-    Button deleteTopButton;
+    Button cancelTopButton;
     Button doneTopButton;
 
     int surfaceOffsetX;
@@ -55,6 +59,9 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
     Paint clickMarkerPaint;
     int clickSquareSize;
     int clickVerticalLineSize;
+
+    int highlightMarkerFgColor;
+    int highlightMarkerBgColor;
 
     float lastMarkerX;
     float lastMarkerY;
@@ -92,39 +99,81 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
 
         @Override
         public void onPlay() {
-
+            hideLeftBar();
         }
 
         @Override
         public void onPause() {
-
+            showLeftBar();
         }
 
         @Override
         public void onStop() {
-
+            showLeftBar();
         }
 
         @Override
         public void onMarkerMatched(Marker match) {
             Log.i(TAG, "MARKER: " + match.getTitle());
+            highlightMarker(match);
         }
     };
+
+    private void highlightMarker(Marker marker) {
+        int position;
+        boolean found = false;
+        for (position = 0; position < currentPrompt.settings.getMarkers().size(); position++) {
+            Marker m = currentPrompt.settings.getMarkers().get(position);
+            if (m.getTitle().equals(marker.getTitle())) {
+                found = true;
+                break;
+            }
+        }
+
+        //TODO: SHOW SOMETHING
+
+        if (found) {
+            highlightMarkerAdapter(position);
+        }
+    }
+
+    private void highlightMarkerAdapter(int position) {
+        final View v = markers.getChildAt(position - markers.getFirstVisiblePosition());
+
+        if (v != null) { //ELEMENT IS VISIBLE
+            //TODO: HIGHLIGHT
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    v.setBackgroundColor(highlightMarkerBgColor);
+                    ((TextView) v.findViewById(R.id.marker_title)).setTextColor(highlightMarkerFgColor);
+                }
+            });
+        }
+    }
+
+    private void resetMarkerAdapter(int position) {
+        final View v = markers.getChildAt(position - markers.getFirstVisiblePosition());
+
+        if (v != null) { //ELEMENT IS VISIBLE
+            //TODO: RESET APPEARANCE
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                }
+            });
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_prompt);
-    }
-
-    public void onResume() {
-        super.onResume();
 
         /****************** LAYOUT ELEMENTS LOAD ******************************************/
-        //Maybe better in onCreate ??
         currentBar = (TextView) findViewById(R.id.prompt_current_bar);
         currentBeat = (TextView) findViewById(R.id.prompt_current_beat);
-        currentBpm = (TextView) findViewById(R.id.prompt_current_bpm);
+        currentBpm = (EditText) findViewById(R.id.prompt_current_bpm);
         controlsView = findViewById(R.id.fullscreen_content_controls);
         contentsFullscreen = findViewById(R.id.contents_fullscreen);
         frameControls = findViewById(R.id.frame_content_controls);
@@ -133,7 +182,7 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
         floatingCanvas = (SurfaceView) findViewById(R.id.prompt_floating_canvas);
 
         editTopButton = (Button) findViewById(R.id.prompt_edit_top_button);
-        deleteTopButton = (Button) findViewById(R.id.prompt_delete_top_button);
+        cancelTopButton = (Button) findViewById(R.id.prompt_cancel_top_button);
         doneTopButton = (Button) findViewById(R.id.prompt_done_top_button);
         /**********************************************************************************/
 
@@ -150,6 +199,8 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
         clickMarkerColor = getResources().getColor(R.color.click_marker_color);
         clickMarkerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         clickMarkerPaint.setColor(clickMarkerColor);
+        highlightMarkerBgColor = getResources().getColor(R.color.highlight_marker_color_bg);
+        highlightMarkerFgColor = getResources().getColor(R.color.highlight_marker_color_fg);
         /***********************************************************************************/
 
         /******************* PROMPT LOADING ************************************************/
@@ -160,29 +211,39 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
     }
 
     @Override
-    public void onDestroy(){
-        super.onDestroy();
+    public void onStart() {
+        Log.i(TAG, "onStart");
+        super.onStart();
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.i(TAG, "onDestroy");
+        pdfview.recycle();
         currentPrompt.close();
+        super.onDestroy();
     }
 
     private void configure() {
         //Clear canvas if needed
         Canvas canvas = floatingCanvas.getHolder().lockCanvas();
         if (canvas != null) {
-            canvas.drawColor(255, PorterDuff.Mode.CLEAR);
+            canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
             floatingCanvas.getHolder().unlockCanvasAndPost(canvas);
         }
 
         if (isEdit) {
             frameControls.setVisibility(View.INVISIBLE);
             editTopButton.setVisibility(View.GONE);
-            deleteTopButton.setVisibility(View.VISIBLE);
+            cancelTopButton.setVisibility(View.VISIBLE);
             doneTopButton.setVisibility(View.VISIBLE);
+            currentBpm.setEnabled(true);
         } else {
             frameControls.setVisibility(View.VISIBLE);
             editTopButton.setVisibility(View.VISIBLE);
-            deleteTopButton.setVisibility(View.GONE);
+            cancelTopButton.setVisibility(View.GONE);
             doneTopButton.setVisibility(View.GONE);
+            currentBpm.setEnabled(false);
         }
 
         //TODO: Sure is the best way to do that ?
@@ -221,6 +282,7 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
 
     public void promptSave(View v) {
         currentPrompt.stop();
+        currentPrompt.settings.setBpm(Integer.parseInt(currentBpm.getText().toString()));
         currentPrompt.prepareSave();
         PromptManager.update(getApplicationContext(), currentPrompt);
         isEdit = false;
@@ -238,8 +300,8 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
             lastMarkerX = (x - currentPrompt.getPdf().getCurrentXOffset()) / currentPrompt.getPdf().getCurrentZoom();
             lastMarkerY = (y - currentPrompt.getPdf().getCurrentYOffset()) / currentPrompt.getPdf().getCurrentZoom();
 
-            Log.i(TAG,"Draw click in " + x + ":" + y);
-            Log.i(TAG,"Real marker position: " + lastMarkerX + ":" + lastMarkerY);
+            Log.i(TAG, "Draw click in " + x + ":" + y);
+            Log.i(TAG, "Real marker position: " + lastMarkerX + ":" + lastMarkerY);
 
             Canvas canvas = floatingCanvas.getHolder().lockCanvas();
             canvas.drawColor(255, PorterDuff.Mode.CLEAR);
@@ -264,7 +326,7 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
 
     }
 
-    public int getStatusBarHeight() {
+    private int getStatusBarHeight() {
         int result = 0;
         int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) {
@@ -293,13 +355,10 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
                     break;
                 case MotionEvent.ACTION_UP:
                     if (isClick && !isFragmentClick) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
-                            controlsView.animate()
-                                    .translationX(contentVisible ? 0 : controlsView.getWidth())
-                                    .setDuration(getResources().getInteger(
-                                            android.R.integer.config_shortAnimTime));
+                        if (contentVisible) {
+                            hideLeftBar();
                         } else {
-                            controlsView.setVisibility(contentVisible ? View.VISIBLE : View.GONE);
+                            showLeftBar();
                         }
                         contentVisible = !contentVisible;
                     }
@@ -309,6 +368,28 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
                     break;
             }
             return super.dispatchTouchEvent(ev);
+        }
+    }
+
+    private void showLeftBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            controlsView.animate()
+                    .translationX(0)
+                    .setDuration(getResources().getInteger(
+                            android.R.integer.config_shortAnimTime));
+        } else {
+            controlsView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void hideLeftBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            controlsView.animate()
+                    .translationX(controlsView.getWidth())
+                    .setDuration(getResources().getInteger(
+                            android.R.integer.config_shortAnimTime));
+        } else {
+            controlsView.setVisibility(View.GONE);
         }
     }
 
@@ -329,19 +410,25 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
         m.setPage(page);
         m.setOffsetX(positionX);
         m.setOffsetY(positionY);
-        m.setId((int)System.currentTimeMillis());
+        m.setId((int) System.currentTimeMillis());
 
         currentPrompt.settings.getMarkers().add(m);
         configure();
     }
 
     @Override
-    public void onCancel(DialogFragment dialog) {
+    public void onMarkerCancelled(DialogFragment dialog) {
         Log.i(TAG, "Marker canceled");
     }
 
     public void switchToEdit(View view) {
         isEdit = true;
+        configure();
+    }
+
+    public void cancelEdit(View view) {
+        //TODO: REFRESH VALUES :)
+        isEdit = false;
         configure();
     }
 }
