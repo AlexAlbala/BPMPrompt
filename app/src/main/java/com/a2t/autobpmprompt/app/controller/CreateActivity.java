@@ -11,6 +11,7 @@ import android.widget.EditText;
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.media.PromptManager;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
+import com.a2t.autobpmprompt.media.audiotools.TapTempo;
 import com.a2t.autobpmprompt.media.prompt.PromptViewManager;
 import com.joanzapata.pdfview.PDFView;
 
@@ -31,6 +32,8 @@ public class CreateActivity extends AppCompatActivity implements PDFDialog.PDFDi
 
     String setList;
 
+    TapTempo t;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,12 +46,21 @@ public class CreateActivity extends AppCompatActivity implements PDFDialog.PDFDi
         pdfPreview = (PDFView)findViewById(R.id.create_pdfpreview);
 
         setList = getIntent().getStringExtra(getString(R.string.setListNameVariable));
+
+        t = new TapTempo();
     }
 
     public void loadPDFClick(View v){
         Log.i(TAG, "Load pdfs");
         DialogFragment newFragment = new PDFDialog();
         newFragment.show(getSupportFragmentManager(), "pdfselect");
+    }
+
+    public void onTapClick(View v) {
+        int cBpm = t.Tap();
+        if(cBpm > 0) {
+            bpm.setText(String.valueOf(cBpm));
+        }
     }
 
     public void createPromptClick(View v){
@@ -71,8 +83,8 @@ public class CreateActivity extends AppCompatActivity implements PDFDialog.PDFDi
         i.putExtra(getString(R.string.setListNameVariable), setList);
         i.putExtra(getString(R.string.isEditVariable), true);
 
-        //TODO: Start activity for result ? PRevent to appear this activity when back button pressed :)
         startActivity(i);
+        finish();
     }
 
     @Override

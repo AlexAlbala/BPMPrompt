@@ -25,4 +25,5 @@ dependencies {
     compile 'com.android.support:support-v4:22.2.1'
     compile 'com.joanzapata.pdfview:android-pdfview:1.0.4@aar'
     compile 'io.realm:realm-android:0.82.2'
+    compile 'com.android.support:design:22.2.1'
 }

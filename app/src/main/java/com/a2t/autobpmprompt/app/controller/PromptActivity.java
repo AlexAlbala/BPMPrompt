@@ -53,12 +53,20 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
     Button cancelTopButton;
     Button doneTopButton;
 
+    TextView currentMarkerTitle;
+    TextView currentMarkerNote;
+
+    View topBarNotifiactions;
+
     int surfaceOffsetX;
     int surfaceOffsetY;
     int clickMarkerColor;
     Paint clickMarkerPaint;
     int clickSquareSize;
     int clickVerticalLineSize;
+
+    int markerFgColor;
+    int markerBgColor;
 
     int highlightMarkerFgColor;
     int highlightMarkerBgColor;
@@ -119,7 +127,7 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
         }
     };
 
-    private void highlightMarker(Marker marker) {
+    private void highlightMarker(final Marker marker) {
         int position;
         boolean found = false;
         for (position = 0; position < currentPrompt.settings.getMarkers().size(); position++) {
@@ -130,23 +138,49 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
             }
         }
 
-        //TODO: SHOW SOMETHING
+        final int p = position;
+        final boolean f = found;
+        drawMarkerMatched(marker);
 
-        if (found) {
-            highlightMarkerAdapter(position);
+        if (f) {
+            highlightMarkerAdapter(p);
         }
+
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                currentMarkerTitle.setText(marker.getTitle() + ":");
+                currentMarkerNote.setText(marker.getNote());
+            }
+        });
+
+        showTopBar();
+
+        Timer t = new Timer();
+
+        t.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                hideTopBar();
+
+                if (f)
+                    resetMarkerAdapter(p);
+            }
+        }, 3000);
     }
 
     private void highlightMarkerAdapter(int position) {
         final View v = markers.getChildAt(position - markers.getFirstVisiblePosition());
 
         if (v != null) { //ELEMENT IS VISIBLE
-            //TODO: HIGHLIGHT
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     v.setBackgroundColor(highlightMarkerBgColor);
                     ((TextView) v.findViewById(R.id.marker_title)).setTextColor(highlightMarkerFgColor);
+                    ((TextView) v.findViewById(R.id.marker_note)).setTextColor(highlightMarkerFgColor);
+                    ((TextView) v.findViewById(R.id.marker_beat)).setTextColor(highlightMarkerFgColor);
+                    ((TextView) v.findViewById(R.id.marker_bar)).setTextColor(highlightMarkerFgColor);
                 }
             });
         }
@@ -156,10 +190,14 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
         final View v = markers.getChildAt(position - markers.getFirstVisiblePosition());
 
         if (v != null) { //ELEMENT IS VISIBLE
-            //TODO: RESET APPEARANCE
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    v.setBackgroundColor(markerBgColor);
+                    ((TextView) v.findViewById(R.id.marker_title)).setTextColor(markerFgColor);
+                    ((TextView) v.findViewById(R.id.marker_bar)).setTextColor(markerFgColor);
+                    ((TextView) v.findViewById(R.id.marker_beat)).setTextColor(markerFgColor);
+                    ((TextView) v.findViewById(R.id.marker_note)).setTextColor(markerFgColor);
                 }
             });
         }
@@ -184,6 +222,11 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
         editTopButton = (Button) findViewById(R.id.prompt_edit_top_button);
         cancelTopButton = (Button) findViewById(R.id.prompt_cancel_top_button);
         doneTopButton = (Button) findViewById(R.id.prompt_done_top_button);
+
+        currentMarkerNote = (TextView) findViewById(R.id.currentMarker_note);
+        currentMarkerTitle = (TextView) findViewById(R.id.currentMarker_title);
+
+        topBarNotifiactions = findViewById(R.id.frame_top_notification);
         /**********************************************************************************/
 
         /******************* RETRIEVE VARIABLES ********************************************/
@@ -201,6 +244,8 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
         clickMarkerPaint.setColor(clickMarkerColor);
         highlightMarkerBgColor = getResources().getColor(R.color.highlight_marker_color_bg);
         highlightMarkerFgColor = getResources().getColor(R.color.highlight_marker_color_fg);
+        markerBgColor = getResources().getColor(R.color.marker_color_bg);
+        markerFgColor = getResources().getColor(R.color.marker_color_fg);
         /***********************************************************************************/
 
         /******************* PROMPT LOADING ************************************************/
@@ -208,6 +253,14 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
         configure();
         currentBpm.setText(String.valueOf(currentPrompt.settings.getBpm()));
         /**********************************************************************************/
+    }
+
+    //Hide top bar when the window has loaded
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        if (hasFocus) {
+            hideTopBar();
+        }
     }
 
     @Override
@@ -219,7 +272,6 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
     @Override
     public void onDestroy() {
         Log.i(TAG, "onDestroy");
-        pdfview.recycle();
         currentPrompt.close();
         super.onDestroy();
     }
@@ -304,7 +356,7 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
             Log.i(TAG, "Real marker position: " + lastMarkerX + ":" + lastMarkerY);
 
             Canvas canvas = floatingCanvas.getHolder().lockCanvas();
-            canvas.drawColor(255, PorterDuff.Mode.CLEAR);
+            canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
             canvas.drawLine(0, y, floatingCanvas.getWidth(), y, clickMarkerPaint);
 
             canvas.drawLine(x, y - clickVerticalLineSize, x, y + clickVerticalLineSize, clickMarkerPaint);
@@ -317,13 +369,30 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
             canvas.drawLine(x - clickSquareSize, y - clickSquareSize, x - clickSquareSize, y + clickSquareSize, clickMarkerPaint);
             canvas.drawLine(x + clickSquareSize, y - clickSquareSize, x + clickSquareSize, y + clickSquareSize, clickMarkerPaint);
 
-
             floatingCanvas.getHolder().unlockCanvasAndPost(canvas);
         }
     }
 
-    private void drawCurrentPosition() {
+    private void drawMarkerMatched(Marker marker) {
+        float x = marker.getOffsetX();
+        float y = marker.getOffsetY();
+        if (x >= 1 && y >= 1) {
+            Canvas canvas = floatingCanvas.getHolder().lockCanvas();
+            canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
 
+            //Horizontal lines
+            canvas.drawLine(x - clickSquareSize, y - clickSquareSize, x + clickSquareSize, y - clickSquareSize, clickMarkerPaint);
+            canvas.drawLine(x - clickSquareSize, y + clickSquareSize, x + clickSquareSize, y + clickSquareSize, clickMarkerPaint);
+
+            //Vertical lines
+            canvas.drawLine(x - clickSquareSize, y - clickSquareSize, x - clickSquareSize, y + clickSquareSize, clickMarkerPaint);
+            canvas.drawLine(x + clickSquareSize, y - clickSquareSize, x + clickSquareSize, y + clickSquareSize, clickMarkerPaint);
+
+            canvas.drawText(marker.getTitle(), x + clickSquareSize * 2, y, clickMarkerPaint);
+            //canvas.drawText(marker.getNote(), x + clickSquareSize, y + clickSquareSize, clickMarkerPaint);
+
+            floatingCanvas.getHolder().unlockCanvasAndPost(canvas);
+        }
     }
 
     private int getStatusBarHeight() {
@@ -390,6 +459,28 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
                             android.R.integer.config_shortAnimTime));
         } else {
             controlsView.setVisibility(View.GONE);
+        }
+    }
+
+    private void showTopBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            topBarNotifiactions.animate()
+                    .translationY(0)
+                    .setDuration(getResources().getInteger(
+                            android.R.integer.config_shortAnimTime));
+        } else {
+            topBarNotifiactions.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void hideTopBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
+            topBarNotifiactions.animate()
+                    .translationY(-1 * topBarNotifiactions.getHeight())
+                    .setDuration(getResources().getInteger(
+                            android.R.integer.config_shortAnimTime));
+        } else {
+            topBarNotifiactions.setVisibility(View.GONE);
         }
     }
 

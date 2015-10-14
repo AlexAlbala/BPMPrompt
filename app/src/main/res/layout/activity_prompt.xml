@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0099cc"
+    android:background="#4b4e50"
     tools:context="com.a2t.autobpmprompt.app.controller.PromptActivity">
 
 
@@ -15,9 +15,9 @@
 
 
         <LinearLayout
-            android:layout_marginTop="@dimen/activity_prompt_top_bar"
             android:layout_width="@dimen/activity_prompt_markers_bar"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_marginTop="@dimen/activity_prompt_top_bar">
 
             <ListView
                 android:id="@+id/prompt_markers"
@@ -39,20 +39,24 @@
                 android:layout_height="@dimen/activity_prompt_top_bar"
                 android:background="@android:color/transparent"
                 android:cacheColorHint="#00000000">
+
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_alignParentStart="true">
+                    android:layout_alignParentStart="true"
+                    android:orientation="horizontal">
+
                     <EditText
                         android:id="@+id/prompt_current_bpm"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:inputType="number"/>
+                        android:inputType="number" />
+
                     <TextView
                         android:id="@+id/prompt_current_bar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
+
                     <TextView
                         android:id="@+id/prompt_current_beat"
                         android:layout_width="wrap_content"
@@ -63,31 +67,33 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_alignParentEnd="true"
-                    android:orientation="horizontal"
-                    android:gravity="end">
+                    android:gravity="end"
+                    android:orientation="horizontal">
+
                     <Button
                         android:id="@+id/prompt_edit_top_button"
                         style="?metaButtonBarStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/edit_button"
-                        android:onClick="switchToEdit"/>
+                        android:onClick="switchToEdit"
+                        android:text="@string/edit_button" />
+
                     <Button
                         android:id="@+id/prompt_done_top_button"
                         style="?metaButtonBarStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/done_button"
-                        android:onClick="promptSave"/>
+                        android:onClick="promptSave"
+                        android:text="@string/done_button" />
+
                     <Button
                         android:id="@+id/prompt_cancel_top_button"
                         style="?metaButtonBarStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/cancel_button"
-                        android:onClick="cancelEdit"/>
+                        android:onClick="cancelEdit"
+                        android:text="@string/cancel_button" />
                 </LinearLayout>
-
 
 
             </RelativeLayout>
@@ -95,6 +101,7 @@
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
+
                 <com.joanzapata.pdfview.PDFView
                     android:id="@+id/pdfview"
                     android:layout_width="match_parent"
@@ -103,7 +110,7 @@
                 <SurfaceView
                     android:id="@+id/prompt_floating_canvas"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent" />
             </FrameLayout>
 
 
@@ -132,23 +139,73 @@
                 android:id="@+id/prompt_button_right_play"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/play_button"
-                android:onClick="promptPlay"/>
+                android:onClick="promptPlay"
+                android:text="@string/play_button" />
 
             <Button
                 android:id="@+id/prompt_button_right_pause"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/pause_button"
-                android:onClick="promptPause"/>
+                android:onClick="promptPause"
+                android:text="@string/pause_button" />
 
             <Button
                 android:id="@+id/prompt_button_right_stop"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/stop_button"
-                android:onClick="promptStop"/>
+                android:onClick="promptStop"
+                android:text="@string/stop_button" />
+        </LinearLayout>
 
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/frame_top_notification"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|center">
+
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:background="@drawable/notifications_bg"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_margin="10dp"
+                android:layout_width="36dp"
+                android:layout_height="fill_parent"
+                android:src="@drawable/infoicon"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/currentMarker_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_margin="10dp"
+                    android:text="Marker title"
+                    android:textColor="#FF000000"
+                    android:textSize="@dimen/abc_text_size_title_material"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/currentMarker_note"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_marginStart="10dp"
+                    android:text="Marker description"
+                    android:textColor="#FF000000" />
+
+            </LinearLayout>
         </LinearLayout>
     </FrameLayout>
 </FrameLayout>

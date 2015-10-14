@@ -1,11 +1,13 @@
 package com.a2t.autobpmprompt.app.adapter;
 
 import android.content.Context;
+import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.a2t.autobpmprompt.R;
@@ -22,16 +24,20 @@ public class SetListAdapter extends BaseAdapter {
     private Context mContext;
     private List<SetList> mItems;
     private SetListAdapterCallback mCallback;
+    private boolean mEditMode;
 
     static class ViewHolderItem {
         TextView setListItem;
         GridView pdfGridItem;
+        ImageButton renameBtn;
+        ImageButton deleteBtn;
     }
 
-    public SetListAdapter(Context context, List<SetList> objects, SetListAdapterCallback callback) {
+    public SetListAdapter(Context context, List<SetList> objects, boolean editMode, SetListAdapterCallback callback) {
         mContext = context;
         mItems = objects;
         mCallback = callback;
+        mEditMode = editMode;
     }
 
     @Override
@@ -52,7 +58,7 @@ public class SetListAdapter extends BaseAdapter {
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolderItem cellView;
-        final SetList setList = (SetList)getItem(position);
+        final SetList setList = (SetList) getItem(position);
 
         if (convertView == null) {
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -62,6 +68,8 @@ public class SetListAdapter extends BaseAdapter {
             cellView = new ViewHolderItem();
             cellView.setListItem = (TextView) convertView.findViewById(R.id.setlist_title);
             cellView.pdfGridItem = (GridView) convertView.findViewById(R.id.setlist_pdfgrid);
+            cellView.renameBtn = (ImageButton) convertView.findViewById(R.id.setlist_rename_btn);
+            cellView.deleteBtn = (ImageButton) convertView.findViewById(R.id.setlist_delete_btn);
 
             // store the holder with the view.
             convertView.setTag(cellView);
@@ -72,6 +80,24 @@ public class SetListAdapter extends BaseAdapter {
         }
 
         if (setList != null) {
+            cellView.renameBtn.setVisibility(mEditMode ? View.VISIBLE : View.INVISIBLE);
+            cellView.deleteBtn.setVisibility(mEditMode ? View.VISIBLE : View.INVISIBLE);
+
+
+            cellView.deleteBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mCallback.onSetListRemovedClicked(setList.getTitle());
+                }
+            });
+
+            cellView.renameBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mCallback.onSetListRenamedClicked(setList.getTitle());
+                }
+            });
+
             cellView.setListItem.setText(setList.getTitle());
 
             List<File> pdflist = new ArrayList<>();
@@ -93,6 +119,8 @@ public class SetListAdapter extends BaseAdapter {
             });
 
             cellView.pdfGridItem.setAdapter(pdfAdapter);
+
+
         }
 
         return convertView;

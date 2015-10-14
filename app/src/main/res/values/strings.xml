@@ -28,6 +28,11 @@
     <string name="placeholder_beat">Beat</string>
     <string name="placeholder_note">Note</string>
 
+    <!-- SETLIST DIALOG -->
+    <string name="create_setlist_title">Create SetList</string>
+    <string name="rename_setlist_title">Rename SetList</string>
+
+
     <!-- SET LISTS -->
     <string name="first_set_list_title">Set List 1</string>
 
@@ -52,6 +57,5 @@
     <string name="xOffsetVariable">x</string>
     <string name="yOffsetVariable">y</string>
     <string name="pageVariable">page</string>
-
 
 </resources>

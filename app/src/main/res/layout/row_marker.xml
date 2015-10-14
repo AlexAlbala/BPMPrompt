@@ -11,22 +11,26 @@
         <TextView
             android:id="@+id/marker_title"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textColor="@color/marker_color_fg"/>
 
         <TextView
             android:id="@+id/marker_note"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textColor="@color/marker_color_fg" />
 
         <TextView
             android:id="@+id/marker_bar"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textColor="@color/marker_color_fg" />
 
         <TextView
             android:id="@+id/marker_beat"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textColor="@color/marker_color_fg" />
     </LinearLayout>
 
     <ImageButton

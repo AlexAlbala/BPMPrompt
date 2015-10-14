@@ -26,7 +26,6 @@ public class PromptViewManager {
     //https://code.google.com/p/apv/
 
     private final float DEFAULT_ZOOM = 1.0F;
-    private String pdf;
     private PDFView pdfview;
     private Activity activity;
     private SurfaceView floatingCanvas;
@@ -147,14 +146,9 @@ public class PromptViewManager {
 
         this.pdfview = pdfview;
         this.activity = mActivity;
-        this.pdf = pdfFile.getName();
         this.pdfFile = pdfFile;
         this.floatingCanvas = floatingCanvas;
         return true;
-    }
-
-    public void printMarkers(List<Marker> markers) {
-
     }
 
     public void centerAt(final float x, final float y) {
@@ -163,7 +157,7 @@ public class PromptViewManager {
     }
 
     public void moveTo(final float x, final float y) {
-        if(x >= 0 && y >= 0) {
+        if(x >= 0 || y >= 0) {
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -235,6 +229,15 @@ public class PromptViewManager {
         });
     }
 
+    public void zommTo(final float zoom){
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                pdfview.zoomTo(zoom);
+            }
+        });
+    }
+
     public void zoomOut() {
         activity.runOnUiThread(new Runnable() {
             @Override
@@ -254,7 +257,7 @@ public class PromptViewManager {
     }
 
     public void close() {
-        //pdfview.recycle();
+        pdfview.recycle();
     }
 
     public float getCurrentZoom() {

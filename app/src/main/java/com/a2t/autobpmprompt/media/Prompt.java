@@ -48,6 +48,8 @@ public class Prompt {
             pdf.moveTo(settings.getOffsetX(), settings.getOffsetY());
         }
 
+        pdf.zommTo(settings.getZoom());
+
         this.mCallback = callback;
 
         mCallback.onBeat(1);
@@ -78,6 +80,14 @@ public class Prompt {
     }
 
     public void play(){
+        int period;
+        int upper = settings.getCfgBarUpper();
+        if(upper == 2 || upper == 3 || upper == 4){ //Simple bar
+            period = 60000 / settings.getBpm();
+        } else{ //Complex bar
+            period = 20000 / settings.getBpm();
+        }
+
         mCallback.onPlay();
         bpmCounterTimer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -91,7 +101,7 @@ public class Prompt {
                 updatePosition();
                 mCallback.onBeat(currentBeat);
             }
-        }, 0, 60000 / settings.getBpm());
+        }, 0, period);
     }
 
     public void pause(){
