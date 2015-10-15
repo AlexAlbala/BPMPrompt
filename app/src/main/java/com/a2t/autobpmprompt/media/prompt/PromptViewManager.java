@@ -7,6 +7,9 @@ import android.util.Log;
 import android.view.SurfaceView;
 import android.widget.Toast;
 
+import com.a2t.autobpmprompt.app.callback.PromptEventsCallback;
+import com.a2t.autobpmprompt.app.callback.PromptViewCallback;
+import com.a2t.autobpmprompt.app.callback.SimpleCallback;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.joanzapata.pdfview.PDFView;
 import com.joanzapata.pdfview.listener.OnDrawListener;
@@ -28,7 +31,8 @@ public class PromptViewManager {
     private final float DEFAULT_ZOOM = 1.0F;
     private PDFView pdfview;
     private Activity activity;
-    private SurfaceView floatingCanvas;
+    private SurfaceView mFloatingCanvas;
+    private PromptViewCallback mCallback;
 
     public File getPdfFile() {
         return pdfFile;
@@ -40,7 +44,8 @@ public class PromptViewManager {
 
     }
 
-    public PromptViewManager(File pdf, PDFView pdfview, SurfaceView floatingCanvas, Activity activity) {
+    public PromptViewManager(File pdf, PDFView pdfview, SurfaceView floatingCanvas, Activity activity, PromptViewCallback callback) {
+        mCallback = callback;
         this.loadPDF(pdf, pdfview, floatingCanvas, activity);
     }
 
@@ -57,12 +62,12 @@ public class PromptViewManager {
 //    }
 
     public static boolean loadThumbnail(File pdfFile, PDFView pdfview) {
-            pdfview.fromFile(pdfFile)
-                    .defaultPage(0)
-                    .pages(0)
-                    .showMinimap(false)
-                    .enableSwipe(false)
-                    .load();
+        pdfview.fromFile(pdfFile)
+                .defaultPage(0)
+                .pages(0)
+                .showMinimap(false)
+                .enableSwipe(false)
+                .load();
 
         return true;
     }
@@ -123,20 +128,19 @@ public class PromptViewManager {
                 .onDraw(new OnDrawListener() {
                     @Override
                     public void onLayerDrawn(Canvas canvas, float v, float v1, int i) {
-                        //System.out.println("ONDRAW");
+                        mCallback.onDraw(canvas, v, v1, i);
                     }
                 })
                 .onLoad(new OnLoadCompleteListener() {
                     @Override
                     public void loadComplete(int i) {
-                        //System.out.println("ONLOAD");
-                        pdfview.zoomTo(DEFAULT_ZOOM);
+                        mCallback.onLoad(i);
                     }
                 })
                 .onPageChange(new OnPageChangeListener() {
                     @Override
                     public void onPageChanged(int i, int i1) {
-                        //System.out.println("ONPAGECHANGE" + i + " - " + i1);
+                        mCallback.onPageChanged(i, i1);
                     }
                 }).swipeVertical(true)
                 .load();
@@ -147,34 +151,40 @@ public class PromptViewManager {
         this.pdfview = pdfview;
         this.activity = mActivity;
         this.pdfFile = pdfFile;
-        this.floatingCanvas = floatingCanvas;
+        this.mFloatingCanvas = floatingCanvas;
         return true;
     }
 
-    public void centerAt(final float x, final float y) {
+    public void centerAt(final float x, final float y, SimpleCallback callback) {
         Log.i(TAG, "Center at " + x + ":" + y);
-        moveTo(x - pdfview.getWidth() * pdfview.getZoom() / 2, y - pdfview.getHeight() * pdfview.getZoom() / 2);
+        float moveX = x - (pdfview.getWidth() / (2 * pdfview.getZoom()));
+        float moveY = y - (pdfview.getHeight() / (2 * pdfview.getZoom()));
+
+        moveTo(moveX, moveY, callback);
     }
 
-    public void moveTo(final float x, final float y) {
-        if(x >= 0 || y >= 0) {
+    public void moveTo(final float x, final float y, final SimpleCallback callback) {
+        if (x >= 0 || y >= 0) {
             activity.runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     float _x = -1 * x * pdfview.getZoom();
                     float _y = -1 * y * pdfview.getZoom();
 
+                    if (_x > 0) _x = 0;
+                    if (_y > 0) _y = 0;
+
                     Log.i(TAG, "Going to move to " + x + ":" + y + " -> " + _x + ":" + _y);
                     pdfview.moveTo(_x, _y);
+                    if (callback != null)
+                        callback.done();
                 }
             });
-        } else{
+        } else {
             Log.i(TAG, "Discard movement to " + x + ":" + y);
+            if (callback != null)
+                callback.done();
         }
-    }
-
-    public void advanceStep() {
-        advanceStep(50);
     }
 
     public void advanceStep(final int step) {
@@ -186,16 +196,6 @@ public class PromptViewManager {
             }
         });
 
-    }
-
-    public void advanceTo(final int pos) {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                float y = -1 * pos * pdfview.getZoom();
-                pdfview.moveTo(0f, y);
-            }
-        });
     }
 
     public void debug() {
@@ -229,11 +229,14 @@ public class PromptViewManager {
         });
     }
 
-    public void zommTo(final float zoom){
+    public void zoomTo(final float zoom, final SimpleCallback callback) {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 pdfview.zoomTo(zoom);
+                if(callback != null){
+                    callback.done();
+                }
             }
         });
     }

@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.SurfaceView;
 
 import com.a2t.autobpmprompt.app.callback.PromptEventsCallback;
+import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.helpers.RealmIOHelper;
 import com.joanzapata.pdfview.PDFView;
@@ -15,7 +16,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.List;
 
 public class PromptManager {
     private static final String TAG = "Prompt manager";
@@ -52,10 +52,6 @@ public class PromptManager {
         return true;
     }
 
-    public static List<PromptSettings> loadAll(Context context) {
-        return RealmIOHelper.getInstance().getAllPromptSettings(context);
-    }
-
     private static String saveFile(Context ctx, File f, String fileName) throws IOException {
         Log.i(TAG, "Save file " + f.getAbsolutePath() + " to " + fileName);
         InputStream is = new FileInputStream(f);
@@ -69,5 +65,10 @@ public class PromptManager {
         os.close();
 
         return ctx.getFilesDir() + "/" + fileName;
+    }
+
+    public static void deleteMarkerFromPrompt(Context ctx, Prompt prompt, Marker m) {
+        update(ctx, prompt);
+        RealmIOHelper.getInstance().deleteMarker(ctx, m);
     }
 }

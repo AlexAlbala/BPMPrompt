@@ -1,5 +1,7 @@
 package com.a2t.autobpmprompt.app.callback;
 
+import android.graphics.Canvas;
+
 import com.a2t.autobpmprompt.app.model.Marker;
 
 public interface PromptEventsCallback {

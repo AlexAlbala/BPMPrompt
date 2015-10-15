@@ -195,4 +195,14 @@ public class RealmIOHelper {
         set.removeFromRealm();
         r.commitTransaction();
     }
+
+    public void deleteMarker(Context ctx, Marker m) {
+        Realm r = getRealm(ctx);
+        Marker marker = r.where(Marker.class).equalTo("id", m.getId()).findFirst();
+
+        // Remove marker
+        r.beginTransaction();
+        marker.removeFromRealm();
+        r.commitTransaction();
+    }
 }

@@ -1,6 +1,7 @@
 package com.a2t.autobpmprompt.app.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import com.a2t.autobpmprompt.app.model.Marker;
 import java.util.List;
 
 public class MarkersAdapter extends BaseAdapter {
+    private static final String TAG = "MARKERSADAPTER";
     private Context mContext;
     private List<Marker> mItems;
     private boolean mIsEdit;
@@ -24,7 +26,6 @@ public class MarkersAdapter extends BaseAdapter {
 
     static class ViewHolderItem {
         TextView markerTitle;
-        TextView markerNote;
         TextView markerBar;
         TextView markerBeat;
         ImageButton markerDelete;
@@ -79,7 +80,6 @@ public class MarkersAdapter extends BaseAdapter {
                 cellView = new ViewHolderItem();
 
                 cellView.markerTitle = (TextView)convertView.findViewById(R.id.marker_title);
-                cellView.markerNote = (TextView)convertView.findViewById(R.id.marker_note);
                 cellView.markerBar = (TextView)convertView.findViewById(R.id.marker_bar);
                 cellView.markerBeat = (TextView)convertView.findViewById(R.id.marker_beat);
                 cellView.markerDelete = (ImageButton)convertView.findViewById(R.id.marker_delete);
@@ -92,9 +92,15 @@ public class MarkersAdapter extends BaseAdapter {
                 cellView = (ViewHolderItem) convertView.getTag();
             }
 
+            convertView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mCallback.onMarkerClicked(marker);
+                }
+            });
+
             if (marker != null) {
                 cellView.markerTitle.setText(marker.getTitle());
-                cellView.markerNote.setText(marker.getNote());
                 cellView.markerBar.setText(String.valueOf(marker.getBar()));
                 cellView.markerBeat.setText(String.valueOf(marker.getBeat()));
 
@@ -103,9 +109,9 @@ public class MarkersAdapter extends BaseAdapter {
                     cellView.markerDelete.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            mCallback.onMarkerRemoved(marker);
                             mItems.remove(position);
                             notifyDataSetChanged();
+                            mCallback.onMarkerRemoved(marker);
                         }
                     });
                 } else{

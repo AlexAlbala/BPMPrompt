@@ -1,9 +1,12 @@
 package com.a2t.autobpmprompt.media;
 
 import android.app.Activity;
+import android.graphics.Canvas;
 import android.view.SurfaceView;
 
 import com.a2t.autobpmprompt.app.callback.PromptEventsCallback;
+import com.a2t.autobpmprompt.app.callback.PromptViewCallback;
+import com.a2t.autobpmprompt.app.callback.SimpleCallback;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.media.prompt.PromptViewManager;
@@ -35,20 +38,35 @@ public class Prompt {
     public int currentBar;
     public int currentBeat;
 
-    public Prompt(PDFView pdfView, SurfaceView floatingCanvas, PromptSettings _settings, Activity context, PromptEventsCallback callback){
+    public Prompt(PDFView pdfView, SurfaceView floatingCanvas, PromptSettings _settings, Activity context, PromptEventsCallback callback) {
         settings = _settings;
 
         File f = new File(settings.getPdfFullPath());
         currentBeat = 0;
         currentBar = 1;
-        pdf = new PromptViewManager(f, pdfView, floatingCanvas, context);
+        pdf = new PromptViewManager(f, pdfView, floatingCanvas, context, new PromptViewCallback() {
+            @Override
+            public void onLoad(int i) {
+                if (settings.getZoom() != 0.0f && settings.getZoom() != 1.0f) {
+                    pdf.zoomTo(settings.getZoom(), null);
+                }
+                if (settings.getOffsetX() != 0.0f || settings.getOffsetY() != 0.0f) {
+                    pdf.moveTo(settings.getOffsetX(), settings.getOffsetY(), null);
+                }
+            }
+
+            @Override
+            public void onDraw(Canvas canvas, float v, float v1, int i) {
+
+            }
+
+            @Override
+            public void onPageChanged(int i, int i1) {
+
+            }
+        });
+
         bpmCounterTimer = new Timer();
-
-        if(settings.getOffsetX() != 0.0f || settings.getOffsetY() != 0.0f) {
-            pdf.moveTo(settings.getOffsetX(), settings.getOffsetY());
-        }
-
-        pdf.zommTo(settings.getZoom());
 
         this.mCallback = callback;
 
@@ -56,35 +74,38 @@ public class Prompt {
         mCallback.onBar(1);
     }
 
-    public void updatePosition(){
-        Marker m = matchMarker();
+    public void updatePosition() {
+        final Marker m = matchMarker();
 
-        if(m != null){
-            if(m.getPage() != pdf.getCurrentPage()){
+        if (m != null) {
+            if (m.getPage() != pdf.getCurrentPage()) {
                 pdf.setCurrentPage(m.getPage());
             }
 
-            pdf.centerAt(m.getOffsetX(), m.getOffsetY());
+            pdf.centerAt(m.getOffsetX(), m.getOffsetY(), new SimpleCallback() {
+                @Override
+                public void done() {
+                    mCallback.onMarkerMatched(m);
+                }
+            });
         }
     }
 
-    public Marker matchMarker(){
-        for(Marker m : settings.getMarkers()){
-            if(m.getBar() == currentBar && m.getBeat() == currentBeat){
-                mCallback.onMarkerMatched(m);
+    public Marker matchMarker() {
+        for (Marker m : settings.getMarkers()) {
+            if (m.getBar() == currentBar && m.getBeat() == currentBeat) {
                 return m;
             }
         }
-
         return null;
     }
 
-    public void play(){
+    public void play() {
         int period;
         int upper = settings.getCfgBarUpper();
-        if(upper == 2 || upper == 3 || upper == 4){ //Simple bar
+        if (upper == 2 || upper == 3 || upper == 4) { //Simple bar
             period = 60000 / settings.getBpm();
-        } else{ //Complex bar
+        } else { //Complex bar
             period = 20000 / settings.getBpm();
         }
 
@@ -93,7 +114,7 @@ public class Prompt {
             @Override
             public void run() {
                 currentBeat++;
-                if(currentBeat > settings.getCfgBarUpper()){
+                if (currentBeat > settings.getCfgBarUpper()) {
                     currentBar++;
                     currentBeat = 1;
                     mCallback.onBar(currentBar);
@@ -104,7 +125,7 @@ public class Prompt {
         }, 0, period);
     }
 
-    public void pause(){
+    public void pause() {
         resetTimer();
         mCallback.onPause();
     }
@@ -119,7 +140,7 @@ public class Prompt {
         mCallback.onBar(1);
     }
 
-    private void resetTimer(){
+    private void resetTimer() {
         bpmCounterTimer.cancel();
         bpmCounterTimer = new Timer();
     }

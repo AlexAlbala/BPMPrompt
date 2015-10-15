@@ -11,8 +11,6 @@ import android.widget.TextView;
 
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.callback.PDFSelectCallback;
-import com.a2t.autobpmprompt.media.prompt.PromptViewManager;
-import com.joanzapata.pdfview.PDFView;
 
 import java.io.File;
 import java.util.List;
