@@ -74,24 +74,28 @@ public class Prompt {
         mCallback.onBar(1);
     }
 
-    public void updatePosition() {
-        final Marker m = matchMarker();
+    private void updatePosition() {
+        Marker m = matchMarker();
 
         if (m != null) {
-            if (m.getPage() != pdf.getCurrentPage()) {
-                pdf.setCurrentPage(m.getPage());
-            }
-
-            pdf.centerAt(m.getOffsetX(), m.getOffsetY(), new SimpleCallback() {
-                @Override
-                public void done() {
-                    mCallback.onMarkerMatched(m);
-                }
-            });
+            notifyMarker(m);
         }
     }
 
-    public Marker matchMarker() {
+    public void notifyMarker(final Marker m) {
+        if (m.getPage() != pdf.getCurrentPage()) {
+            pdf.setCurrentPage(m.getPage());
+        }
+
+        pdf.centerAt(m.getOffsetX(), m.getOffsetY(), new SimpleCallback() {
+            @Override
+            public void done() {
+                mCallback.onMarkerMatched(m);
+            }
+        });
+    }
+
+    private Marker matchMarker() {
         for (Marker m : settings.getMarkers()) {
             if (m.getBar() == currentBar && m.getBeat() == currentBeat) {
                 return m;

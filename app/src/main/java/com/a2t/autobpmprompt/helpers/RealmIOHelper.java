@@ -6,6 +6,7 @@ import android.util.Log;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.SetList;
+import com.a2t.autobpmprompt.media.Prompt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -175,6 +176,10 @@ public class RealmIOHelper {
         r.beginTransaction();
         set.removeFromRealm();
         r.commitTransaction();
+
+        for(PromptSettings ps : set.getPrompts()){
+            deletePrompt(ctx, ps);
+        }
     }
 
     public void renameSetList(Context ctx, String title, String newTitle) {
@@ -204,5 +209,19 @@ public class RealmIOHelper {
         r.beginTransaction();
         marker.removeFromRealm();
         r.commitTransaction();
+    }
+
+    public void deletePrompt(Context ctx, PromptSettings prompt) {
+        Realm r = getRealm(ctx);
+        PromptSettings p = r.where(PromptSettings.class).equalTo("name", prompt.getName()).findFirst();
+
+        // Remove prompt
+        r.beginTransaction();
+        p.removeFromRealm();
+        r.commitTransaction();
+
+        for(Marker m : p.getMarkers()){
+            deleteMarker(ctx, m);
+        }
     }
 }

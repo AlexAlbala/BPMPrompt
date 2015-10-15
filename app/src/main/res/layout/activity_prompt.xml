@@ -90,20 +90,11 @@
                         android:text="@string/done_button" />
 
                     <Button
-                        android:id="@+id/prompt_cancel_top_button"
-                        style="?metaButtonBarStyle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:onClick="cancelEdit"
-                        android:textSize="@dimen/abc_text_size_small_material"
-                        android:text="@string/cancel_button" />
-
-                    <Button
                         android:id="@+id/prompt_rename_top_button"
                         style="?metaButtonBarStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:onClick="cancelEdit"
+                        android:onClick="renamePrompt"
                         android:textSize="@dimen/abc_text_size_small_material"
                         android:text="@string/rename_button" />
 
@@ -113,7 +104,7 @@
                         android:background="#FFFF0000"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:onClick="cancelEdit"
+                        android:onClick="deletePrompt"
                         android:textSize="@dimen/abc_text_size_small_material"
                         android:text="@string/delete_button" />
                 </LinearLayout>

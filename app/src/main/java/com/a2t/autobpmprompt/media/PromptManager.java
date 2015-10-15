@@ -71,4 +71,8 @@ public class PromptManager {
         update(ctx, prompt);
         RealmIOHelper.getInstance().deleteMarker(ctx, m);
     }
+
+    public static void delete(Context ctx, Prompt prompt) {
+        RealmIOHelper.getInstance().deletePrompt(ctx, prompt.settings);
+    }
 }

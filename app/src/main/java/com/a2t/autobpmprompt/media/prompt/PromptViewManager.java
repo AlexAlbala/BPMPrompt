@@ -234,7 +234,7 @@ public class PromptViewManager {
             @Override
             public void run() {
                 pdfview.zoomTo(zoom);
-                if(callback != null){
+                if (callback != null) {
                     callback.done();
                 }
             }

@@ -79,10 +79,10 @@ public class MarkersAdapter extends BaseAdapter {
                 // well set up the ViewHolder
                 cellView = new ViewHolderItem();
 
-                cellView.markerTitle = (TextView)convertView.findViewById(R.id.marker_title);
-                cellView.markerBar = (TextView)convertView.findViewById(R.id.marker_bar);
-                cellView.markerBeat = (TextView)convertView.findViewById(R.id.marker_beat);
-                cellView.markerDelete = (ImageButton)convertView.findViewById(R.id.marker_delete);
+                cellView.markerTitle = (TextView) convertView.findViewById(R.id.marker_title);
+                cellView.markerBar = (TextView) convertView.findViewById(R.id.marker_bar);
+                cellView.markerBeat = (TextView) convertView.findViewById(R.id.marker_beat);
+                cellView.markerDelete = (ImageButton) convertView.findViewById(R.id.marker_delete);
 
                 // store the holder with the view.
                 convertView.setTag(cellView);
@@ -104,7 +104,7 @@ public class MarkersAdapter extends BaseAdapter {
                 cellView.markerBar.setText(String.valueOf(marker.getBar()));
                 cellView.markerBeat.setText(String.valueOf(marker.getBeat()));
 
-                if(mIsEdit){
+                if (mIsEdit) {
                     cellView.markerDelete.setVisibility(View.VISIBLE);
                     cellView.markerDelete.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -114,7 +114,7 @@ public class MarkersAdapter extends BaseAdapter {
                             mCallback.onMarkerRemoved(marker);
                         }
                     });
-                } else{
+                } else {
                     cellView.markerDelete.setVisibility(View.GONE);
                 }
 
