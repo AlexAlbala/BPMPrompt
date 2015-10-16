@@ -12,14 +12,14 @@ import android.widget.Toast;
 
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.adapter.PDFGridAdapter;
-import com.a2t.autobpmprompt.app.callback.PDFSelectCallback;
+import com.a2t.autobpmprompt.app.callback.PDFGridCallback;
+import com.a2t.autobpmprompt.media.prompt.PromptPDFFile;
 import com.a2t.autobpmprompt.media.prompt.PDFFiles;
 
-import java.io.File;
 import java.util.List;
 
 
-public class PDFDialog extends DialogFragment implements PDFSelectCallback {
+public class PDFDialog extends DialogFragment implements PDFGridCallback {
     // Use this instance of the interface to deliver action events
     PDFDialogResultListener mListener;
 
@@ -52,9 +52,9 @@ public class PDFDialog extends DialogFragment implements PDFSelectCallback {
 
         AlertDialog dialog = builder.create();
 
-        List<File> pdfs = PDFFiles.findAllPDFs();
+        List<PromptPDFFile> pdfs = PDFFiles.findAllPDFs();
         GridView gridview = (GridView) dialogView.findViewById(R.id.dialog_gridpdf);
-        gridview.setAdapter(new PDFGridAdapter(getActivity(), pdfs, false, this));
+        gridview.setAdapter(new PDFGridAdapter(getActivity(), pdfs, false, false, this));
         return dialog;
     }
 
@@ -66,7 +66,12 @@ public class PDFDialog extends DialogFragment implements PDFSelectCallback {
 
     @Override
     public void onCreatePDFClicked() {
-        //DO NOTHING
+        //DO NOTHING :)
+    }
+
+    @Override
+    public void onPDFRemoveClicked(String fullPath, int id) {
+        //Do nothing :)
     }
 
     /* The activity that creates an instance of this dialog fragment must

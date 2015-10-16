@@ -79,7 +79,7 @@ public class CreateActivity extends AppCompatActivity implements PDFDialog.PDFDi
 
         //LAUNCH PROMPT EDIT ACTIVITY
         Intent i = new Intent(getApplicationContext(), PromptActivity.class);
-        i.putExtra(getString(R.string.promptNameVariable), promptSettings.getName());
+        i.putExtra(getString(R.string.promptIdVariable), promptSettings.getId());
         i.putExtra(getString(R.string.setListNameVariable), setList);
         i.putExtra(getString(R.string.isEditVariable), true);
 

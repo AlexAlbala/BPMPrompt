@@ -102,7 +102,7 @@ public class PromptViewManager {
 //            byte[] decode = IOUtils.toByteArray(inStream);
 //
 //            ByteBuffer buf = ByteBuffer.wrap(decode);
-//            PDFPage mPdfPage = new PDFFile(buf).getPage(0);
+//            PDFPage mPdfPage = new PromptPDFFile(buf).getPage(0);
 //            float width = mPdfPage.getWidth();
 //            float height = mPdfPage.getHeight();
 //            RectF clip = null;

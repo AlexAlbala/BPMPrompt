@@ -29,7 +29,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class PromptActivity extends AppCompatActivity implements MarkerDialog.MarkerDialogListener {
+public class PromptActivity extends AppCompatActivity implements MarkerDialog.MarkerDialogListener, RenamePromptDialog.RenamePromptDialogListener{
     static final String TAG = "PROMPTACTIVITY";
     boolean isEdit = false;
     boolean contentVisible = false;
@@ -240,7 +240,7 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
 
         /******************* RETRIEVE VARIABLES ********************************************/
         this.isEdit = getIntent().getBooleanExtra(getString(R.string.isEditVariable), false);
-        String name = getIntent().getStringExtra(getString(R.string.promptNameVariable));
+        long idPrompt = getIntent().getLongExtra(getString(R.string.promptIdVariable), -1);
         /***********************************************************************************/
 
         /******************* INITIALIZE DIMENSIONS && COLORS *******************************/
@@ -258,7 +258,7 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
         /***********************************************************************************/
 
         /******************* PROMPT LOADING ************************************************/
-        currentPrompt = PromptManager.load(name, pdfview, floatingCanvas, PromptActivity.this, promptEventsCallback);
+        currentPrompt = PromptManager.load(idPrompt, pdfview, floatingCanvas, PromptActivity.this, promptEventsCallback);
         configure();
         currentBpm.setText(String.valueOf(currentPrompt.settings.getBpm()));
         /**********************************************************************************/
@@ -569,6 +569,22 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
     }
 
     public void renamePrompt(View view) {
-        //TODO
+        DialogFragment newFragment = new RenamePromptDialog();
+        Bundle args = new Bundle();
+        args.putString(getString(R.string.promptNameVariable), currentPrompt.settings.getName());
+        newFragment.setArguments(args);
+        newFragment.show(getSupportFragmentManager(), "renamesetlist");
+    }
+
+    @Override
+    public void onPromptRenamed(DialogFragment dialog, String name) {
+        PromptManager.renamePrompt(getApplicationContext(), currentPrompt, name);
+        isEdit = false;
+        configure();
+    }
+
+    @Override
+    public void onPromptRenameCancelled(DialogFragment dialog) {
+
     }
 }

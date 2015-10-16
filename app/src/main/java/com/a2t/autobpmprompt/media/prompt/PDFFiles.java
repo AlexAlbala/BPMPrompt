@@ -11,15 +11,15 @@ import java.util.List;
 public class PDFFiles {
     private static final String TAG = "PDFFiles";
 
-    public static List<File> findAllPDFs() {
+    public static List<PromptPDFFile> findAllPDFs() {
         return findAllPDFs(Environment.getExternalStorageDirectory().toString());
     }
 
-    private static List<File> findAllPDFs(String path) {
+    private static List<PromptPDFFile> findAllPDFs(String path) {
         //TODO: Progress bar :)
         Log.i(TAG, "Searching pdf files in " + path);
 
-        List<File> files = new ArrayList<>();
+        List<PromptPDFFile> files = new ArrayList<>();
 
         File root = new File(path);
         File[] list = root.listFiles();
@@ -34,7 +34,10 @@ public class PDFFiles {
                 files.addAll(findAllPDFs(f.getAbsolutePath()));
             } else {
                 if (f.getName().endsWith(".pdf") || f.getName().endsWith(".PDF")) {
-                    files.add(f);
+                    PromptPDFFile pdf = new PromptPDFFile();
+                    pdf.file = f;
+                    pdf.displayName = f.getName();
+                    files.add(pdf);
                     Log.i(TAG, "FOUND FILE:" + f.getAbsoluteFile());
                 }
             }

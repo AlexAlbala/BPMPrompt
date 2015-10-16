@@ -10,9 +10,9 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.a2t.autobpmprompt.R;
-import com.a2t.autobpmprompt.app.callback.PDFSelectCallback;
+import com.a2t.autobpmprompt.app.callback.PDFGridCallback;
+import com.a2t.autobpmprompt.media.prompt.PromptPDFFile;
 
-import java.io.File;
 import java.util.List;
 
 public class PDFGridAdapter extends BaseAdapter {
@@ -23,16 +23,18 @@ public class PDFGridAdapter extends BaseAdapter {
     }
 
     private Context mContext;
-    private PDFSelectCallback mCallback = null;
-    private List<File> mFiles = null;
+    private PDFGridCallback mCallback = null;
+    private List<PromptPDFFile> mFiles = null;
     private boolean mAddInsertButton;
+    private boolean mRemovableElements;
 
     // Gets the context so it can be used later
-    public PDFGridAdapter(Context c, List<File> files, boolean addInsertButton, PDFSelectCallback callback) {
+    public PDFGridAdapter(Context c, List<PromptPDFFile> files, boolean addInsertButton, boolean removableElements, PDFGridCallback callback) {
         mContext = c;
         mFiles = files;
         mCallback = callback;
         mAddInsertButton = addInsertButton;
+        mRemovableElements = removableElements;
     }
 
     // Total number of things contained within the adapter
@@ -67,7 +69,7 @@ public class PDFGridAdapter extends BaseAdapter {
                 }
             });
         } else {
-            final File f = (File) getItem(position);
+            final PromptPDFFile f = (PromptPDFFile) getItem(position);
 
             if (convertView == null) {
                 LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -90,12 +92,12 @@ public class PDFGridAdapter extends BaseAdapter {
             cellView.container.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mCallback.onPDFSelected(f.getAbsolutePath(), position);
+                    mCallback.onPDFSelected(f.file.getAbsolutePath(), position);
                 }
             });
 
             if (f != null) {
-                cellView.fileNameItem.setText(f.getName());
+                cellView.fileNameItem.setText(f.displayName);
 //                PromptViewManager.loadThumbnail(f, cellView.pdfView);
 //                PromptViewManager.loadThumbnail(f, mContext);
             }

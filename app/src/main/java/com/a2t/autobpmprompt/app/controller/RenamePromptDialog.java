@@ -13,11 +13,10 @@ import android.widget.EditText;
 import com.a2t.autobpmprompt.R;
 
 
-public class SetListDialog extends DialogFragment {
+public class RenamePromptDialog extends DialogFragment {
     // Use this instance of the interface to deliver action events
-    SetListDialogListener mListener;
+    RenamePromptDialogListener mListener;
     EditText title;
-    String tag;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -28,49 +27,38 @@ public class SetListDialog extends DialogFragment {
         LayoutInflater inflater = getActivity().getLayoutInflater();
 
 
-        View dialogView = inflater.inflate(R.layout.dialog_new_setlist, null);
-
-        tag = getTag();
-
-        final boolean isRename = tag.equals("renamesetlist");
+        View dialogView = inflater.inflate(R.layout.dialog_rename_prompt, null);
 
         // Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout
         builder.setView(dialogView)
-                .setMessage(getString(isRename ? R.string.rename_setlist_title : R.string.create_setlist_title))
+                .setMessage(getString(R.string.rename_prompt_title))
                 .setPositiveButton(R.string.save_button, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         String mTitle = title.getText().toString();
 
-                        if (isRename) {//TODO: ÑAPA ??
-                            String originalName = getArguments().getString(getString(R.string.setListNameVariable));
-                            mListener.onSetListRenamed(SetListDialog.this, originalName, mTitle);
-                        } else {
-                            mListener.onSetListCreated(SetListDialog.this, mTitle);
-                        }
+                        mListener.onPromptRenamed(RenamePromptDialog.this, mTitle);
                     }
                 })
                 .setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // User cancelled the dialog
-                        mListener.onSetListCancelled(SetListDialog.this);
+                        mListener.onPromptRenameCancelled(RenamePromptDialog.this);
                     }
                 });
 
-        title = (EditText)dialogView.findViewById(R.id.setlist_title);
+        title = (EditText) dialogView.findViewById(R.id.prompt_rename_title);
 
-        if(isRename){
-            String setList = getArguments().getString(getString(R.string.setListNameVariable));
-            title.setText(setList);
-        }
+        String promptName = getArguments().getString(getString(R.string.promptNameVariable));
+        title.setText(promptName);
 
         return builder.create();
     }
 
-    public interface SetListDialogListener {
-        void onSetListCreated(DialogFragment dialog, String title);
-        void onSetListRenamed(DialogFragment dialog, String title, String newTitle);
-        void onSetListCancelled(DialogFragment dialog);
+    public interface RenamePromptDialogListener {
+        void onPromptRenamed(DialogFragment dialog, String name);
+
+        void onPromptRenameCancelled(DialogFragment dialog);
     }
 
     // Override the Fragment.onAttach() method to instantiate the PDFDialogResultListener
@@ -80,11 +68,11 @@ public class SetListDialog extends DialogFragment {
         // Verify that the host activity implements the callback interface
         try {
             // Instantiate the SetListDialogListener so we can send events to the host
-            mListener = (SetListDialogListener) activity;
+            mListener = (RenamePromptDialogListener) activity;
         } catch (ClassCastException e) {
             // The activity doesn't implement the interface, throw exception
             throw new ClassCastException(activity.toString()
-                    + " must implement SetListDialogListener");
+                    + " must implement RenamePromptDialogListener");
         }
     }
 }

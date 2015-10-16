@@ -33,6 +33,7 @@
     <!-- SETLIST DIALOG -->
     <string name="create_setlist_title">Create SetList</string>
     <string name="rename_setlist_title">Rename SetList</string>
+    <string name="rename_prompt_title">Rename Prompt</string>
 
 
     <!-- SET LISTS -->
@@ -47,6 +48,11 @@
     <!-- ACTIVITY TITLES -->
     <string name="title_activity_prompt">PlayActivity</string>
 
+    <!-- ARE YOU SURE -->
+    <string name="areyousure_dialog_title">Are you sure?</string>
+    <string name="areyousure_dialog_ok">Yes</string>
+    <string name="areyousure_dialog_no">No</string>
+
 
     <!-- GLOBAL APP -->
     <string name="app_name">Auto BPM Prompt</string>
@@ -54,6 +60,7 @@
     <!-- STATIC BUNDLE VALUES -->
     <string name="isEditVariable">isEdit</string>
     <string name="promptNameVariable">promptName</string>
+    <string name="promptIdVariable">promptId</string>
     <string name="setListNameVariable">setList</string>
 
     <string name="xOffsetVariable">x</string>

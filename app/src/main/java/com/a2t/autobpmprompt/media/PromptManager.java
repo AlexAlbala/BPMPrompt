@@ -17,20 +17,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import io.realm.RealmList;
+
 public class PromptManager {
     private static final String TAG = "Prompt manager";
 
-    public static Prompt load(String name, PDFView pdf, SurfaceView floatingCanvas, Activity context, PromptEventsCallback callback) {
-        Log.i(TAG, "Loading prompt " + name);
-        PromptSettings settings = RealmIOHelper.getInstance().getPrompt(context, name);
+    public static Prompt load(long id, PDFView pdf, SurfaceView floatingCanvas, Activity context, PromptEventsCallback callback) {
+        Log.i(TAG, "Loading prompt " + id);
+        PromptSettings settings = RealmIOHelper.getInstance().getPrompt(context, id);
         return new Prompt(pdf, floatingCanvas, settings, context, callback);
     }
 
     public static boolean create(Context context, PromptSettings p) {
         RealmIOHelper r = RealmIOHelper.getInstance();
-
-        Log.i(TAG, "Create prompt " + p.toString());
-        String fileName = p.getName();
+        p.setId(System.currentTimeMillis());
+        p.setMarkers(new RealmList<Marker>());
+        String fileName = p.getName() + p.getId();
         File f = new File(p.getPdfFullPath());
         String saved;
         try {
@@ -42,8 +44,6 @@ public class PromptManager {
             e.printStackTrace();
             return false;
         }
-
-        //TODO: Assert values !!!!
     }
 
     public static boolean update(Context context, Prompt p) {
@@ -72,7 +72,20 @@ public class PromptManager {
         RealmIOHelper.getInstance().deleteMarker(ctx, m);
     }
 
+    public static void renamePrompt(Context ctx, Prompt prompt, String newName){
+        prompt.settings.setName(newName);
+        update(ctx, prompt);
+    }
+
     public static void delete(Context ctx, Prompt prompt) {
-        RealmIOHelper.getInstance().deletePrompt(ctx, prompt.settings);
+        delete(ctx, prompt.settings);
+    }
+
+    public static void delete(Context ctx, PromptSettings prompt) {
+        RealmIOHelper.getInstance().deletePrompt(ctx, prompt);
+    }
+
+    public static void delete(Context ctx, long promptId) {
+        RealmIOHelper.getInstance().deletePrompt(ctx, promptId);
     }
 }

@@ -8,6 +8,8 @@ import io.realm.annotations.PrimaryKey;
 
 public class PromptSettings extends RealmObject {
     @PrimaryKey
+    private long id;
+
     private String name;
 
     private String pdfFullPath;
@@ -113,6 +115,15 @@ public class PromptSettings extends RealmObject {
     public void setZoom(float zoom) {
         this.zoom = zoom;
     }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
 
     public PromptSettings() {
 

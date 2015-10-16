@@ -16,14 +16,14 @@ import com.a2t.autobpmprompt.app.callback.SetListAdapterCallback;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.app.model.SetList;
 import com.a2t.autobpmprompt.helpers.RealmIOHelper;
+import com.a2t.autobpmprompt.media.PromptManager;
 
 import java.util.List;
 
-import io.realm.Realm;
 import io.realm.RealmList;
 
 
-public class MainActivity extends AppCompatActivity implements SetListDialog.SetListDialogListener {
+public class MainActivity extends AppCompatActivity implements SetListDialog.SetListDialogListener, AreYouSureDialog.AreYouSureDialogListener {
     private static final String TAG = "MAIN ACTIVITY";
 
     boolean editMode = false;
@@ -33,20 +33,7 @@ public class MainActivity extends AppCompatActivity implements SetListDialog.Set
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
-        List<SetList> setLists = RealmIOHelper.getInstance().getAllSetLists(getApplicationContext());
-        if (setLists.size() == 0) {
-            SetList s = new SetList();
-            s.setTitle(getString(R.string.first_set_list_title));
-            RealmIOHelper.getInstance().insertSetList(getApplicationContext(), s);
-
-            //Set the first set list also in the local setlists list
-            s.setPrompts(new RealmList<PromptSettings>());
-            setLists.add(s);
-        }
-
-        setListsView = (ListView) findViewById(R.id.main_setlists);
+        loadSetLists();
         RealmIOHelper.getInstance().Debug(getApplicationContext());
     }
 
@@ -60,6 +47,16 @@ public class MainActivity extends AppCompatActivity implements SetListDialog.Set
     private void loadSetLists() {
         List<SetList> setLists = RealmIOHelper.getInstance().getAllSetLists(getApplicationContext());
 
+        if (setLists.size() == 0) {
+            SetList s = new SetList();
+            s.setTitle(getString(R.string.first_set_list_title));
+            RealmIOHelper.getInstance().insertSetList(getApplicationContext(), s);
+
+            //Set the first set list also in the local setlists list
+            s.setPrompts(new RealmList<PromptSettings>());
+            setLists.add(s);
+        }
+
         if (setListsView == null) {
             setListsView = (ListView) findViewById(R.id.main_setlists);
         }
@@ -69,8 +66,9 @@ public class MainActivity extends AppCompatActivity implements SetListDialog.Set
             public void onPromptSelected(String setList, PromptSettings prompt, int position) {
                 //Toast.makeText(getApplicationContext(), "SELECTED PROMPT " + prompt.toString(), Toast.LENGTH_SHORT).show();
                 Intent i = new Intent(getApplicationContext(), PromptActivity.class);
-                i.putExtra(getString(R.string.promptNameVariable), prompt.getName());
+                //i.putExtra(getString(R.string.promptNameVariable), prompt.getName());
                 i.putExtra(getString(R.string.setListNameVariable), setList);
+                i.putExtra(getString(R.string.promptIdVariable), prompt.getId());
                 i.putExtra(getString(R.string.isEditVariable), false);
                 startActivity(i);
             }
@@ -92,10 +90,23 @@ public class MainActivity extends AppCompatActivity implements SetListDialog.Set
             }
 
             @Override
-            public void onSetListRemovedClicked(String setList) {
-                //TODO: Are you sure ? check :)
-                RealmIOHelper.getInstance().deleteSetList(getApplicationContext(), setList);
-                loadSetLists();
+            public void onRemoveSetListClicked(String setList) {
+                DialogFragment newFragment = new AreYouSureDialog();
+                Bundle b = new Bundle();
+                b.putString("type", "setlist");
+                b.putString(getString(R.string.setListNameVariable), setList);
+                newFragment.setArguments(b);
+                newFragment.show(getSupportFragmentManager(), "areyousuresetlist");
+            }
+
+            @Override
+            public void onRemovePromptClicked(String setList, PromptSettings prompt, int position) {
+                DialogFragment newFragment = new SetListDialog();
+                Bundle b = new Bundle();
+                b.putString("type", "prompt");
+                b.putLong(getString(R.string.promptIdVariable), prompt.getId());
+                newFragment.setArguments(b);
+                newFragment.show(getSupportFragmentManager(), "areyousureprompt");
             }
         });
         setListsView.setAdapter(setListAdapter);
@@ -147,5 +158,24 @@ public class MainActivity extends AppCompatActivity implements SetListDialog.Set
     @Override
     public void onSetListCancelled(DialogFragment dialog) {
 
+    }
+
+    @Override
+    public void onOk(DialogFragment dialog, Bundle args) {
+        String type = args.getString("type");
+        if (type != null) {
+            if (type.equals("setlist")) {
+                RealmIOHelper.getInstance().deleteSetList(getApplicationContext(), args.getString(getString(R.string.setListNameVariable)));
+            } else if (type.equals("prompt")) {
+                PromptManager.delete(getApplicationContext(), args.getLong(getString(R.string.promptIdVariable)));
+            }
+        }
+        loadSetLists();
+        dialog.dismiss();
+    }
+
+    @Override
+    public void onCancel(DialogFragment dialog, Bundle args) {
+        dialog.dismiss();
     }
 }

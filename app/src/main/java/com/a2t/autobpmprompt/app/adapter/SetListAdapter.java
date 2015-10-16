@@ -1,7 +1,6 @@
 package com.a2t.autobpmprompt.app.adapter;
 
 import android.content.Context;
-import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,10 +10,11 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.a2t.autobpmprompt.R;
-import com.a2t.autobpmprompt.app.callback.PDFSelectCallback;
+import com.a2t.autobpmprompt.app.callback.PDFGridCallback;
 import com.a2t.autobpmprompt.app.callback.SetListAdapterCallback;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.app.model.SetList;
+import com.a2t.autobpmprompt.media.prompt.PromptPDFFile;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -87,7 +87,7 @@ public class SetListAdapter extends BaseAdapter {
             cellView.deleteBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mCallback.onSetListRemovedClicked(setList.getTitle());
+                    mCallback.onRemoveSetListClicked(setList.getTitle());
                 }
             });
 
@@ -100,12 +100,15 @@ public class SetListAdapter extends BaseAdapter {
 
             cellView.setListItem.setText(setList.getTitle());
 
-            List<File> pdflist = new ArrayList<>();
+            List<PromptPDFFile> pdflist = new ArrayList<>();
             for (PromptSettings ps : setList.getPrompts()) {
-                pdflist.add(new File(ps.getPdfFullPath()));
+                PromptPDFFile pdf = new PromptPDFFile();
+                pdf.file = new File(ps.getPdfFullPath());
+                pdf.displayName = ps.getName();
+                pdflist.add(pdf);
             }
 
-            PDFGridAdapter pdfAdapter = new PDFGridAdapter(mContext, pdflist, true, new PDFSelectCallback() {
+            PDFGridAdapter pdfAdapter = new PDFGridAdapter(mContext, pdflist, true, mEditMode, new PDFGridCallback() {
                 @Override
                 public void onPDFSelected(String fullPath, int pos) {
                     //Toast.makeText(mContext, "SETLISTADAPTER - FILE SELECTED " + fullPath, Toast.LENGTH_LONG).show();
@@ -115,6 +118,11 @@ public class SetListAdapter extends BaseAdapter {
                 @Override
                 public void onCreatePDFClicked() {
                     mCallback.onCreatePromptClicked(setList.getTitle());
+                }
+
+                @Override
+                public void onPDFRemoveClicked(String fullPath, int pos) {
+                    mCallback.onRemovePromptClicked(setList.getTitle(), setList.getPrompts().get(pos), position);
                 }
             });
 

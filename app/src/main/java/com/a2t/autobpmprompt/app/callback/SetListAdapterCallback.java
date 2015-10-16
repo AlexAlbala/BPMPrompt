@@ -6,5 +6,6 @@ public interface SetListAdapterCallback {
     void onPromptSelected(String setList, PromptSettings prompt, int position);
     void onCreatePromptClicked(String setList);
     void onSetListRenamedClicked(String setList);
-    void onSetListRemovedClicked(String setList);
+    void onRemoveSetListClicked(String setList);
+    void onRemovePromptClicked(String setList, PromptSettings prompt, int position);
 }
