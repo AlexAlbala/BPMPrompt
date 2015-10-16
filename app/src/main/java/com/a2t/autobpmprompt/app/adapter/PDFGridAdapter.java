@@ -18,8 +18,9 @@ import java.util.List;
 public class PDFGridAdapter extends BaseAdapter {
     static class ViewHolderItem {
         TextView fileNameItem;
-//        PDFView pdfView;
+        //        PDFView pdfView;
         Button container;
+        ImageButton deleteButton;
     }
 
     private Context mContext;
@@ -80,6 +81,7 @@ public class PDFGridAdapter extends BaseAdapter {
                 cellView.fileNameItem = (TextView) convertView.findViewById(R.id.cell_pdftitle);
 //                cellView.pdfView = (PDFView) convertView.findViewById(R.id.cell_pdfpreview);
                 cellView.container = (Button) convertView.findViewById(R.id.cell_pdfbutton);
+                cellView.deleteButton = (ImageButton) convertView.findViewById(R.id.cell_deleteButton);
 
                 // store the holder with the view.
                 convertView.setTag(cellView);
@@ -100,6 +102,14 @@ public class PDFGridAdapter extends BaseAdapter {
                 cellView.fileNameItem.setText(f.displayName);
 //                PromptViewManager.loadThumbnail(f, cellView.pdfView);
 //                PromptViewManager.loadThumbnail(f, mContext);
+
+                cellView.deleteButton.setVisibility(mRemovableElements ? View.VISIBLE : View.GONE);
+                cellView.deleteButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mCallback.onPDFRemoveClicked(f.file.getAbsolutePath(), position);
+                    }
+                });
             }
         }
 

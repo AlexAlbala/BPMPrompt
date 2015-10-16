@@ -31,6 +31,13 @@
         android:layout_gravity="bottom|center_horizontal"
         android:background="#0000"
         android:clickable="true" />
+
+    <ImageButton
+        android:id="@+id/cell_deleteButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:src="@android:drawable/ic_delete"        />
     <!--android:text="@string/select_pdf_button" />-->
 
 

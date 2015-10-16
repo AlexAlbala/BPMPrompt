@@ -101,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements SetListDialog.Set
 
             @Override
             public void onRemovePromptClicked(String setList, PromptSettings prompt, int position) {
-                DialogFragment newFragment = new SetListDialog();
+                DialogFragment newFragment = new AreYouSureDialog();
                 Bundle b = new Bundle();
                 b.putString("type", "prompt");
                 b.putLong(getString(R.string.promptIdVariable), prompt.getId());
