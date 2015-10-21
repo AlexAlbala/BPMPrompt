@@ -29,7 +29,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class PromptActivity extends AppCompatActivity implements MarkerDialog.MarkerDialogListener, RenamePromptDialog.RenamePromptDialogListener{
+public class PromptActivity extends AppCompatActivity implements MarkerDialog.MarkerDialogListener, RenamePromptDialog.RenamePromptDialogListener {
     static final String TAG = "PROMPTACTIVITY";
     boolean isEdit = false;
     boolean contentVisible = false;
@@ -63,10 +63,6 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
 
     int surfaceOffsetX;
     int surfaceOffsetY;
-    int clickMarkerColor;
-    Paint clickMarkerPaint;
-    int clickSquareSize;
-    int clickVerticalLineSize;
 
     int markerFgColor;
     int markerBgColor;
@@ -143,7 +139,7 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
 
         final int p = position;
         final boolean f = found;
-        drawMarkerMatched(marker);
+        currentPrompt.getPdf().drawMarkerMatched(marker);
 
         if (f) {
             highlightMarkerAdapter(p);
@@ -162,7 +158,6 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
             });
 
             showTopBar();
-
 
             Timer t = new Timer();
             t.schedule(new TimerTask() {
@@ -239,18 +234,14 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
         /**********************************************************************************/
 
         /******************* RETRIEVE VARIABLES ********************************************/
-        this.isEdit = getIntent().getBooleanExtra(getString(R.string.isEditVariable), false);
-        long idPrompt = getIntent().getLongExtra(getString(R.string.promptIdVariable), -1);
+        this.isEdit = getIntent().getBooleanExtra("isEdit", false);
+        long idPrompt = getIntent().getLongExtra("promptId", -1);
         /***********************************************************************************/
 
         /******************* INITIALIZE DIMENSIONS && COLORS *******************************/
         surfaceOffsetX = (int) getResources().getDimension(R.dimen.activity_prompt_markers_bar);
         surfaceOffsetY = (int) getResources().getDimension(R.dimen.activity_prompt_top_bar) + getStatusBarHeight();
-        clickSquareSize = (int) getResources().getDimension(R.dimen.click_square_size);
-        clickVerticalLineSize = (int) getResources().getDimension(R.dimen.click_verticalline_size);
-        clickMarkerColor = getResources().getColor(R.color.click_marker_color);
-        clickMarkerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        clickMarkerPaint.setColor(clickMarkerColor);
+
         highlightMarkerBgColor = getResources().getColor(R.color.highlight_marker_color_bg);
         highlightMarkerFgColor = getResources().getColor(R.color.highlight_marker_color_fg);
         markerBgColor = getResources().getColor(R.color.marker_color_bg);
@@ -287,11 +278,7 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
 
     private void configure() {
         //Clear canvas if needed
-        Canvas canvas = floatingCanvas.getHolder().lockCanvas();
-        if (canvas != null) {
-            canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
-            floatingCanvas.getHolder().unlockCanvasAndPost(canvas);
-        }
+        currentPrompt.getPdf().clear();
 
         if (isEdit) {
             frameControls.setVisibility(View.INVISIBLE);
@@ -315,9 +302,9 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
             public void onCreateMarkerClick() {
                 DialogFragment newFragment = new MarkerDialog();
                 Bundle args = new Bundle();
-                args.putFloat(getString(R.string.xOffsetVariable), lastMarkerX);
-                args.putFloat(getString(R.string.yOffsetVariable), lastMarkerY);
-                args.putInt(getString(R.string.pageVariable), currentPrompt.getPdf().getCurrentPage());
+                args.putFloat("xOffset", lastMarkerX);
+                args.putFloat("yOffset", lastMarkerY);
+                args.putInt("page", currentPrompt.getPdf().getCurrentPage());
 
                 newFragment.setArguments(args);
                 newFragment.show(PromptActivity.this.getSupportFragmentManager(), "markercreate");
@@ -330,13 +317,7 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
 
             @Override
             public void onMarkerClicked(Marker m) {
-                //drawMarkerMatched(m);
-                //int position;
-                //for (position = 0; position < currentPrompt.settings.getMarkers().size(); position++) {
-                //    resetMarkerAdapter(position);
-                //}
                 currentPrompt.notifyMarker(m);
-                //highlightMarker(m, false);
             }
         });
         markers.setAdapter(m);
@@ -375,58 +356,6 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
         }
     }
 
-    private void drawClickMarker(float x, float y) {
-        if (x >= 1 && y >= 1) {
-            lastMarkerX = (x - currentPrompt.getPdf().getCurrentXOffset()) / currentPrompt.getPdf().getCurrentZoom();
-            lastMarkerY = (y - currentPrompt.getPdf().getCurrentYOffset()) / currentPrompt.getPdf().getCurrentZoom();
-
-
-            Log.i(TAG, "Draw click in " + x + ":" + y);
-            Log.i(TAG, "Real marker position: " + lastMarkerX + ":" + lastMarkerY);
-
-            Canvas canvas = floatingCanvas.getHolder().lockCanvas();
-            canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
-            canvas.drawLine(0, y, floatingCanvas.getWidth(), y, clickMarkerPaint);
-
-            canvas.drawLine(x, y - clickVerticalLineSize, x, y + clickVerticalLineSize, clickMarkerPaint);
-
-            //Horizontal lines
-            canvas.drawLine(x - clickSquareSize, y - clickSquareSize, x + clickSquareSize, y - clickSquareSize, clickMarkerPaint);
-            canvas.drawLine(x - clickSquareSize, y + clickSquareSize, x + clickSquareSize, y + clickSquareSize, clickMarkerPaint);
-
-            //Vertical lines
-            canvas.drawLine(x - clickSquareSize, y - clickSquareSize, x - clickSquareSize, y + clickSquareSize, clickMarkerPaint);
-            canvas.drawLine(x + clickSquareSize, y - clickSquareSize, x + clickSquareSize, y + clickSquareSize, clickMarkerPaint);
-
-            floatingCanvas.getHolder().unlockCanvasAndPost(canvas);
-        }
-    }
-
-    private void drawMarkerMatched(Marker marker) {
-        Canvas canvas = floatingCanvas.getHolder().lockCanvas();
-        canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
-        float x = marker.getOffsetX() * currentPrompt.getPdf().getCurrentZoom() + currentPrompt.getPdf().getCurrentXOffset();
-        float y = marker.getOffsetY() * currentPrompt.getPdf().getCurrentZoom() + currentPrompt.getPdf().getCurrentYOffset();
-        Log.i(TAG, "Draw marker " + x + ":" + y);
-        if (x >= 1 && y >= 1) {
-
-
-            //Horizontal lines
-            canvas.drawLine(x - clickSquareSize, y - clickSquareSize, x + clickSquareSize, y - clickSquareSize, clickMarkerPaint);
-            canvas.drawLine(x - clickSquareSize, y + clickSquareSize, x + clickSquareSize, y + clickSquareSize, clickMarkerPaint);
-
-            //Vertical lines
-            canvas.drawLine(x - clickSquareSize, y - clickSquareSize, x - clickSquareSize, y + clickSquareSize, clickMarkerPaint);
-            canvas.drawLine(x + clickSquareSize, y - clickSquareSize, x + clickSquareSize, y + clickSquareSize, clickMarkerPaint);
-
-            canvas.drawText(marker.getTitle(), x + clickSquareSize * 2, y, clickMarkerPaint);
-            //canvas.drawText(marker.getNote(), x + clickSquareSize, y + clickSquareSize, clickMarkerPaint);
-
-        }
-
-        floatingCanvas.getHolder().unlockCanvasAndPost(canvas);
-    }
-
     private int getStatusBarHeight() {
         int result = 0;
         int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
@@ -441,7 +370,16 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
         float x = ev.getX();
         float y = ev.getY();
         if (isEdit) {
-            drawClickMarker(x - surfaceOffsetX, y - surfaceOffsetY);
+            float aX = x - surfaceOffsetX;
+            float aY = y - surfaceOffsetY;
+            lastMarkerX = (aX - currentPrompt.getPdf().getCurrentXOffset()) / currentPrompt.getPdf().getCurrentZoom();
+            lastMarkerY = (aY - currentPrompt.getPdf().getCurrentYOffset()) / currentPrompt.getPdf().getCurrentZoom();
+
+
+            Log.i(TAG, "Draw click in " + aX + ":" + aY);
+            Log.i(TAG, "Real marker position: " + lastMarkerX + ":" + lastMarkerY);
+
+            currentPrompt.getPdf().drawClickMarker(x, y);
             return super.dispatchTouchEvent(ev);
         } else {
             int cwidth = frameControls.getWidth();
@@ -571,7 +509,7 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
     public void renamePrompt(View view) {
         DialogFragment newFragment = new RenamePromptDialog();
         Bundle args = new Bundle();
-        args.putString(getString(R.string.promptNameVariable), currentPrompt.settings.getName());
+        args.putString("promptName", currentPrompt.settings.getName());
         newFragment.setArguments(args);
         newFragment.show(getSupportFragmentManager(), "renamesetlist");
     }

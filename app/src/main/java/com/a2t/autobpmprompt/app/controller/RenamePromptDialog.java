@@ -49,7 +49,7 @@ public class RenamePromptDialog extends DialogFragment {
 
         title = (EditText) dialogView.findViewById(R.id.prompt_rename_title);
 
-        String promptName = getArguments().getString(getString(R.string.promptNameVariable));
+        String promptName = getArguments().getString("promptName");
         title.setText(promptName);
 
         return builder.create();

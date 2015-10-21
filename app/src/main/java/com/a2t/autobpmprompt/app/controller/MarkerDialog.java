@@ -35,9 +35,9 @@ public class MarkerDialog extends DialogFragment {
         View dialogView = inflater.inflate(R.layout.dialog_marker, null);
 
         Bundle b = getArguments();
-        mX = b.getFloat(getString(R.string.xOffsetVariable));
-        mY = b.getFloat(getString(R.string.yOffsetVariable));
-        mPage = b.getInt(getString(R.string.pageVariable));
+        mX = b.getFloat("xOffset");
+        mY = b.getFloat("yOffset");
+        mPage = b.getInt("page");
 
         // Inflate and set the layout for the dialog
         // Pass null as the parent view because its going in the dialog layout
@@ -60,16 +60,17 @@ public class MarkerDialog extends DialogFragment {
                     }
                 });
 
-        title = (EditText)dialogView.findViewById(R.id.marker_title);
-        note = (EditText)dialogView.findViewById(R.id.marker_note);
-        bar = (EditText)dialogView.findViewById(R.id.marker_bar);
-        beat = (EditText)dialogView.findViewById(R.id.marker_beat);
+        title = (EditText) dialogView.findViewById(R.id.marker_title);
+        note = (EditText) dialogView.findViewById(R.id.marker_note);
+        bar = (EditText) dialogView.findViewById(R.id.marker_bar);
+        beat = (EditText) dialogView.findViewById(R.id.marker_beat);
 
         return builder.create();
     }
 
     public interface MarkerDialogListener {
         void onMarkerCreated(DialogFragment dialog, String title, String note, int bar, int beat, int page, float positionX, float positionY);
+
         void onMarkerCancelled(DialogFragment dialog);
     }
 

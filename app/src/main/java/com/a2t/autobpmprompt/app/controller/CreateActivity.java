@@ -45,7 +45,7 @@ public class CreateActivity extends AppCompatActivity implements PDFDialog.PDFDi
         lower = (EditText)findViewById(R.id.create_bar_lower);
         pdfPreview = (PDFView)findViewById(R.id.create_pdfpreview);
 
-        setList = getIntent().getStringExtra(getString(R.string.setListNameVariable));
+        setList = getIntent().getStringExtra("setListName");
 
         t = new TapTempo();
     }
@@ -79,9 +79,9 @@ public class CreateActivity extends AppCompatActivity implements PDFDialog.PDFDi
 
         //LAUNCH PROMPT EDIT ACTIVITY
         Intent i = new Intent(getApplicationContext(), PromptActivity.class);
-        i.putExtra(getString(R.string.promptIdVariable), promptSettings.getId());
-        i.putExtra(getString(R.string.setListNameVariable), setList);
-        i.putExtra(getString(R.string.isEditVariable), true);
+        i.putExtra("promptId", promptSettings.getId());
+        i.putExtra("setListName", setList);
+        i.putExtra("isEdit", true);
 
         startActivity(i);
         finish();

@@ -2,12 +2,14 @@ package com.a2t.autobpmprompt.media.prompt;
 
 import android.app.Activity;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.PixelFormat;
+import android.graphics.PorterDuff;
 import android.util.Log;
 import android.view.SurfaceView;
 import android.widget.Toast;
 
-import com.a2t.autobpmprompt.app.callback.PromptEventsCallback;
+import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.callback.PromptViewCallback;
 import com.a2t.autobpmprompt.app.callback.SimpleCallback;
 import com.a2t.autobpmprompt.app.model.Marker;
@@ -17,7 +19,6 @@ import com.joanzapata.pdfview.listener.OnLoadCompleteListener;
 import com.joanzapata.pdfview.listener.OnPageChangeListener;
 
 import java.io.File;
-import java.util.List;
 
 
 public class PromptViewManager {
@@ -28,38 +29,26 @@ public class PromptViewManager {
     //Native:
     //https://code.google.com/p/apv/
 
-    private final float DEFAULT_ZOOM = 1.0F;
     private PDFView pdfview;
     private Activity activity;
     private SurfaceView mFloatingCanvas;
     private PromptViewCallback mCallback;
+    int clickMarkerColor;
+    Paint clickMarkerPaint;
+    int clickSquareSize;
+    int clickVerticalLineSize;
 
-    public File getPdfFile() {
-        return pdfFile;
-    }
-
-    private File pdfFile;
-
-    private PromptViewManager() {
-
-    }
+    private Marker lastMarkerPrinted;
 
     public PromptViewManager(File pdf, PDFView pdfview, SurfaceView floatingCanvas, Activity activity, PromptViewCallback callback) {
         mCallback = callback;
+        clickSquareSize = (int) activity.getResources().getDimension(R.dimen.click_square_size);
+        clickVerticalLineSize = (int) activity.getResources().getDimension(R.dimen.click_verticalline_size);
+        clickMarkerColor = activity.getResources().getColor(R.color.click_marker_color);
+        clickMarkerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        clickMarkerPaint.setColor(clickMarkerColor);
         this.loadPDF(pdf, pdfview, floatingCanvas, activity);
     }
-
-//    /**
-//     * Hack because of a bug in PDFview; It crashes when you load a second PDF
-//     */
-//    public static void reinitPdfView(Context ctx, PDFView view) {
-//        ViewGroup group = (ViewGroup) view.getParent();
-//        int index = group.indexOfChild(view);
-//        group.removeView(view);
-//        view = new PDFView(ctx, null);
-//        view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-//        group.addView(view, index);
-//    }
 
     public static boolean loadThumbnail(File pdfFile, PDFView pdfview) {
         pdfview.fromFile(pdfFile)
@@ -72,54 +61,6 @@ public class PromptViewManager {
         return true;
     }
 
-//    @Nullable
-//    public static Bitmap renderToBitmap(Context context, File pdfFile) {
-//        Bitmap bi = null;
-//        InputStream inStream = null;
-//
-//        try {
-//            inStream = new FileInputStream(pdfFile);
-//
-//            Log.d(TAG, "Attempting to copy this file: " + pdfFile.getAbsolutePath());
-//            bi = renderToBitmap(context, inStream);
-//        } catch (java.io.FileNotFoundException e) {
-//            e.printStackTrace();
-//        } finally {
-//            try {
-//                inStream.close();
-//            } catch (IOException e) {
-//                // do nothing because the stream has already been closed
-//            }
-//        }
-//        return bi;
-//    }
-//
-//
-//    @Nullable
-//    public static Bitmap renderToBitmap(Context context, InputStream inStream) {
-//        Bitmap bi = null;
-//        try {
-//            byte[] decode = IOUtils.toByteArray(inStream);
-//
-//            ByteBuffer buf = ByteBuffer.wrap(decode);
-//            PDFPage mPdfPage = new PromptPDFFile(buf).getPage(0);
-//            float width = mPdfPage.getWidth();
-//            float height = mPdfPage.getHeight();
-//            RectF clip = null;
-//            bi = mPdfPage.getImage((int) (width), (int) (height), clip, true,
-//                    true);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        } finally {
-//            try {
-//                inStream.close();
-//            } catch (IOException e) {
-//                // do nothing because the stream has already been closed
-//            }
-//        }
-//        return bi;
-//    }
-
     public boolean loadPDF(File pdfFile, final PDFView pdfview, SurfaceView floatingCanvas, Activity mActivity) {
         pdfview.fromFile(pdfFile)
                 .defaultPage(1)
@@ -128,6 +69,11 @@ public class PromptViewManager {
                 .onDraw(new OnDrawListener() {
                     @Override
                     public void onLayerDrawn(Canvas canvas, float v, float v1, int i) {
+                        if(lastMarkerPrinted != null){
+                            drawMarkerMatched(lastMarkerPrinted);
+                        } else{
+                            clear();
+                        }
                         mCallback.onDraw(canvas, v, v1, i);
                     }
                 })
@@ -150,7 +96,6 @@ public class PromptViewManager {
 
         this.pdfview = pdfview;
         this.activity = mActivity;
-        this.pdfFile = pdfFile;
         this.mFloatingCanvas = floatingCanvas;
         return true;
     }
@@ -220,15 +165,6 @@ public class PromptViewManager {
         return pdfview.getCurrentPage();
     }
 
-    public void zoomIn() {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                pdfview.zoomTo(1.5F);
-            }
-        });
-    }
-
     public void zoomTo(final float zoom, final SimpleCallback callback) {
         activity.runOnUiThread(new Runnable() {
             @Override
@@ -237,15 +173,6 @@ public class PromptViewManager {
                 if (callback != null) {
                     callback.done();
                 }
-            }
-        });
-    }
-
-    public void zoomOut() {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                pdfview.zoomTo(1 / 1.5F);
             }
         });
     }
@@ -267,5 +194,58 @@ public class PromptViewManager {
         return pdfview.getZoom();
     }
 
+    public void drawClickMarker(float x, float y) {
+        if (x >= 1 && y >= 1) {
 
+            Canvas canvas = mFloatingCanvas.getHolder().lockCanvas();
+            canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
+            canvas.drawLine(0, y, mFloatingCanvas.getWidth(), y, clickMarkerPaint);
+
+            canvas.drawLine(x, y - clickVerticalLineSize, x, y + clickVerticalLineSize, clickMarkerPaint);
+
+            //Horizontal lines
+            canvas.drawLine(x - clickSquareSize, y - clickSquareSize, x + clickSquareSize, y - clickSquareSize, clickMarkerPaint);
+            canvas.drawLine(x - clickSquareSize, y + clickSquareSize, x + clickSquareSize, y + clickSquareSize, clickMarkerPaint);
+
+            //Vertical lines
+            canvas.drawLine(x - clickSquareSize, y - clickSquareSize, x - clickSquareSize, y + clickSquareSize, clickMarkerPaint);
+            canvas.drawLine(x + clickSquareSize, y - clickSquareSize, x + clickSquareSize, y + clickSquareSize, clickMarkerPaint);
+
+            mFloatingCanvas.getHolder().unlockCanvasAndPost(canvas);
+        }
+    }
+
+    public void clear(){
+        Canvas canvas = mFloatingCanvas.getHolder().lockCanvas();
+        if (canvas != null) {
+            canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
+            mFloatingCanvas.getHolder().unlockCanvasAndPost(canvas);
+        }
+        lastMarkerPrinted = null;
+    }
+
+    public void drawMarkerMatched(Marker marker) {
+        lastMarkerPrinted = marker;
+        Canvas canvas = mFloatingCanvas.getHolder().lockCanvas();
+        canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
+        float x = marker.getOffsetX() * getCurrentZoom() + getCurrentXOffset();
+        float y = marker.getOffsetY() * getCurrentZoom() + getCurrentYOffset();
+        Log.i(TAG, "Draw marker " + x + ":" + y);
+        if (x >= 1 && y >= 1) {
+
+            //Horizontal lines
+            canvas.drawLine(x - clickSquareSize, y - clickSquareSize, x + clickSquareSize, y - clickSquareSize, clickMarkerPaint);
+            canvas.drawLine(x - clickSquareSize, y + clickSquareSize, x + clickSquareSize, y + clickSquareSize, clickMarkerPaint);
+
+            //Vertical lines
+            canvas.drawLine(x - clickSquareSize, y - clickSquareSize, x - clickSquareSize, y + clickSquareSize, clickMarkerPaint);
+            canvas.drawLine(x + clickSquareSize, y - clickSquareSize, x + clickSquareSize, y + clickSquareSize, clickMarkerPaint);
+
+            canvas.drawText(marker.getTitle(), x + clickSquareSize * 2, y, clickMarkerPaint);
+            //canvas.drawText(marker.getNote(), x + clickSquareSize, y + clickSquareSize, clickMarkerPaint);
+
+        }
+
+        mFloatingCanvas.getHolder().unlockCanvasAndPost(canvas);
+    }
 }

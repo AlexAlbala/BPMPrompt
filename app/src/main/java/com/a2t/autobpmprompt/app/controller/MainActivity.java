@@ -64,19 +64,17 @@ public class MainActivity extends AppCompatActivity implements SetListDialog.Set
         SetListAdapter setListAdapter = new SetListAdapter(getApplicationContext(), setLists, editMode, new SetListAdapterCallback() {
             @Override
             public void onPromptSelected(String setList, PromptSettings prompt, int position) {
-                //Toast.makeText(getApplicationContext(), "SELECTED PROMPT " + prompt.toString(), Toast.LENGTH_SHORT).show();
                 Intent i = new Intent(getApplicationContext(), PromptActivity.class);
-                //i.putExtra(getString(R.string.promptNameVariable), prompt.getName());
-                i.putExtra(getString(R.string.setListNameVariable), setList);
-                i.putExtra(getString(R.string.promptIdVariable), prompt.getId());
-                i.putExtra(getString(R.string.isEditVariable), false);
+                i.putExtra("setListName", setList);
+                i.putExtra("promptId", prompt.getId());
+                i.putExtra("isEdit", false);
                 startActivity(i);
             }
 
             @Override
             public void onCreatePromptClicked(String setList) {
                 Intent i = new Intent(getApplicationContext(), CreateActivity.class);
-                i.putExtra(getString(R.string.setListNameVariable), setList);
+                i.putExtra("setListName", setList);
                 startActivity(i);
             }
 
@@ -84,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements SetListDialog.Set
             public void onSetListRenamedClicked(String setList) {
                 DialogFragment newFragment = new SetListDialog();
                 Bundle args = new Bundle();
-                args.putString(getString(R.string.setListNameVariable), setList);
+                args.putString("setListName", setList);
                 newFragment.setArguments(args);
                 newFragment.show(getSupportFragmentManager(), "renamesetlist");
             }
@@ -94,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements SetListDialog.Set
                 DialogFragment newFragment = new AreYouSureDialog();
                 Bundle b = new Bundle();
                 b.putString("type", "setlist");
-                b.putString(getString(R.string.setListNameVariable), setList);
+                b.putString("setListName", setList);
                 newFragment.setArguments(b);
                 newFragment.show(getSupportFragmentManager(), "areyousuresetlist");
             }
@@ -104,7 +102,7 @@ public class MainActivity extends AppCompatActivity implements SetListDialog.Set
                 DialogFragment newFragment = new AreYouSureDialog();
                 Bundle b = new Bundle();
                 b.putString("type", "prompt");
-                b.putLong(getString(R.string.promptIdVariable), prompt.getId());
+                b.putLong("promptId", prompt.getId());
                 newFragment.setArguments(b);
                 newFragment.show(getSupportFragmentManager(), "areyousureprompt");
             }
@@ -165,9 +163,9 @@ public class MainActivity extends AppCompatActivity implements SetListDialog.Set
         String type = args.getString("type");
         if (type != null) {
             if (type.equals("setlist")) {
-                RealmIOHelper.getInstance().deleteSetList(getApplicationContext(), args.getString(getString(R.string.setListNameVariable)));
+                RealmIOHelper.getInstance().deleteSetList(getApplicationContext(), args.getString("setListName"));
             } else if (type.equals("prompt")) {
-                PromptManager.delete(getApplicationContext(), args.getLong(getString(R.string.promptIdVariable)));
+                PromptManager.delete(getApplicationContext(), args.getLong("promptId"));
             }
         }
         loadSetLists();

@@ -43,7 +43,7 @@ public class SetListDialog extends DialogFragment {
                         String mTitle = title.getText().toString();
 
                         if (isRename) {//TODO: ÑAPA ??
-                            String originalName = getArguments().getString(getString(R.string.setListNameVariable));
+                            String originalName = getArguments().getString("setListName");
                             mListener.onSetListRenamed(SetListDialog.this, originalName, mTitle);
                         } else {
                             mListener.onSetListCreated(SetListDialog.this, mTitle);
@@ -57,10 +57,10 @@ public class SetListDialog extends DialogFragment {
                     }
                 });
 
-        title = (EditText)dialogView.findViewById(R.id.setlist_title);
+        title = (EditText) dialogView.findViewById(R.id.setlist_title);
 
-        if(isRename){
-            String setList = getArguments().getString(getString(R.string.setListNameVariable));
+        if (isRename) {
+            String setList = getArguments().getString("setListName");
             title.setText(setList);
         }
 
@@ -69,7 +69,9 @@ public class SetListDialog extends DialogFragment {
 
     public interface SetListDialogListener {
         void onSetListCreated(DialogFragment dialog, String title);
+
         void onSetListRenamed(DialogFragment dialog, String title, String newTitle);
+
         void onSetListCancelled(DialogFragment dialog);
     }
 
