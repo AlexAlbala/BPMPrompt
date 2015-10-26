@@ -25,13 +25,9 @@ public class CreateActivity extends AppCompatActivity implements PDFDialog.PDFDi
     EditText bpm;
     EditText upper;
     EditText lower;
-
     PDFView pdfPreview;
-
     File pdfFile;
-
     String setList;
-
     TapTempo t;
 
     @Override

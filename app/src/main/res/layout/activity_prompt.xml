@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#4b4e50"
+    android:background="#ffffff"
     tools:context="com.a2t.autobpmprompt.app.controller.PromptActivity">
 
 
@@ -50,7 +50,8 @@
                         android:id="@+id/prompt_current_bpm"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:inputType="number" />
+                        android:layout_gravity="center_vertical"
+                        android:inputType="number"/>
 
                     <TextView
                         android:id="@+id/prompt_current_bar"
@@ -61,6 +62,13 @@
                         android:id="@+id/prompt_current_beat"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
+
+                    <ImageView
+                        android:id="@+id/led_top_bar"
+                        android:layout_width="@dimen/activity_prompt_ledsize"
+                        android:layout_height="@dimen/activity_prompt_ledsize"
+                        android:src="@drawable/ledoff"
+                        android:layout_gravity="center_vertical"/>
                 </LinearLayout>
 
                 <LinearLayout

@@ -22,6 +22,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -31,9 +32,13 @@ import java.util.TimerTask;
 
 public class PromptActivity extends AppCompatActivity implements MarkerDialog.MarkerDialogListener, RenamePromptDialog.RenamePromptDialogListener {
     static final String TAG = "PROMPTACTIVITY";
+    private static final int NOTIFICATION_TIME = 5000;
+    private static final int BLINK_LED_TIME_MS = 150;
     boolean isEdit = false;
     boolean contentVisible = false;
     boolean isClick = false;
+
+    Timer blinkTimer;
 
     View controlsView;
     View frameControls;
@@ -53,6 +58,7 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
     Button doneTopButton;
     Button renameTopButton;
     Button deleteTopButton;
+    ImageView ledImage;
 
     TextView currentMarkerTitle;
     TextView currentMarkerNote;
@@ -64,23 +70,34 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
     int surfaceOffsetX;
     int surfaceOffsetY;
 
-    int markerFgColor;
-    int markerBgColor;
-
-    int highlightMarkerFgColor;
-    int highlightMarkerBgColor;
-
     float lastMarkerX;
     float lastMarkerY;
 
     int nCurrentBeat;
     int nCurrentBar;
 
+    private void blinkLed() {
+        if (blinkTimer != null) {
+            ledImage.setImageResource(R.drawable.ledon);
+            blinkTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ledImage.setImageResource(R.drawable.ledoff);
+                        }
+                    });
+                }
+            }, BLINK_LED_TIME_MS);
+        }
+    }
 
     Runnable changeBar = new Runnable() {
         @Override
         public void run() {
             currentBar.setText(String.valueOf(nCurrentBar));
+            blinkLed();
         }
     };
 
@@ -88,8 +105,10 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
         @Override
         public void run() {
             currentBeat.setText(String.valueOf(nCurrentBeat));
+            blinkLed();
         }
     };
+
 
     PromptEventsCallback promptEventsCallback = new PromptEventsCallback() {
         @Override
@@ -153,7 +172,6 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
                     currentMarkerNote.setText(marker.getNote());
                     currentMarkerBeat.setText("Beat: " + marker.getBeat());
                     currentMarkerBar.setText("Bar: " + marker.getBar());
-
                 }
             });
 
@@ -168,7 +186,7 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
                     if (f)
                         resetMarkerAdapter(p);
                 }
-            }, 3000);
+            }, NOTIFICATION_TIME);
         }
     }
 
@@ -179,10 +197,7 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    v.setBackgroundColor(highlightMarkerBgColor);
-                    ((TextView) v.findViewById(R.id.marker_title)).setTextColor(highlightMarkerFgColor);
-                    ((TextView) v.findViewById(R.id.marker_beat)).setTextColor(highlightMarkerFgColor);
-                    ((TextView) v.findViewById(R.id.marker_bar)).setTextColor(highlightMarkerFgColor);
+                    ((ImageView) v.findViewById(R.id.marker_bg_image)).setImageResource(R.drawable.postitgreen);
                 }
             });
         }
@@ -195,10 +210,7 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    v.setBackgroundColor(markerBgColor);
-                    ((TextView) v.findViewById(R.id.marker_title)).setTextColor(markerFgColor);
-                    ((TextView) v.findViewById(R.id.marker_bar)).setTextColor(markerFgColor);
-                    ((TextView) v.findViewById(R.id.marker_beat)).setTextColor(markerFgColor);
+                    ((ImageView) v.findViewById(R.id.marker_bg_image)).setImageResource(R.drawable.postityellow);
                 }
             });
         }
@@ -211,6 +223,7 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
 
         /****************** LAYOUT ELEMENTS LOAD ******************************************/
         currentBar = (TextView) findViewById(R.id.prompt_current_bar);
+        ledImage = (ImageView) findViewById(R.id.led_top_bar);
         currentBeat = (TextView) findViewById(R.id.prompt_current_beat);
         currentBpm = (EditText) findViewById(R.id.prompt_current_bpm);
         controlsView = findViewById(R.id.fullscreen_content_controls);
@@ -241,11 +254,6 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
         /******************* INITIALIZE DIMENSIONS && COLORS *******************************/
         surfaceOffsetX = (int) getResources().getDimension(R.dimen.activity_prompt_markers_bar);
         surfaceOffsetY = (int) getResources().getDimension(R.dimen.activity_prompt_top_bar) + getStatusBarHeight();
-
-        highlightMarkerBgColor = getResources().getColor(R.color.highlight_marker_color_bg);
-        highlightMarkerFgColor = getResources().getColor(R.color.highlight_marker_color_fg);
-        markerBgColor = getResources().getColor(R.color.marker_color_bg);
-        markerFgColor = getResources().getColor(R.color.marker_color_fg);
         /***********************************************************************************/
 
         /******************* PROMPT LOADING ************************************************/
@@ -253,6 +261,8 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
         configure();
         currentBpm.setText(String.valueOf(currentPrompt.settings.getBpm()));
         /**********************************************************************************/
+
+        blinkTimer = new Timer();
     }
 
     //Hide top bar when the window has loaded
@@ -372,14 +382,16 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
         if (isEdit) {
             float aX = x - surfaceOffsetX;
             float aY = y - surfaceOffsetY;
-            lastMarkerX = (aX - currentPrompt.getPdf().getCurrentXOffset()) / currentPrompt.getPdf().getCurrentZoom();
-            lastMarkerY = (aY - currentPrompt.getPdf().getCurrentYOffset()) / currentPrompt.getPdf().getCurrentZoom();
 
+            if (aX >= 0 && aY >= 0) {
+                lastMarkerX = (aX - currentPrompt.getPdf().getCurrentXOffset()) / currentPrompt.getPdf().getCurrentZoom();
+                lastMarkerY = (aY - currentPrompt.getPdf().getCurrentYOffset()) / currentPrompt.getPdf().getCurrentZoom();
 
-            Log.i(TAG, "Draw click in " + aX + ":" + aY);
-            Log.i(TAG, "Real marker position: " + lastMarkerX + ":" + lastMarkerY);
+                Log.i(TAG, "Draw click in " + aX + ":" + aY);
+                Log.i(TAG, "Real marker position: " + lastMarkerX + ":" + lastMarkerY);
 
-            currentPrompt.getPdf().drawClickMarker(x, y);
+                currentPrompt.getPdf().drawClickMarker(aX, aY);
+            }
             return super.dispatchTouchEvent(ev);
         } else {
             int cwidth = frameControls.getWidth();
@@ -474,7 +486,7 @@ public class PromptActivity extends AppCompatActivity implements MarkerDialog.Ma
 
     @Override
     public void onMarkerCreated(DialogFragment dialog, String title, String note, int bar, int beat, int page, float positionX, float positionY) {
-        Log.i(TAG, "Marker created");
+        Log.i(TAG, "Marker created: " + positionX + ":" + positionY);
 
         Marker m = new Marker();
         m.setTitle(title);
