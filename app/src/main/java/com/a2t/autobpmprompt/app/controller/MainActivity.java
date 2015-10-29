@@ -1,8 +1,8 @@
 package com.a2t.autobpmprompt.app.controller;
 
+import android.app.Activity;
+import android.app.DialogFragment;
 import android.content.Intent;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -23,7 +23,7 @@ import java.util.List;
 import io.realm.RealmList;
 
 
-public class MainActivity extends AppCompatActivity implements SetListDialog.SetListDialogListener, AreYouSureDialog.AreYouSureDialogListener {
+public class MainActivity extends Activity implements SetListDialog.SetListDialogListener, AreYouSureDialog.AreYouSureDialogListener {
     private static final String TAG = "MAIN ACTIVITY";
 
     boolean editMode = false;
@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements SetListDialog.Set
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         loadSetLists();
-        RealmIOHelper.getInstance().Debug(getApplicationContext());
+        RealmIOHelper.getInstance().debug(getApplicationContext());
     }
 
     @Override
@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity implements SetListDialog.Set
                 Bundle args = new Bundle();
                 args.putString("setListName", setList);
                 newFragment.setArguments(args);
-                newFragment.show(getSupportFragmentManager(), "renamesetlist");
+                newFragment.show(getFragmentManager(), "renamesetlist");
             }
 
             @Override
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements SetListDialog.Set
                 b.putString("type", "setlist");
                 b.putString("setListName", setList);
                 newFragment.setArguments(b);
-                newFragment.show(getSupportFragmentManager(), "areyousuresetlist");
+                newFragment.show(getFragmentManager(), "areyousuresetlist");
             }
 
             @Override
@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements SetListDialog.Set
                 b.putString("type", "prompt");
                 b.putLong("promptId", prompt.getId());
                 newFragment.setArguments(b);
-                newFragment.show(getSupportFragmentManager(), "areyousureprompt");
+                newFragment.show(getFragmentManager(), "areyousureprompt");
             }
         });
         setListsView.setAdapter(setListAdapter);
@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements SetListDialog.Set
 
     public void createSetList(View view) {
         DialogFragment newFragment = new SetListDialog();
-        newFragment.show(getSupportFragmentManager(), "createsetlist");
+        newFragment.show(getFragmentManager(), "createsetlist");
     }
 
     public void editMode(View view) {

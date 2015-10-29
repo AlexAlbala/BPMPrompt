@@ -40,6 +40,8 @@
     <string name="play_button">Play</string>
     <string name="pause_button">Pause</string>
     <string name="stop_button">Stop</string>
+    <string name="cant_create_marker">Cannot create marker</string>
+    <string name="must_click_marker">Before you create marker you must click the location in the prompt</string>
 
 
     <!-- ACTIVITY TITLES -->

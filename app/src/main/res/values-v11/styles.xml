@@ -1,17 +1,13 @@
 <resources>
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="android:Theme.Holo.Light">
+        <!-- Customize your theme here. -->
+    </style>
 
-    <style name="FullscreenTheme" parent="android:Theme.Holo">
+    <style name="FullscreenTheme" parent="android:Theme.Holo.Light.NoActionBar.Fullscreen">
         <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
         <item name="android:windowActionBarOverlay">true</item>
         <item name="android:windowBackground">@null</item>
-        <item name="metaButtonBarStyle">?android:attr/buttonBarStyle</item>
-        <item name="metaButtonBarButtonStyle">?android:attr/buttonBarButtonStyle</item>
-    </style>
-
-    <style name="FullscreenNoActionBarTheme" parent="android:Theme.Black.NoTitleBar.Fullscreen">
-        <item name="android:windowActionBarOverlay">false</item>
-        <item name="android:windowBackground">@null</item>
-        <item name="android:button">@android:style/Widget.ActionButton</item>
         <item name="metaButtonBarStyle">?android:attr/buttonBarStyle</item>
         <item name="metaButtonBarButtonStyle">?android:attr/buttonBarButtonStyle</item>
     </style>
@@ -20,11 +16,11 @@
         <item name="android:background">@android:color/transparent</item>
     </style>
 
-    <style name="CompatNoTitle" parent="@style/Theme.AppCompat.Light">
-        <item name="windowNoTitle">true</item>
-        <item name="windowActionBar">false</item>
+    <style name="FullScreen" parent="@style/FullscreenTheme">
+        <!--<item name="windowNoTitle">true</item>-->
+        <!--<item name="windowActionBar">false</item>-->
         <!--<item name="android:windowFullscreen">true</item>-->
-        <item name="android:windowContentOverlay">@null</item>
+        <!--<item name="android:windowContentOverlay">@null</item>-->
     </style>
 
 </resources>

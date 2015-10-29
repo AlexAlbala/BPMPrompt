@@ -6,11 +6,18 @@
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
+        <ImageView
+            android:layout_width="150dp"
+            android:layout_height="130dp"
+            android:src="@drawable/clip_note"/>
 
         <TextView
             android:id="@+id/setlist_title"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="60dp"
+            android:layout_marginStart="30dp"
+            android:text="pasdadsad"/>
 
         <LinearLayout
             android:layout_width="wrap_content"

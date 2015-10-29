@@ -10,7 +10,7 @@ import android.view.SurfaceView;
 
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.callback.PromptViewCallback;
-import com.a2t.autobpmprompt.app.callback.SimpleCallback;
+import com.a2t.a2tlib.tools.SimpleCallback;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.joanzapata.pdfview.PDFView;
 import com.joanzapata.pdfview.listener.OnDrawListener;
@@ -46,6 +46,8 @@ public class PromptViewManager {
     private float lastXClick;
     private float lastYClick;
 
+    //private final int MOVEMENT_PX = 1;
+
     public PromptViewManager(File pdf, PDFView pdfview, SurfaceView floatingCanvas, Activity activity, PromptViewCallback callback) {
         mCallback = callback;
         clickSquareSize = (int) activity.getResources().getDimension(R.dimen.click_square_size);
@@ -53,6 +55,7 @@ public class PromptViewManager {
         clickMarkerColor = activity.getResources().getColor(R.color.click_marker_color);
         clickMarkerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         clickMarkerPaint.setColor(clickMarkerColor);
+        clickMarkerPaint.setStrokeWidth(activity.getResources().getDimension(R.dimen.click_stroke_size));
         markerRefreshTimer = new Timer();
         this.loadPDF(pdf, pdfview, floatingCanvas, activity);
     }
@@ -136,7 +139,18 @@ public class PromptViewManager {
                     if (_y > 0) _y = 0;
 
                     Log.i(TAG, "Going to move to " + x + ":" + y + " -> " + _x + ":" + _y);
+
+                    /*float tx, ty;
+                    for (tx = pdfview.getCurrentXOffset(), ty = pdfview.getCurrentYOffset(); tx > _x || ty > _y; tx -= MOVEMENT_PX, ty -= MOVEMENT_PX) {
+                        if (tx < _x) tx = _x;
+                        if (ty < _y) ty = _y;
+                        Log.i(TAG, "tx " + tx + " ty " + ty);
+
+                        pdfview.moveTo(tx, ty);
+                    }*/
+
                     pdfview.moveTo(_x, _y);
+
                     if (callback != null)
                         callback.done();
                 }
@@ -148,19 +162,8 @@ public class PromptViewManager {
         }
     }
 
-    public void advanceStep(final int step) {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                float n = -1 * step * pdfview.getZoom();
-                pdfview.moveRelativeTo(0f, n);
-            }
-        });
-
-    }
-
     public void debug() {
-        Log.i(TAG,"PAGE: " + pdfview.getCurrentPage() +
+        Log.i(TAG, "PAGE: " + pdfview.getCurrentPage() +
                 "\nZOOM: " + pdfview.getZoom() +
                 "\nOFFSETX: " + pdfview.getCurrentXOffset() +
                 "\nOFFSETY: " + pdfview.getCurrentYOffset() +
@@ -215,21 +218,26 @@ public class PromptViewManager {
         if (x >= 1 && y >= 1) {
 
             Canvas canvas = mFloatingCanvas.getHolder().lockCanvas();
-            canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
-            canvas.drawLine(0, y, mFloatingCanvas.getWidth(), y, clickMarkerPaint);
-
-            canvas.drawLine(x, y - clickVerticalLineSize, x, y + clickVerticalLineSize, clickMarkerPaint);
-
-            //Horizontal lines
-            canvas.drawLine(x - clickSquareSize, y - clickSquareSize, x + clickSquareSize, y - clickSquareSize, clickMarkerPaint);
-            canvas.drawLine(x - clickSquareSize, y + clickSquareSize, x + clickSquareSize, y + clickSquareSize, clickMarkerPaint);
-
-            //Vertical lines
-            canvas.drawLine(x - clickSquareSize, y - clickSquareSize, x - clickSquareSize, y + clickSquareSize, clickMarkerPaint);
-            canvas.drawLine(x + clickSquareSize, y - clickSquareSize, x + clickSquareSize, y + clickSquareSize, clickMarkerPaint);
-
+            drawClickOnCanvas(canvas, x, y);
             mFloatingCanvas.getHolder().unlockCanvasAndPost(canvas);
         }
+    }
+
+    private void drawClickOnCanvas(Canvas canvas, float x, float y) {
+        canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
+//        canvas.drawLine(0, y, mFloatingCanvas.getWidth(), y, clickMarkerPaint);
+
+        //HORIZONTAL SEPARATOR
+        //canvas.drawLine(x, y - clickVerticalLineSize, x, y + clickVerticalLineSize, clickMarkerPaint);
+
+        //SQUARE
+        //Horizontal lines
+        canvas.drawLine(x - clickSquareSize, y - clickSquareSize, x + clickSquareSize, y + clickSquareSize, clickMarkerPaint);
+        canvas.drawLine(x - clickSquareSize, y + clickSquareSize, x + clickSquareSize, y - clickSquareSize, clickMarkerPaint);
+
+        //Vertical lines
+        //canvas.drawLine(x - clickSquareSize, y - clickSquareSize, x - clickSquareSize, y + clickSquareSize, clickMarkerPaint);
+//        canvas.drawLine(x + clickSquareSize, y - clickSquareSize, x + clickSquareSize, y + clickSquareSize, clickMarkerPaint);
     }
 
     public void clear() {
@@ -250,6 +258,9 @@ public class PromptViewManager {
         Log.i(TAG, "Draw marker " + x + ":" + y);
         if (x >= 1 && y >= 1) {
 
+            drawClickOnCanvas(canvas, x, y);
+
+            /*
             //Horizontal lines
             canvas.drawLine(x - clickSquareSize, y - clickSquareSize, x + clickSquareSize, y - clickSquareSize, clickMarkerPaint);
             canvas.drawLine(x - clickSquareSize, y + clickSquareSize, x + clickSquareSize, y + clickSquareSize, clickMarkerPaint);
@@ -257,10 +268,9 @@ public class PromptViewManager {
             //Vertical lines
             canvas.drawLine(x - clickSquareSize, y - clickSquareSize, x - clickSquareSize, y + clickSquareSize, clickMarkerPaint);
             canvas.drawLine(x + clickSquareSize, y - clickSquareSize, x + clickSquareSize, y + clickSquareSize, clickMarkerPaint);
+            */
 
-            canvas.drawText(marker.getTitle(), x + clickSquareSize * 2, y, clickMarkerPaint);
-            //canvas.drawText(marker.getNote(), x + clickSquareSize, y + clickSquareSize, clickMarkerPaint);
-
+            //canvas.drawText(marker.getTitle(), x + clickSquareSize * 2, y, clickMarkerPaint);
         }
 
         mFloatingCanvas.getHolder().unlockCanvasAndPost(canvas);

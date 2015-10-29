@@ -3,25 +3,29 @@ package com.a2t.autobpmprompt.helpers;
 import android.content.Context;
 import android.util.Log;
 
+import com.a2t.a2tlib.bbdd.RealmDriver;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.SetList;
-import com.a2t.autobpmprompt.media.Prompt;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import io.realm.Realm;
 import io.realm.RealmList;
-import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
 public class RealmIOHelper {
     private static RealmIOHelper INSTANCE;
     private static final String TAG = "RealmIOHelper";
 
-    private RealmIOHelper() {
+    RealmDriver<SetList> mSetLists;
+    RealmDriver<PromptSettings> mPromptSettings;
+    RealmDriver<Marker> mMarker;
 
+    private RealmIOHelper() {
+        mSetLists = new RealmDriver<>(SetList.class);
+        mPromptSettings = new RealmDriver<>(PromptSettings.class);
+        mMarker = new RealmDriver<>(Marker.class);
     }
 
     public static RealmIOHelper getInstance() {
@@ -30,10 +34,6 @@ public class RealmIOHelper {
         }
 
         return INSTANCE;
-    }
-
-    private Realm getRealm(Context ctx) {
-        return Realm.getInstance(ctx);
     }
 
     public void insertPrompt(Context ctx, PromptSettings settings) {
@@ -47,45 +47,37 @@ public class RealmIOHelper {
     }
 
     public void insertSetList(Context ctx, SetList setList) {
-        Realm r = getRealm(ctx);
-        r.beginTransaction();
-        SetList s = r.createObject(SetList.class);
-        s.setTitle(setList.getTitle());
-        s.setPrompts(setList.getPrompts());
-        r.commitTransaction();
+        mSetLists.insertOne(ctx, setList);
     }
 
     public void insertPromptIntoSetList(Context ctx, PromptSettings prompt, String setList) {
-        Realm r = getRealm(ctx);
-        r.beginTransaction();
-        SetList updatedSetList = r.where(SetList.class).equalTo("title", setList).findFirst();
+        SetList s = mSetLists.getOne(ctx, "title", setList);
+        SetList updatedSetList = new SetList();
+        CopySetList(s, updatedSetList);
         updatedSetList.getPrompts().add(prompt);
-        r.commitTransaction();
+        mSetLists.updateOne(ctx, updatedSetList);
     }
 
     public List<SetList> getAllSetLists(Context ctx) {
+        RealmResults<SetList> results = mSetLists.getAll(ctx);
         List<SetList> list = new ArrayList<>();
-        for (SetList s : getRealm(ctx).allObjects(SetList.class)) {
+        for (SetList s : results) {
             list.add(s);
         }
         return list;
     }
 
-    public List<PromptSettings> getAllPromptSettings(Context ctx) {
-        List<PromptSettings> list = new ArrayList<>();
-        for (PromptSettings ps : getRealm(ctx).allObjects(PromptSettings.class)) {
-            list.add(ps);
-        }
-        return list;
-    }
+//    public List<PromptSettings> getAllPromptSettings(Context ctx) {
+//        RealmResults<PromptSettings> results = mPromptSettings.getAll(ctx);
+//        List<PromptSettings> list = new ArrayList<>();
+//        for (PromptSettings ps : results) {
+//            list.add(ps);
+//        }
+//        return list;
+//    }
 
     public void updatePrompt(Context ctx, PromptSettings updatedPrompt) {
-        Realm r = getRealm(ctx);
-        r.beginTransaction();
-        PromptSettings prompt = r.where(PromptSettings.class).equalTo("id", updatedPrompt.getId()).findFirst();
-        CopyPromptSettings(updatedPrompt, prompt);
-        r.commitTransaction();
-
+        mPromptSettings.updateOne(ctx, updatedPrompt);
     }
 
     private void CopyMarker(Marker from, Marker to) {
@@ -97,6 +89,17 @@ public class RealmIOHelper {
         to.setBar(from.getBar());
         to.setBeat(from.getBeat());
         to.setPage(from.getPage());
+    }
+
+    private void CopySetList(SetList from, SetList to) {
+        to.setPrompts(new RealmList<PromptSettings>());
+
+        for (PromptSettings ps : from.getPrompts()) {
+            PromptSettings newPrompt = new PromptSettings();
+            CopyPromptSettings(ps, newPrompt);
+            to.getPrompts().add(newPrompt);
+        }
+        to.setTitle(from.getTitle());
     }
 
     private void CopyPromptSettings(PromptSettings from, PromptSettings to) {
@@ -122,25 +125,14 @@ public class RealmIOHelper {
     }
 
     public PromptSettings getPrompt(Context ctx, long id) {
-        Realm r = getRealm(ctx);
-
-        // Build the query looking at all users:
-        RealmQuery<PromptSettings> query = r.where(PromptSettings.class);
-
-        // Add query conditions:
-        query.equalTo("id", id);
-
-        // Execute the query:
-        PromptSettings fromDb = query.findFirst();
-
+        PromptSettings ps =  mPromptSettings.getOne(ctx, "id", id);
         PromptSettings returned = new PromptSettings();
-        CopyPromptSettings(fromDb, returned);
+        CopyPromptSettings(ps, returned);
         return returned;
     }
 
-    public void Debug(Context ctx) {
-
-        RealmResults<Marker> lm = getRealm(ctx).allObjects(Marker.class);
+    public void debug(Context ctx) {
+        RealmResults<Marker> lm = mMarker.getAll(ctx);
         Log.i(TAG, "*********************************");
         Log.i(TAG, "FOUND " + lm.size() + " MARKERS");
         Log.i(TAG, "*********************************");
@@ -148,7 +140,7 @@ public class RealmIOHelper {
             Log.i(TAG, m.toString());
         }
 
-        RealmResults<PromptSettings> lp = getRealm(ctx).allObjects(PromptSettings.class);
+        RealmResults<PromptSettings> lp = mPromptSettings.getAll(ctx);
         Log.i(TAG, "*********************************");
         Log.i(TAG, "FOUND " + lp.size() + " PROMPTS");
         Log.i(TAG, "*********************************");
@@ -156,74 +148,47 @@ public class RealmIOHelper {
             Log.i(TAG, ps.toString());
         }
 
-        RealmResults<SetList> ls = getRealm(ctx).allObjects(SetList.class);
+        RealmResults<SetList> ls = mSetLists.getAll(ctx);
         Log.i(TAG, "*********************************");
         Log.i(TAG, "FOUND " + ls.size() + " SETLISTS");
         Log.i(TAG, "*********************************");
 
-        for (SetList s : getRealm(ctx).allObjects(SetList.class)) {
+        for (SetList s : ls) {
             Log.i(TAG, s.toString());
         }
     }
 
     public void deleteSetList(Context ctx, String setList) {
-        Realm r = getRealm(ctx);
-        SetList set = r.where(SetList.class).equalTo("title", setList).findFirst();
+        SetList set = mSetLists.getOne(ctx, "title", setList);
 
         for(PromptSettings ps : set.getPrompts()){
-            deletePrompt(ctx, ps);
+            deletePrompt(ctx, ps.getId());
         }
 
-        // All changes to data must happen in a transaction
-        r.beginTransaction();
-        set.removeFromRealm();
-        r.commitTransaction();
+        mSetLists.deleteOne(ctx, "title", setList);
     }
 
     public void renameSetList(Context ctx, String title, String newTitle) {
         Log.i(TAG, "Rename set list: " + title + " -> " + newTitle);
 
-        Realm r = getRealm(ctx);
-        SetList set = r.where(SetList.class).equalTo("title", title).findFirst();
+        SetList set = mSetLists.getOne(ctx, "title", title);
+        set.setTitle(newTitle);
 
-        //Create new set list
-        r.beginTransaction();
-        SetList s = r.createObject(SetList.class);
-        s.setTitle(newTitle);
-        s.setPrompts(set.getPrompts());
-        r.commitTransaction();
-
-        // Remove old set list
-        r.beginTransaction();
-        set.removeFromRealm();
-        r.commitTransaction();
+        mSetLists.insertOne(ctx, set);
+        mSetLists.deleteOne(ctx, "title", title);
     }
 
     public void deleteMarker(Context ctx, Marker m) {
-        Realm r = getRealm(ctx);
-        Marker marker = r.where(Marker.class).equalTo("id", m.getId()).findFirst();
-
-        // Remove marker
-        r.beginTransaction();
-        marker.removeFromRealm();
-        r.commitTransaction();
-    }
-
-    public void deletePrompt(Context ctx, PromptSettings prompt) {
-        deletePrompt(ctx, prompt.getId());
+        mMarker.deleteOne(ctx, "id", m.getId());
     }
 
     public void deletePrompt(Context ctx, long promptID) {
-        Realm r = getRealm(ctx);
-        PromptSettings p = r.where(PromptSettings.class).equalTo("id", promptID).findFirst();
+        PromptSettings p = mPromptSettings.getOne(ctx, "id", promptID);
 
         for(Marker m : p.getMarkers()){
             deleteMarker(ctx, m);
         }
 
-        // Remove prompt
-        r.beginTransaction();
-        p.removeFromRealm();
-        r.commitTransaction();
+        mPromptSettings.deleteOne(ctx, "id", promptID);
     }
 }

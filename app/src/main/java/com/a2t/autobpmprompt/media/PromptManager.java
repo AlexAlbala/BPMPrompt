@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import io.realm.Realm;
 import io.realm.RealmList;
 
 public class PromptManager {
@@ -77,15 +78,12 @@ public class PromptManager {
         update(ctx, prompt);
     }
 
-    public static void delete(Context ctx, Prompt prompt) {
-        delete(ctx, prompt.settings);
-    }
-
-    public static void delete(Context ctx, PromptSettings prompt) {
-        RealmIOHelper.getInstance().deletePrompt(ctx, prompt);
-    }
-
     public static void delete(Context ctx, long promptId) {
+        //Remove saved file
+        PromptSettings ps = RealmIOHelper.getInstance().getPrompt(ctx, promptId);
+        File f = new File(ps.getPdfFullPath());
+        f.delete();
+
         RealmIOHelper.getInstance().deletePrompt(ctx, promptId);
     }
 }

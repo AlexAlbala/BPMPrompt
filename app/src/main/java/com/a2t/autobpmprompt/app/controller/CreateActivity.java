@@ -1,9 +1,9 @@
 package com.a2t.autobpmprompt.app.controller;
 
+import android.app.Activity;
+import android.app.DialogFragment;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -18,7 +18,7 @@ import com.joanzapata.pdfview.PDFView;
 import java.io.File;
 
 
-public class CreateActivity extends AppCompatActivity implements PDFDialog.PDFDialogResultListener {
+public class CreateActivity extends Activity implements PDFDialog.PDFDialogResultListener {
     private static final String TAG = "CreateActivity";
 
     EditText name;
@@ -49,7 +49,7 @@ public class CreateActivity extends AppCompatActivity implements PDFDialog.PDFDi
     public void loadPDFClick(View v){
         Log.i(TAG, "Load pdfs");
         DialogFragment newFragment = new PDFDialog();
-        newFragment.show(getSupportFragmentManager(), "pdfselect");
+        newFragment.show(getFragmentManager(), "pdfselect");
     }
 
     public void onTapClick(View v) {

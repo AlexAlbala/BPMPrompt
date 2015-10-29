@@ -2,11 +2,12 @@ package com.a2t.autobpmprompt.media;
 
 import android.app.Activity;
 import android.graphics.Canvas;
+import android.util.Log;
 import android.view.SurfaceView;
 
 import com.a2t.autobpmprompt.app.callback.PromptEventsCallback;
 import com.a2t.autobpmprompt.app.callback.PromptViewCallback;
-import com.a2t.autobpmprompt.app.callback.SimpleCallback;
+import com.a2t.a2tlib.tools.SimpleCallback;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.media.prompt.PromptViewManager;
@@ -17,20 +18,19 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class Prompt {
-    //Manage the audio
-    //Manage the pdf
-    //Manage the markers
-    //Manage the tempo
+    public enum Status {
+        PLAYING,
+        PAUSED,
+        STOPPED
+    }
+
+    private Status mStatus;
 
     private PromptEventsCallback mCallback;
 
     private final String TAG = "PROMPT";
 
     public PromptSettings settings;
-
-    public PromptViewManager getPdf() {
-        return pdf;
-    }
 
     PromptViewManager pdf;
     Timer bpmCounterTimer;
@@ -48,6 +48,7 @@ public class Prompt {
             @Override
             public void onLoad(int i) {
                 if (settings.getZoom() != 0.0f && settings.getZoom() != 1.0f) {
+                    Log.i(TAG, "Applying zoom: " + settings.getZoom());
                     pdf.zoomTo(settings.getZoom(), null);
                 }
                 if (settings.getOffsetX() != 0.0f || settings.getOffsetY() != 0.0f) {
@@ -65,21 +66,46 @@ public class Prompt {
 
             }
         });
-
         bpmCounterTimer = new Timer();
-
         this.mCallback = callback;
-
         mCallback.onBeat(1);
         mCallback.onBar(1);
+        mStatus = Status.STOPPED;
     }
 
     private void updatePosition() {
         Marker m = matchMarker();
-
         if (m != null) {
             notifyMarker(m);
         }
+    }
+
+    public float getCurrentXOffset() {
+        return pdf.getCurrentXOffset();
+    }
+
+    public float getCurrentYOffset() {
+        return pdf.getCurrentYOffset();
+    }
+
+    public float getCurrentZoom() {
+        return pdf.getCurrentZoom();
+    }
+
+    public void drawClickMarker(float x, float y) {
+        pdf.drawClickMarker(x, y);
+    }
+
+    public void drawMarkerMatched(Marker marker) {
+        pdf.drawMarkerMatched(marker);
+    }
+
+    public int getCurrentPage() {
+        return pdf.getCurrentPage();
+    }
+
+    public void clearCanvas() {
+        pdf.clear();
     }
 
     public void notifyMarker(final Marker m) {
@@ -112,6 +138,8 @@ public class Prompt {
         } else { //Complex bar
             period = 20000 / settings.getBpm();
         }
+        Log.i(TAG, "Period timer: " + period);
+        clearCanvas();
 
         mCallback.onPlay();
         bpmCounterTimer.scheduleAtFixedRate(new TimerTask() {
@@ -127,21 +155,25 @@ public class Prompt {
                 mCallback.onBeat(currentBeat);
             }
         }, 0, period);
+        mStatus = Status.PLAYING;
     }
 
     public void pause() {
         resetTimer();
         mCallback.onPause();
+        mStatus = Status.PAUSED;
     }
 
     public void stop() {
         resetTimer();
+        clearCanvas();
         currentBeat = 0;
         currentBar = 1;
 
         mCallback.onStop();
         mCallback.onBeat(1);
         mCallback.onBar(1);
+        mStatus = Status.STOPPED;
     }
 
     private void resetTimer() {
@@ -150,12 +182,17 @@ public class Prompt {
     }
 
     public void close() {
+        this.stop();
         pdf.close();
     }
 
+    public Status getStatus() {
+        return mStatus;
+    }
+
     public void prepareSave() {
-        this.settings.setOffsetY((int) pdf.getCurrentXOffset());
-        this.settings.setOffsetY((int) pdf.getCurrentYOffset());
+        this.settings.setOffsetY(pdf.getCurrentXOffset());
+        this.settings.setOffsetY(pdf.getCurrentYOffset());
         this.settings.setZoom(pdf.getCurrentZoom());
     }
 }

@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#ffffff"
+    android:background="@color/prompt_bg"
     tools:context="com.a2t.autobpmprompt.app.controller.PromptActivity">
 
 
@@ -43,7 +43,10 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentStart="true"
+                    android:background="@drawable/transport_bg"
+                    android:layout_centerInParent="true"
+                    android:layout_marginStart="@dimen/transport_left"
+                    android:layout_margin="2dp"
                     android:orientation="horizontal">
 
                     <EditText
@@ -51,32 +54,45 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:inputType="number"/>
+                        android:textColor="@color/transport_window_fg"
+                        android:layout_marginStart="@dimen/transport_elem_margin"
+                        android:layout_marginEnd="@dimen/transport_elem_margin"
+                        android:inputType="number" />
 
                     <TextView
                         android:id="@+id/prompt_current_bar"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="@dimen/transport_elem_margin"
+                        android:layout_marginEnd="@dimen/transport_elem_margin"
+                        android:textColor="@color/transport_window_fg"/>
 
                     <TextView
                         android:id="@+id/prompt_current_beat"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="@dimen/transport_elem_margin"
+                        android:layout_marginEnd="@dimen/transport_elem_margin"
+                        android:textColor="@color/transport_window_fg"/>
 
                     <ImageView
                         android:id="@+id/led_top_bar"
                         android:layout_width="@dimen/activity_prompt_ledsize"
                         android:layout_height="@dimen/activity_prompt_ledsize"
-                        android:src="@drawable/ledoff"
-                        android:layout_gravity="center_vertical"/>
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="@dimen/transport_elem_margin"
+                        android:layout_marginEnd="@dimen/transport_elem_margin"
+                        android:src="@drawable/ledoff" />
                 </LinearLayout>
 
                 <LinearLayout
+                    style="?metaButtonBarStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_alignParentEnd="true"
                     android:gravity="end"
-                    style="?metaButtonBarStyle"
                     android:orientation="horizontal">
 
                     <Button
@@ -85,8 +101,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:onClick="switchToEdit"
-                        android:textSize="@dimen/abc_text_size_small_material"
-                        android:text="@string/edit_button" />
+                        android:text="@string/edit_button"
+                        android:textSize="@dimen/abc_text_size_small_material" />
 
                     <Button
                         android:id="@+id/prompt_done_top_button"
@@ -94,8 +110,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:onClick="promptSave"
-                        android:textSize="@dimen/abc_text_size_small_material"
-                        android:text="@string/done_button" />
+                        android:text="@string/done_button"
+                        android:textSize="@dimen/abc_text_size_small_material" />
 
                     <Button
                         android:id="@+id/prompt_rename_top_button"
@@ -103,18 +119,18 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:onClick="renamePrompt"
-                        android:textSize="@dimen/abc_text_size_small_material"
-                        android:text="@string/rename_button" />
+                        android:text="@string/rename_button"
+                        android:textSize="@dimen/abc_text_size_small_material" />
 
                     <Button
                         android:id="@+id/prompt_delete_top_button"
                         style="?metaButtonBarStyle"
-                        android:background="#FFFF0000"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:textColor="#FFFF0000"
                         android:onClick="deletePrompt"
-                        android:textSize="@dimen/abc_text_size_small_material"
-                        android:text="@string/delete_button" />
+                        android:text="@string/delete_button"
+                        android:textSize="@dimen/abc_text_size_small_material" />
                 </LinearLayout>
 
 
@@ -153,7 +169,7 @@
             style="?metaButtonBarStyle"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:background="@color/black_overlay"
+            android:background="@color/prompt_right_bar"
             android:orientation="vertical"
             tools:ignore="UselessParent">
 
@@ -180,12 +196,12 @@
         </LinearLayout>
 
     </FrameLayout>
-
     <FrameLayout
         android:id="@+id/frame_top_notification"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="top|center">
+        android:layout_gravity="top|center"
+        android:visibility="invisible">
 
 
         <LinearLayout
@@ -195,10 +211,10 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:layout_margin="10dp"
                 android:layout_width="36dp"
                 android:layout_height="fill_parent"
-                android:src="@drawable/infoicon"/>
+                android:layout_margin="10dp"
+                android:src="@drawable/infoicon" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -230,6 +246,7 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:orientation="horizontal">
 
                     <TextView
@@ -250,10 +267,8 @@
                         android:layout_margin="10dp"
                         android:text="Marker beat"
                         android:textColor="#FF000000"
-                        android:textStyle="bold"/>
-
+                        android:textStyle="bold" />
                 </LinearLayout>
-
             </LinearLayout>
         </LinearLayout>
     </FrameLayout>

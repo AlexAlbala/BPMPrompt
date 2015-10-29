@@ -16,6 +16,7 @@ import com.a2t.autobpmprompt.app.callback.MarkerAdapterCallback;
 import com.a2t.autobpmprompt.app.model.Marker;
 
 import java.util.List;
+import java.util.Random;
 
 public class MarkersAdapter extends BaseAdapter {
     private static final String TAG = "MARKERSADAPTER";
@@ -23,6 +24,9 @@ public class MarkersAdapter extends BaseAdapter {
     private List<Marker> mItems;
     private boolean mIsEdit;
     private MarkerAdapterCallback mCallback;
+    private Random r;
+    private final int MAX_ROT_DEGREES = 15;
+    private final int MIN_ROT_DEGREES = -15;
 
     static class ViewHolderItem {
         TextView markerTitle;
@@ -36,6 +40,8 @@ public class MarkersAdapter extends BaseAdapter {
         mItems = objects;
         mIsEdit = isEdit;
         mCallback = callback;
+
+        r = new Random();
     }
 
     @Override
@@ -117,6 +123,9 @@ public class MarkersAdapter extends BaseAdapter {
                 } else {
                     cellView.markerDelete.setVisibility(View.GONE);
                 }
+
+                int rotation = r.nextInt(MAX_ROT_DEGREES - MIN_ROT_DEGREES) - MAX_ROT_DEGREES;
+                convertView.setRotation(rotation);
 
             }
         }
