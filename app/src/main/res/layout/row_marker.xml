@@ -3,14 +3,21 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-    <ImageView
+    <!--<ImageView
         android:id="@+id/marker_bg_image"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/activity_prompt_marker_height"
         android:src="@drawable/postityellow"
-        android:layout_gravity="top|center"/>
+        android:layout_gravity="top|center"/>-->
+    <TextView
+        android:id="@+id/marker_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textColor="@color/marker_color_fg"
+        android:text="hola"/>
 
-    <LinearLayout
+    <!--<LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -36,14 +43,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/marker_color_fg" />
-    </LinearLayout>
+    </LinearLayout>-->
 
-    <ImageButton
+    <!--<ImageButton
         android:id="@+id/marker_delete"
         android:layout_gravity="top|end"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/abc_ic_clear_mtrl_alpha" />
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@drawable/abc_ic_clear_mtrl_alpha" />-->
 
 
 </FrameLayout>

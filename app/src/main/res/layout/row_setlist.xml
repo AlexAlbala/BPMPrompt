@@ -6,17 +6,17 @@
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
-        <ImageView
+        <!--<ImageView
             android:layout_width="150dp"
             android:layout_height="130dp"
-            android:src="@drawable/clip_note"/>
+            android:src="@drawable/clip_note"/>-->
 
         <TextView
             android:id="@+id/setlist_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="60dp"
-            android:layout_marginStart="30dp"
+            android:textColor="@android:color/black"
+            android:textSize="30sp"
             android:text="pasdadsad"/>
 
         <LinearLayout
@@ -41,7 +41,7 @@
 
     </RelativeLayout>
 
-    <GridView
+    <com.a2t.a2tlib.views.ExpandedGridView
         android:id="@+id/setlist_pdfgrid"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"

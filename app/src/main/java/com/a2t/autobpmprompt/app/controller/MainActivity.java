@@ -7,9 +7,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ListView;
 
+import com.a2t.a2tlib.content.compat.A2TActivity;
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.adapter.SetListAdapter;
 import com.a2t.autobpmprompt.app.callback.SetListAdapterCallback;
@@ -23,9 +25,7 @@ import java.util.List;
 import io.realm.RealmList;
 
 
-public class MainActivity extends Activity implements SetListDialog.SetListDialogListener, AreYouSureDialog.AreYouSureDialogListener {
-    private static final String TAG = "MAIN ACTIVITY";
-
+public class MainActivity extends A2TActivity implements SetListDialog.SetListDialogListener, AreYouSureDialog.AreYouSureDialogListener {
     boolean editMode = false;
     ListView setListsView;
 
@@ -39,7 +39,7 @@ public class MainActivity extends Activity implements SetListDialog.SetListDialo
 
     @Override
     protected void onResume() {
-        Log.i(TAG, "onResume");
+        ldebug("onResume");
         super.onResume();
 
     }
@@ -112,7 +112,7 @@ public class MainActivity extends Activity implements SetListDialog.SetListDialo
 
     @Override
     protected void onStart() {
-        Log.i(TAG, "onStart");
+        ldebug("onStart");
         loadSetLists();
         super.onStart();
     }

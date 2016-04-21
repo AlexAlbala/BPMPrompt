@@ -2,6 +2,7 @@ package com.a2t.autobpmprompt.app.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -127,6 +128,20 @@ public class SetListAdapter extends BaseAdapter {
             });
 
             cellView.pdfGridItem.setAdapter(pdfAdapter);
+
+            cellView.pdfGridItem.setOnTouchListener(new View.OnTouchListener() {
+
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                        return true;
+                    }
+                    return false;
+                }
+
+            });
+
+
 
 
         }

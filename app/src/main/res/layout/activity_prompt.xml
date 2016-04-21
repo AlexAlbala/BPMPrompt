@@ -41,49 +41,51 @@
                 android:cacheColorHint="#00000000">
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="@dimen/transport_width"
                     android:layout_height="wrap_content"
                     android:background="@drawable/transport_bg"
-                    android:layout_centerInParent="true"
-                    android:layout_marginStart="@dimen/transport_left"
-                    android:layout_margin="2dp"
+                    android:layout_marginBottom="2dp"
+                    android:weightSum="10"
+                    android:layout_marginTop="2dp"
                     android:orientation="horizontal">
 
                     <EditText
                         android:id="@+id/prompt_current_bpm"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="5"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:gravity="center"
+                        android:textStyle="bold"
                         android:textColor="@color/transport_window_fg"
-                        android:layout_marginStart="@dimen/transport_elem_margin"
-                        android:layout_marginEnd="@dimen/transport_elem_margin"
                         android:inputType="number" />
 
                     <TextView
                         android:id="@+id/prompt_current_bar"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
+                        android:layout_weight="2"
                         android:layout_height="wrap_content"
+                        android:gravity="center"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginStart="@dimen/transport_elem_margin"
-                        android:layout_marginEnd="@dimen/transport_elem_margin"
+                        android:textStyle="bold"
                         android:textColor="@color/transport_window_fg"/>
 
                     <TextView
                         android:id="@+id/prompt_current_beat"
-                        android:layout_width="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:gravity="center"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginStart="@dimen/transport_elem_margin"
-                        android:layout_marginEnd="@dimen/transport_elem_margin"
+                        android:textStyle="bold"
                         android:textColor="@color/transport_window_fg"/>
 
                     <ImageView
                         android:id="@+id/led_top_bar"
-                        android:layout_width="@dimen/activity_prompt_ledsize"
+                        android:layout_weight="1"
+                        android:layout_width="0dp"
                         android:layout_height="@dimen/activity_prompt_ledsize"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginStart="@dimen/transport_elem_margin"
-                        android:layout_marginEnd="@dimen/transport_elem_margin"
                         android:src="@drawable/ledoff" />
                 </LinearLayout>
 

@@ -11,6 +11,7 @@
     <!-- MENU -->
     <string name="action_settings">Play demo</string>
     <string name="action_create">Create</string>
+    <string name="action_delete">Delete</string>
 
     <!-- CREATE PROMPT -->
     <string name="placeholder_title">Title</string>

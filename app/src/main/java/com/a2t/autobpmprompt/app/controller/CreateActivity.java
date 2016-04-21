@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
+import com.a2t.a2tlib.content.compat.A2TActivity;
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.media.PromptManager;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
@@ -18,9 +19,7 @@ import com.joanzapata.pdfview.PDFView;
 import java.io.File;
 
 
-public class CreateActivity extends Activity implements PDFDialog.PDFDialogResultListener {
-    private static final String TAG = "CreateActivity";
-
+public class CreateActivity extends A2TActivity implements PDFDialog.PDFDialogResultListener {
     EditText name;
     EditText bpm;
     EditText upper;

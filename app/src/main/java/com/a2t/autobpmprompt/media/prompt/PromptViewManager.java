@@ -37,7 +37,6 @@ public class PromptViewManager {
     private int clickMarkerColor;
     private Paint clickMarkerPaint;
     private int clickSquareSize;
-    private int clickVerticalLineSize;
 
     private Timer markerRefreshTimer;
     private final int REFRESH_THRESHOLD_MS = 100;
@@ -51,7 +50,6 @@ public class PromptViewManager {
     public PromptViewManager(File pdf, PDFView pdfview, SurfaceView floatingCanvas, Activity activity, PromptViewCallback callback) {
         mCallback = callback;
         clickSquareSize = (int) activity.getResources().getDimension(R.dimen.click_square_size);
-        clickVerticalLineSize = (int) activity.getResources().getDimension(R.dimen.click_verticalline_size);
         clickMarkerColor = activity.getResources().getColor(R.color.click_marker_color);
         clickMarkerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         clickMarkerPaint.setColor(clickMarkerColor);

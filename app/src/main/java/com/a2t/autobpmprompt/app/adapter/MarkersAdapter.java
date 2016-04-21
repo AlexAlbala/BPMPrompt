@@ -1,6 +1,7 @@
 package com.a2t.autobpmprompt.app.adapter;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.a2t.a2tlib.content.adapter.CustomArrayAdapter;
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.callback.MarkerAdapterCallback;
 import com.a2t.autobpmprompt.app.model.Marker;
@@ -18,10 +20,8 @@ import com.a2t.autobpmprompt.app.model.Marker;
 import java.util.List;
 import java.util.Random;
 
-public class MarkersAdapter extends BaseAdapter {
+public class MarkersAdapter extends CustomArrayAdapter<Marker> {
     private static final String TAG = "MARKERSADAPTER";
-    private Context mContext;
-    private List<Marker> mItems;
     private boolean mIsEdit;
     private MarkerAdapterCallback mCallback;
     private Random r;
@@ -30,14 +30,13 @@ public class MarkersAdapter extends BaseAdapter {
 
     static class ViewHolderItem {
         TextView markerTitle;
-        TextView markerBar;
-        TextView markerBeat;
-        ImageButton markerDelete;
+        //TextView markerBar;
+        //TextView markerBeat;
+        //ImageButton markerDelete;
     }
 
     public MarkersAdapter(Context context, List<Marker> objects, boolean isEdit, MarkerAdapterCallback callback) {
-        mContext = context;
-        mItems = objects;
+        super(context, objects);
         mIsEdit = isEdit;
         mCallback = callback;
 
@@ -46,12 +45,7 @@ public class MarkersAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return mIsEdit ? mItems.size() + 1 : mItems.size();
-    }
-
-    @Override
-    public Object getItem(int position) {
-        return mItems.get(position);
+        return mIsEdit ? getElements().size() + 1 : getElements().size();
     }
 
     @Override
@@ -63,8 +57,8 @@ public class MarkersAdapter extends BaseAdapter {
     public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolderItem cellView;
 
-        if (mIsEdit && position == mItems.size()) {
-            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        if (mIsEdit && position == getElements().size()) {
+            LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.row_emptymarker, parent, false);
             Button b = (Button) convertView.findViewById(R.id.marker_create_button);
 
@@ -76,19 +70,25 @@ public class MarkersAdapter extends BaseAdapter {
             });
 
         } else {
-            final Marker marker = (Marker) getItem(position);
+            final Marker marker = getItem(position);
 
             if (convertView == null) {
-                LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 convertView = inflater.inflate(R.layout.row_marker, parent, false);
 
                 // well set up the ViewHolder
                 cellView = new ViewHolderItem();
 
                 cellView.markerTitle = (TextView) convertView.findViewById(R.id.marker_title);
-                cellView.markerBar = (TextView) convertView.findViewById(R.id.marker_bar);
-                cellView.markerBeat = (TextView) convertView.findViewById(R.id.marker_beat);
-                cellView.markerDelete = (ImageButton) convertView.findViewById(R.id.marker_delete);
+                //cellView.markerBar = (TextView) convertView.findViewById(R.id.marker_bar);
+                //cellView.markerBeat = (TextView) convertView.findViewById(R.id.marker_beat);
+                //cellView.markerDelete = (ImageButton) convertView.findViewById(R.id.marker_delete);
+
+                //Typeface digitalTypeface = Typeface.createFromAsset(mContext.getAssets(), "fonts/pencil.ttf");
+
+                //cellView.markerTitle.setTypeface(digitalTypeface);
+                //currentBpm.setTypeface(digitalTypeface);
+                //currentBar.setTypeface(digitalTypeface);
 
                 // store the holder with the view.
                 convertView.setTag(cellView);
@@ -98,19 +98,19 @@ public class MarkersAdapter extends BaseAdapter {
                 cellView = (ViewHolderItem) convertView.getTag();
             }
 
-            convertView.setOnClickListener(new View.OnClickListener() {
+            /*convertView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     mCallback.onMarkerClicked(marker);
                 }
-            });
+            });*/
 
             if (marker != null) {
                 cellView.markerTitle.setText(marker.getTitle());
-                cellView.markerBar.setText(String.valueOf(marker.getBar()));
-                cellView.markerBeat.setText(String.valueOf(marker.getBeat()));
+                //cellView.markerBar.setText(String.valueOf(marker.getBar()));
+                //cellView.markerBeat.setText(String.valueOf(marker.getBeat()));
 
-                if (mIsEdit) {
+                /*if (mIsEdit) {
                     cellView.markerDelete.setVisibility(View.VISIBLE);
                     cellView.markerDelete.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -122,10 +122,10 @@ public class MarkersAdapter extends BaseAdapter {
                     });
                 } else {
                     cellView.markerDelete.setVisibility(View.GONE);
-                }
+                }*/
 
-                int rotation = r.nextInt(MAX_ROT_DEGREES - MIN_ROT_DEGREES) - MAX_ROT_DEGREES;
-                convertView.setRotation(rotation);
+                //int rotation = r.nextInt(MAX_ROT_DEGREES - MIN_ROT_DEGREES) - MAX_ROT_DEGREES;
+                //convertView.setRotation(rotation);
 
             }
         }

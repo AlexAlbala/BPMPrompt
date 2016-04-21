@@ -1,5 +1,7 @@
 package com.a2t.autobpmprompt.app.controller;
 
+import com.a2t.a2tlib.content.adapter.CustomArrayAdapter;
+import com.a2t.a2tlib.content.compat.A2TActivity;
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.adapter.MarkersAdapter;
 import com.a2t.autobpmprompt.app.callback.MarkerAdapterCallback;
@@ -13,14 +15,19 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -31,7 +38,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class PromptActivity extends Activity implements MarkerDialog.MarkerDialogListener, RenamePromptDialog.RenamePromptDialogListener {
+public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDialogListener, RenamePromptDialog.RenamePromptDialogListener {
     static final String TAG = "PROMPTACTIVITY";
 
     private static final int NOTIFICATION_TIME_MS = 5000;
@@ -148,7 +155,7 @@ public class PromptActivity extends Activity implements MarkerDialog.MarkerDialo
 
         @Override
         public void onMarkerMatched(Marker match) {
-            Log.i(TAG, "MARKER: " + match.getTitle() + " " + match.getOffsetX() + ":" + match.getOffsetY());
+            ldebug("MARKER: " + match.getTitle() + " " + match.getOffsetX() + ":" + match.getOffsetY());
             highlightMarker(match, true);
         }
     };
@@ -205,7 +212,7 @@ public class PromptActivity extends Activity implements MarkerDialog.MarkerDialo
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    ((ImageView) v.findViewById(R.id.marker_bg_image)).setImageResource(R.drawable.postitgreen);
+                    //((ImageView) v.findViewById(R.id.marker_bg_image)).setImageResource(R.drawable.postitgreen);
                 }
             });
         }
@@ -218,10 +225,10 @@ public class PromptActivity extends Activity implements MarkerDialog.MarkerDialo
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    ImageView img = (ImageView) v.findViewById(R.id.marker_bg_image);
+                    /*ImageView img = (ImageView) v.findViewById(R.id.marker_bg_image);
 
                     if (img != null)
-                        img.setImageResource(R.drawable.postityellow);
+                        img.setImageResource(R.drawable.postityellow);*/
                 }
             });
         }
@@ -237,6 +244,14 @@ public class PromptActivity extends Activity implements MarkerDialog.MarkerDialo
         ledImage = (ImageView) findViewById(R.id.led_top_bar);
         currentBeat = (TextView) findViewById(R.id.prompt_current_beat);
         currentBpm = (EditText) findViewById(R.id.prompt_current_bpm);
+
+        Typeface digitalTypeface = Typeface.createFromAsset(getAssets(), "fonts/digital.ttf");
+
+        currentBeat.setTypeface(digitalTypeface);
+        currentBpm.setTypeface(digitalTypeface);
+        currentBar.setTypeface(digitalTypeface);
+
+
         controlsView = findViewById(R.id.fullscreen_content_controls);
         contentsFullscreen = findViewById(R.id.contents_fullscreen);
         frameControls = findViewById(R.id.frame_content_controls);
@@ -289,13 +304,13 @@ public class PromptActivity extends Activity implements MarkerDialog.MarkerDialo
 
     @Override
     public void onStart() {
-        Log.i(TAG, "onStart");
+        lverbose("onStart");
         super.onStart();
     }
 
     @Override
     public void onDestroy() {
-        Log.i(TAG, "onDestroy");
+        lverbose("onDestroy");
         currentPrompt.close();
         super.onDestroy();
     }
@@ -349,17 +364,24 @@ public class PromptActivity extends Activity implements MarkerDialog.MarkerDialo
                 }
             }
 
-            @Override
+            /*@Override
             public void onMarkerRemoved(Marker m) {
                 PromptManager.deleteMarkerFromPrompt(getApplicationContext(), currentPrompt, m);
-            }
+            }*/
 
-            @Override
+            /*@Override
             public void onMarkerClicked(Marker m) {
                 currentPrompt.notifyMarker(m);
-            }
+            }*/
         });
         markers.setAdapter(m);
+        markers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                currentPrompt.notifyMarker(((CustomArrayAdapter<Marker>) markers.getAdapter()).getItem(position));
+            }
+        });
+        registerForContextMenu(markers);
     }
 
     public void promptPlay(View v) {
@@ -419,8 +441,8 @@ public class PromptActivity extends Activity implements MarkerDialog.MarkerDialo
                 lastMarkerX = (aX - currentPrompt.getCurrentXOffset()) / currentPrompt.getCurrentZoom();
                 lastMarkerY = (aY - currentPrompt.getCurrentYOffset()) / currentPrompt.getCurrentZoom();
 
-                Log.i(TAG, "Draw click in " + aX + ":" + aY);
-                Log.i(TAG, "Real marker position: " + lastMarkerX + ":" + lastMarkerY);
+                ldebug("Draw click in " + aX + ":" + aY);
+                ldebug("Real marker position: " + lastMarkerX + ":" + lastMarkerY);
 
                 currentPrompt.drawClickMarker(aX, aY);
             }
@@ -507,7 +529,7 @@ public class PromptActivity extends Activity implements MarkerDialog.MarkerDialo
 
     @Override
     public void onMarkerCreated(DialogFragment dialog, String title, String note, int bar, int beat, int page, float positionX, float positionY) {
-        Log.i(TAG, "Marker created: " + positionX + ":" + positionY);
+        ldebug("Marker created: " + positionX + ":" + positionY);
 
         Marker m = new Marker();
         m.setTitle(title);
@@ -525,7 +547,7 @@ public class PromptActivity extends Activity implements MarkerDialog.MarkerDialo
 
     @Override
     public void onMarkerCancelled(DialogFragment dialog) {
-        Log.i(TAG, "Marker canceled");
+        ldebug("Marker canceled");
     }
 
     public void switchToEdit(View view) {
@@ -557,5 +579,30 @@ public class PromptActivity extends Activity implements MarkerDialog.MarkerDialo
     @Override
     public void onPromptRenameCancelled(DialogFragment dialog) {
 
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        if (v.getId() == R.id.prompt_markers) {
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.marker_menu, menu);
+        }
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.action_delete:
+                // add stuff here
+                CustomArrayAdapter<Marker> currentAdapter = (CustomArrayAdapter<Marker>) markers.getAdapter();
+                PromptManager.deleteMarkerFromPrompt(getApplicationContext(), currentPrompt, currentAdapter.getItem(info.position));
+                currentAdapter.getElements().remove(info.position);
+                currentAdapter.notifyDataSetChanged();
+                return true;
+            default:
+                return false;
+        }
     }
 }

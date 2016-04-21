@@ -3,7 +3,8 @@ package com.a2t.autobpmprompt.helpers;
 import android.content.Context;
 import android.util.Log;
 
-import com.a2t.a2tlib.bbdd.RealmDriver;
+import com.a2t.a2tlib.database.RealmDriver;
+import com.a2t.autobpmprompt.BuildConfig;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.SetList;
@@ -132,29 +133,31 @@ public class RealmIOHelper {
     }
 
     public void debug(Context ctx) {
-        RealmResults<Marker> lm = mMarker.getAll(ctx);
-        Log.i(TAG, "*********************************");
-        Log.i(TAG, "FOUND " + lm.size() + " MARKERS");
-        Log.i(TAG, "*********************************");
-        for (Marker m : lm) {
-            Log.i(TAG, m.toString());
-        }
+        if(BuildConfig.DEBUG) {
+            RealmResults<Marker> lm = mMarker.getAll(ctx);
+            Log.i(TAG, "*********************************");
+            Log.i(TAG, "FOUND " + lm.size() + " MARKERS");
+            Log.i(TAG, "*********************************");
+            for (Marker m : lm) {
+                Log.i(TAG, m.toString());
+            }
 
-        RealmResults<PromptSettings> lp = mPromptSettings.getAll(ctx);
-        Log.i(TAG, "*********************************");
-        Log.i(TAG, "FOUND " + lp.size() + " PROMPTS");
-        Log.i(TAG, "*********************************");
-        for (PromptSettings ps : lp) {
-            Log.i(TAG, ps.toString());
-        }
+            RealmResults<PromptSettings> lp = mPromptSettings.getAll(ctx);
+            Log.i(TAG, "*********************************");
+            Log.i(TAG, "FOUND " + lp.size() + " PROMPTS");
+            Log.i(TAG, "*********************************");
+            for (PromptSettings ps : lp) {
+                Log.i(TAG, ps.toString());
+            }
 
-        RealmResults<SetList> ls = mSetLists.getAll(ctx);
-        Log.i(TAG, "*********************************");
-        Log.i(TAG, "FOUND " + ls.size() + " SETLISTS");
-        Log.i(TAG, "*********************************");
+            RealmResults<SetList> ls = mSetLists.getAll(ctx);
+            Log.i(TAG, "*********************************");
+            Log.i(TAG, "FOUND " + ls.size() + " SETLISTS");
+            Log.i(TAG, "*********************************");
 
-        for (SetList s : ls) {
-            Log.i(TAG, s.toString());
+            for (SetList s : ls) {
+                Log.i(TAG, s.toString());
+            }
         }
     }
 
