@@ -6,18 +6,13 @@
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
-        <!--<ImageView
-            android:layout_width="150dp"
-            android:layout_height="130dp"
-            android:src="@drawable/clip_note"/>-->
 
         <TextView
             android:id="@+id/setlist_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@android:color/black"
-            android:textSize="30sp"
-            android:text="pasdadsad"/>
+            android:textSize="@dimen/heading1" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -40,11 +35,4 @@
         </LinearLayout>
 
     </RelativeLayout>
-
-    <com.a2t.a2tlib.views.ExpandedGridView
-        android:id="@+id/setlist_pdfgrid"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:columnWidth="150dp"
-        android:numColumns="auto_fit" />
 </LinearLayout>

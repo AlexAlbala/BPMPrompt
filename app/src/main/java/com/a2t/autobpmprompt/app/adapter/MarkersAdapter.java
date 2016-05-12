@@ -1,6 +1,7 @@
 package com.a2t.autobpmprompt.app.adapter;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Typeface;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,8 +31,8 @@ public class MarkersAdapter extends CustomArrayAdapter<Marker> {
 
     static class ViewHolderItem {
         TextView markerTitle;
-        //TextView markerBar;
-        //TextView markerBeat;
+        TextView markerBar;
+        TextView markerBeat;
         //ImageButton markerDelete;
     }
 
@@ -80,8 +81,8 @@ public class MarkersAdapter extends CustomArrayAdapter<Marker> {
                 cellView = new ViewHolderItem();
 
                 cellView.markerTitle = (TextView) convertView.findViewById(R.id.marker_title);
-                //cellView.markerBar = (TextView) convertView.findViewById(R.id.marker_bar);
-                //cellView.markerBeat = (TextView) convertView.findViewById(R.id.marker_beat);
+                cellView.markerBar = (TextView) convertView.findViewById(R.id.marker_bar);
+                cellView.markerBeat = (TextView) convertView.findViewById(R.id.marker_beat);
                 //cellView.markerDelete = (ImageButton) convertView.findViewById(R.id.marker_delete);
 
                 //Typeface digitalTypeface = Typeface.createFromAsset(mContext.getAssets(), "fonts/pencil.ttf");
@@ -106,9 +107,12 @@ public class MarkersAdapter extends CustomArrayAdapter<Marker> {
             });*/
 
             if (marker != null) {
+                Resources res = getContext().getResources();
                 cellView.markerTitle.setText(marker.getTitle());
-                //cellView.markerBar.setText(String.valueOf(marker.getBar()));
-                //cellView.markerBeat.setText(String.valueOf(marker.getBeat()));
+
+
+                cellView.markerBar.setText(String.format(res.getString(R.string.prompt_bar_number), marker.getBar()));
+                cellView.markerBeat.setText(String.format(res.getString(R.string.prompt_beat_number), marker.getBeat()));
 
                 /*if (mIsEdit) {
                     cellView.markerDelete.setVisibility(View.VISIBLE);

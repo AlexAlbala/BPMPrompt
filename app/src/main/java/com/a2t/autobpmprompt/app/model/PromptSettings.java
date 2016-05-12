@@ -20,9 +20,6 @@ public class PromptSettings extends RealmObject {
 
     private float offsetX;
     private float offsetY;
-
-
-
     private float zoom;
 
     //STATE

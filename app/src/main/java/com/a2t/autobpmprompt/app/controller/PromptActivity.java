@@ -12,13 +12,14 @@ import com.a2t.autobpmprompt.media.PromptManager;
 import com.joanzapata.pdfview.PDFView;
 
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.MenuInflater;
@@ -44,13 +45,14 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
     private static final int NOTIFICATION_TIME_MS = 5000;
     private static final int BLINK_LED_TIME_MS = 150;
     boolean isEdit = false;
-    boolean contentVisible = false;
+    boolean contentVisible = true;
     boolean isClick = false;
 
     Timer blinkTimer;
 
     View controlsView;
     View frameControls;
+    View frameMarkers;
     PDFView pdfview;
     View contentsFullscreen;
     Prompt currentPrompt;
@@ -62,8 +64,8 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
      *******/
     TextView currentBeat;
     TextView currentBar;
-    EditText currentBpm;
-    Button editTopButton;
+    TextView currentBpm;
+    //Button editTopButton;
     Button doneTopButton;
     Button renameTopButton;
     Button deleteTopButton;
@@ -75,6 +77,8 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
     TextView currentMarkerBar;
 
     View topBarNotifiactions;
+
+    FloatingActionButton fab;
 
     int surfaceOffsetX;
     int surfaceOffsetY;
@@ -135,22 +139,28 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
         @Override
         public void onPlay() {
             hideLeftBar();
+            hideRightBar();
             lastMarkerX = -1;
             lastMarkerY = -1;
+            contentVisible = false;
         }
 
         @Override
         public void onPause() {
             showLeftBar();
+            showRightBar();
             lastMarkerX = -1;
             lastMarkerY = -1;
+            contentVisible = true;
         }
 
         @Override
         public void onStop() {
             showLeftBar();
+            showRightBar();
             lastMarkerX = -1;
             lastMarkerY = -1;
+            contentVisible = true;
         }
 
         @Override
@@ -243,7 +253,7 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
         currentBar = (TextView) findViewById(R.id.prompt_current_bar);
         ledImage = (ImageView) findViewById(R.id.led_top_bar);
         currentBeat = (TextView) findViewById(R.id.prompt_current_beat);
-        currentBpm = (EditText) findViewById(R.id.prompt_current_bpm);
+        currentBpm = (TextView) findViewById(R.id.prompt_current_bpm);
 
         Typeface digitalTypeface = Typeface.createFromAsset(getAssets(), "fonts/digital.ttf");
 
@@ -255,11 +265,12 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
         controlsView = findViewById(R.id.fullscreen_content_controls);
         contentsFullscreen = findViewById(R.id.contents_fullscreen);
         frameControls = findViewById(R.id.frame_content_controls);
+        frameMarkers = findViewById(R.id.frame_marker_list);
         pdfview = (PDFView) findViewById(R.id.pdfview);
         markers = (ListView) findViewById(R.id.prompt_markers);
         floatingCanvas = (SurfaceView) findViewById(R.id.prompt_floating_canvas);
 
-        editTopButton = (Button) findViewById(R.id.prompt_edit_top_button);
+        //editTopButton = (Button) findViewById(R.id.prompt_edit_top_button);
         doneTopButton = (Button) findViewById(R.id.prompt_done_top_button);
         renameTopButton = (Button) findViewById(R.id.prompt_rename_top_button);
         deleteTopButton = (Button) findViewById(R.id.prompt_delete_top_button);
@@ -270,6 +281,8 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
         currentMarkerBar = (TextView) findViewById(R.id.currentMarker_bar);
 
         topBarNotifiactions = findViewById(R.id.frame_top_notification);
+
+        fab = (FloatingActionButton) findViewById(R.id.fab_edit);
         /**********************************************************************************/
 
         /******************* RETRIEVE VARIABLES ********************************************/
@@ -278,7 +291,8 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
         /***********************************************************************************/
 
         /******************* INITIALIZE DIMENSIONS && COLORS *******************************/
-        surfaceOffsetX = (int) getResources().getDimension(R.dimen.activity_prompt_markers_bar);
+        //surfaceOffsetX = (int) getResources().getDimension(R.dimen.activity_prompt_markers_bar);
+        surfaceOffsetX = 0;
         surfaceOffsetY = (int) getResources().getDimension(R.dimen.activity_prompt_top_bar) + getStatusBarHeight();
         /***********************************************************************************/
 
@@ -291,6 +305,8 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
         lastMarkerX = -1;
         lastMarkerY = -1;
         blinkTimer = new Timer();
+
+        registerForContextMenu(markers);
     }
 
     //Hide top bar when the window has loaded
@@ -322,19 +338,21 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
         lastMarkerY = -1;
 
         if (isEdit) {
+            fab.hide();
             frameControls.setVisibility(View.INVISIBLE);
-            editTopButton.setVisibility(View.GONE);
+            //editTopButton.setVisibility(View.GONE);
             doneTopButton.setVisibility(View.VISIBLE);
             renameTopButton.setVisibility(View.VISIBLE);
             deleteTopButton.setVisibility(View.VISIBLE);
-            currentBpm.setEnabled(true);
         } else {
+            if(currentPrompt.getStatus() != Prompt.Status.PLAYING) {
+                fab.show();
+            }
             frameControls.setVisibility(View.VISIBLE);
-            editTopButton.setVisibility(View.VISIBLE);
+            //editTopButton.setVisibility(View.VISIBLE);
             doneTopButton.setVisibility(View.GONE);
             renameTopButton.setVisibility(View.GONE);
             deleteTopButton.setVisibility(View.GONE);
-            currentBpm.setEnabled(false);
         }
 
         //TODO: Sure is the best way to do that ?
@@ -349,7 +367,7 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
                     args.putInt("page", currentPrompt.getCurrentPage());
 
                     newFragment.setArguments(args);
-                    newFragment.show(PromptActivity.this.getFragmentManager(), "markercreate");
+                    newFragment.show(PromptActivity.this.getSupportFragmentManager(), "markercreate");
                 } else {
                     new AlertDialog.Builder(PromptActivity.this)
                             .setTitle(R.string.cant_create_marker)
@@ -381,18 +399,20 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
                 currentPrompt.notifyMarker(((CustomArrayAdapter<Marker>) markers.getAdapter()).getItem(position));
             }
         });
-        registerForContextMenu(markers);
     }
 
     public void promptPlay(View v) {
+        fab.hide();
         currentPrompt.play();
     }
 
     public void promptPause(View v) {
+        fab.show();
         currentPrompt.pause();
     }
 
     public void promptStop(View v) {
+        fab.show();
         currentPrompt.stop();
     }
 
@@ -474,8 +494,10 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
                 case MotionEvent.ACTION_UP:
                     if (isClick && !isControlsClick && !isMarkerClick && !isTopClick) {
                         if (contentVisible) {
+                            hideRightBar();
                             hideLeftBar();
                         } else {
+                            showRightBar();
                             showLeftBar();
                         }
                         contentVisible = !contentVisible;
@@ -495,13 +517,27 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
     }
 
     private void showLeftBar() {
-        controlsView.animate()
+        frameMarkers.animate()
                 .translationX(0)
                 .setDuration(getResources().getInteger(
                         android.R.integer.config_shortAnimTime));
     }
 
     private void hideLeftBar() {
+        frameMarkers.animate()
+                .translationX(-1 * frameMarkers.getWidth())
+                .setDuration(getResources().getInteger(
+                        android.R.integer.config_shortAnimTime));
+    }
+
+    private void showRightBar() {
+        controlsView.animate()
+                .translationX(0)
+                .setDuration(getResources().getInteger(
+                        android.R.integer.config_shortAnimTime));
+    }
+
+    private void hideRightBar() {
         controlsView.animate()
                 .translationX(controlsView.getWidth())
                 .setDuration(getResources().getInteger(
@@ -546,12 +582,21 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
     }
 
     @Override
+    public void onMarkerEdited(DialogFragment dialog, String title, String note, int bar, int beat, int page, float positionX, float positionY) {
+        //TODO: Edit marker !
+        ldebug("Marker edited: " + title);
+
+    }
+
+    @Override
     public void onMarkerCancelled(DialogFragment dialog) {
         ldebug("Marker canceled");
     }
 
     public void switchToEdit(View view) {
         isEdit = true;
+        showLeftBar();
+        hideRightBar();
         configure();
     }
 
@@ -566,11 +611,11 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
         Bundle args = new Bundle();
         args.putString("promptName", currentPrompt.settings.getName());
         newFragment.setArguments(args);
-        newFragment.show(getFragmentManager(), "renamesetlist");
+        newFragment.show(getSupportFragmentManager(), "renamesetlist");
     }
 
     @Override
-    public void onPromptRenamed(DialogFragment dialog, String name) {
+    public void onPromptRename(DialogFragment dialog, long prompt_id, String name) {
         PromptManager.renamePrompt(getApplicationContext(), currentPrompt, name);
         isEdit = false;
         configure();
@@ -578,7 +623,7 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
 
     @Override
     public void onPromptRenameCancelled(DialogFragment dialog) {
-
+        //Do Nothing :)
     }
 
     @Override
@@ -593,13 +638,18 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
     @Override
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        CustomArrayAdapter<Marker> currentAdapter = (CustomArrayAdapter<Marker>) markers.getAdapter();
+
         switch (item.getItemId()) {
             case R.id.action_delete:
                 // add stuff here
-                CustomArrayAdapter<Marker> currentAdapter = (CustomArrayAdapter<Marker>) markers.getAdapter();
                 PromptManager.deleteMarkerFromPrompt(getApplicationContext(), currentPrompt, currentAdapter.getItem(info.position));
                 currentAdapter.getElements().remove(info.position);
                 currentAdapter.notifyDataSetChanged();
+                return true;
+            case R.id.action_edit:
+                DialogFragment d = MarkerDialog.editMarkerDialog(currentAdapter.getItem(info.position));
+                d.show(getSupportFragmentManager(),"edit");
                 return true;
             default:
                 return false;

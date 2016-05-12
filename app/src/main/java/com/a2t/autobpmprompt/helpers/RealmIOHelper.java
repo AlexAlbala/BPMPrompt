@@ -4,6 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.a2t.a2tlib.database.RealmDriver;
+import com.a2t.a2tlib.tools.BuildUtils;
+import com.a2t.a2tlib.tools.LogUtils;
 import com.a2t.autobpmprompt.BuildConfig;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.app.model.Marker;
@@ -17,7 +19,7 @@ import io.realm.RealmResults;
 
 public class RealmIOHelper {
     private static RealmIOHelper INSTANCE;
-    private static final String TAG = "RealmIOHelper";
+    private static final String TAG = "DBHelper";
 
     RealmDriver<SetList> mSetLists;
     RealmDriver<PromptSettings> mPromptSettings;
@@ -41,8 +43,7 @@ public class RealmIOHelper {
         if (settings.getSetList() != null) {
             insertPromptIntoSetList(ctx, settings, settings.getSetList());
         } else {
-            Log.w(TAG, "¡¡ THIS MESSAGE SHOULD NEVER BE SHOWN !!!!!");
-
+            LogUtils.w(TAG, "¡¡ THIS MESSAGE SHOULD NEVER BE SHOWN !!!!!");
             throw new UnsupportedOperationException();
         }
     }
@@ -133,30 +134,30 @@ public class RealmIOHelper {
     }
 
     public void debug(Context ctx) {
-        if(BuildConfig.DEBUG) {
+        if(BuildUtils.isDebugBuild()) {
             RealmResults<Marker> lm = mMarker.getAll(ctx);
-            Log.i(TAG, "*********************************");
-            Log.i(TAG, "FOUND " + lm.size() + " MARKERS");
-            Log.i(TAG, "*********************************");
+            LogUtils.i(TAG, "*********************************");
+            LogUtils.i(TAG, "FOUND " + lm.size() + " MARKERS");
+            LogUtils.i(TAG, "*********************************");
             for (Marker m : lm) {
-                Log.i(TAG, m.toString());
+                LogUtils.i(TAG, m.toString());
             }
 
             RealmResults<PromptSettings> lp = mPromptSettings.getAll(ctx);
-            Log.i(TAG, "*********************************");
-            Log.i(TAG, "FOUND " + lp.size() + " PROMPTS");
-            Log.i(TAG, "*********************************");
+            LogUtils.i(TAG, "*********************************");
+            LogUtils.i(TAG, "FOUND " + lp.size() + " PROMPTS");
+            LogUtils.i(TAG, "*********************************");
             for (PromptSettings ps : lp) {
-                Log.i(TAG, ps.toString());
+                LogUtils.i(TAG, ps.toString());
             }
 
             RealmResults<SetList> ls = mSetLists.getAll(ctx);
-            Log.i(TAG, "*********************************");
-            Log.i(TAG, "FOUND " + ls.size() + " SETLISTS");
-            Log.i(TAG, "*********************************");
+            LogUtils.i(TAG, "*********************************");
+            LogUtils.i(TAG, "FOUND " + ls.size() + " SETLISTS");
+            LogUtils.i(TAG, "*********************************");
 
             for (SetList s : ls) {
-                Log.i(TAG, s.toString());
+                LogUtils.i(TAG, s.toString());
             }
         }
     }
@@ -172,9 +173,10 @@ public class RealmIOHelper {
     }
 
     public void renameSetList(Context ctx, String title, String newTitle) {
-        Log.i(TAG, "Rename set list: " + title + " -> " + newTitle);
+        LogUtils.i(TAG, "Rename set list: " + title + " -> " + newTitle);
 
-        SetList set = mSetLists.getOne(ctx, "title", title);
+        SetList set = new SetList();
+        CopySetList(mSetLists.getOne(ctx, "title", title), set);
         set.setTitle(newTitle);
 
         mSetLists.insertOne(ctx, set);

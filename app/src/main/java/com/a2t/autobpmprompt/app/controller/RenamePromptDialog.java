@@ -5,7 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.app.DialogFragment;
+import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -37,7 +37,7 @@ public class RenamePromptDialog extends DialogFragment {
                     public void onClick(DialogInterface dialog, int id) {
                         String mTitle = title.getText().toString();
 
-                        mListener.onPromptRenamed(RenamePromptDialog.this, mTitle);
+                        mListener.onPromptRename(RenamePromptDialog.this, getArguments().getLong("promptId"), mTitle);
                     }
                 })
                 .setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
@@ -56,7 +56,7 @@ public class RenamePromptDialog extends DialogFragment {
     }
 
     public interface RenamePromptDialogListener {
-        void onPromptRenamed(DialogFragment dialog, String name);
+        void onPromptRename(DialogFragment dialog, long prompt_id, String name);
 
         void onPromptRenameCancelled(DialogFragment dialog);
     }

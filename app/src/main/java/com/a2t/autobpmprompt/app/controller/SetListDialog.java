@@ -3,9 +3,9 @@ package com.a2t.autobpmprompt.app.controller;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -26,10 +26,7 @@ public class SetListDialog extends DialogFragment {
 
         // Get the layout inflater
         LayoutInflater inflater = getActivity().getLayoutInflater();
-
-
         View dialogView = inflater.inflate(R.layout.dialog_new_setlist, null);
-
         tag = getTag();
 
         final boolean isRename = tag.equals("renamesetlist");

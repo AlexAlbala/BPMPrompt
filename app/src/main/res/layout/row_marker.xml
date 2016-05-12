@@ -3,19 +3,43 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal">
 
-    <!--<ImageView
-        android:id="@+id/marker_bg_image"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/activity_prompt_marker_height"
-        android:src="@drawable/postityellow"
-        android:layout_gravity="top|center"/>-->
-    <TextView
-        android:id="@+id/marker_title"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textColor="@color/marker_color_fg"
-        android:text="hola"/>
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/marker_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textSize="@dimen/big_text"
+            android:textColor="@color/marker_color_fg"
+            android:text="hola"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/marker_bar"
+                android:layout_width="0dp"
+                android:textSize="@dimen/normal_text"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:layout_height="wrap_content"
+                android:textColor="@color/marker_color_fg" />
+
+            <TextView
+                android:id="@+id/marker_beat"
+                android:layout_weight="1"
+                android:textSize="@dimen/normal_text"
+                android:gravity="center"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:textColor="@color/marker_color_fg" />
+        </LinearLayout>
+
+    </LinearLayout>
+
 
     <!--<LinearLayout
         android:layout_width="wrap_content"

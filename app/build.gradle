@@ -7,7 +7,7 @@ android {
     defaultConfig {
         applicationId "com.a2t.autobpmprompt"
         minSdkVersion 19
-        targetSdkVersion 22
+        targetSdkVersion 23
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
@@ -22,6 +22,7 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:design:23.1.1'
     compile 'com.joanzapata.pdfview:android-pdfview:1.0.4@aar'
     compile project(':a2tlib')
 }

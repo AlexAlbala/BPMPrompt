@@ -4,7 +4,7 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <!-- PROMPT ACTIVITY LAYOUT  -->
-    <dimen name="activity_prompt_markers_bar">60dp</dimen>
+    <dimen name="activity_prompt_markers_bar">110dp</dimen>
     <dimen name="activity_prompt_marker_height">110dp</dimen>
     <dimen name="activity_prompt_markers_notification_bar">60dp</dimen>
     <dimen name="activity_prompt_top_bar">45dp</dimen>
@@ -12,6 +12,8 @@
     <dimen name="transport_left">100dp</dimen>
     <dimen name="transport_elem_margin">15dp</dimen>
     <dimen name="transport_width">170dp</dimen>
+    <dimen name="transport_height">40dp</dimen>
+    <dimen name="prompt_control_width">70dp</dimen>
 
 
     <!-- CLICK PAINTS DIMENSIONS -->
@@ -22,4 +24,15 @@
     <!-- PDF THUMBNAILS -->
     <dimen name="pdf_thumb_height">100dp</dimen>
     <dimen name="pdf_thumb_width">77dp</dimen>
+
+
+    <!-- TEXT -->
+    <dimen name="heading1">30sp</dimen>
+    <dimen name="heading2">25sp</dimen>
+    <dimen name="heading3">20sp</dimen>
+
+    <dimen name="normal_text">12sp</dimen>
+    <dimen name="big_text">14sp</dimen>
+    <dimen name="small_text">8sp</dimen>
+
 </resources>

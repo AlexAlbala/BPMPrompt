@@ -2,6 +2,8 @@ package com.a2t.autobpmprompt.media.audiotools;
 
 import android.util.Log;
 
+import com.a2t.a2tlib.tools.LogUtils;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -47,7 +49,7 @@ public class TapTempo {
     }
 
     public void Reset() {
-        Log.i(TAG, "Reset");
+        LogUtils.i(TAG, "Reset");
         taps = -1;
         timeStart = -1;
         timeStop = -1;

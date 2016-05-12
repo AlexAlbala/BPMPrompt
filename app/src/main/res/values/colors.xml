@@ -1,5 +1,6 @@
 <resources>
-
+    <color name="primary_color">#63b9ff</color>
+    <color name="secondary_color">#4e8fff</color>
 
     <color name="click_marker_color">#ffff0000</color>
 
@@ -9,8 +10,9 @@
     <color name="transport_window_bg_2">#006867</color>
     <color name="transport_window_fg">#afdcff</color>
 
-    <color name="prompt_bg">#8e8e8e</color>
+    <color name="prompt_bg">#ffffff</color>
     <color name="prompt_right_bar">@android:color/transparent</color>
+    <color name="prompt_left_bar">#6f8e8e8e</color>
 
 
 

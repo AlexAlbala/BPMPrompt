@@ -7,11 +7,17 @@
     <string name="delete_button">Delete</string>
     <string name="done_button">Done</string>
     <string name="rename_button">Rename</string>
+    <string name="prompt_create_new">Create new…</string>
 
     <!-- MENU -->
     <string name="action_settings">Play demo</string>
     <string name="action_create">Create</string>
     <string name="action_delete">Delete</string>
+    <string name="action_edit">Edit</string>
+
+    <!-- MAIN -->
+    <string name="tab_setlists">SetLists</string>
+    <string name="tab_all_songs">All</string>
 
     <!-- CREATE PROMPT -->
     <string name="placeholder_title">Title</string>
@@ -24,6 +30,7 @@
 
     <!-- MARKER DIALOG -->
     <string name="create_marker_title">Create Marker</string>
+    <string name="edit_marker_title">Edit Marker</string>
     <string name="placeholder_bar">Bar</string>
     <string name="placeholder_beat">Beat</string>
     <string name="placeholder_note">Note</string>
@@ -43,6 +50,9 @@
     <string name="stop_button">Stop</string>
     <string name="cant_create_marker">Cannot create marker</string>
     <string name="must_click_marker">Before you create marker you must click the location in the prompt</string>
+    <string name="markers_list">Markers</string>
+    <string name="prompt_beat_number">Beat: %1$d</string>
+    <string name="prompt_bar_number">Bar: %1$d</string>
 
 
     <!-- ACTIVITY TITLES -->
@@ -56,6 +66,13 @@
 
     <!-- GLOBAL APP -->
     <string name="app_name">Auto BPM Prompt</string>
+
+    <!-- MENU -->
+    <string name="rename_setlist_menu">Rename setlist</string>
+    <string name="delete_setlist_menu">Delete setlist</string>
+
+    <string name="rename_prompt_menu">Rename prompt</string>
+    <string name="delete_prompt_menu">Delete prompt</string>
 
 
 </resources>

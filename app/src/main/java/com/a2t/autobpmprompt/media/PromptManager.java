@@ -5,6 +5,7 @@ import android.content.Context;
 import android.util.Log;
 import android.view.SurfaceView;
 
+import com.a2t.a2tlib.tools.LogUtils;
 import com.a2t.autobpmprompt.app.callback.PromptEventsCallback;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
@@ -24,7 +25,7 @@ public class PromptManager {
     private static final String TAG = "Prompt manager";
 
     public static Prompt load(long id, PDFView pdf, SurfaceView floatingCanvas, Activity context, PromptEventsCallback callback) {
-        Log.i(TAG, "Loading prompt " + id);
+        LogUtils.i(TAG, "Loading prompt " + id);
         PromptSettings settings = RealmIOHelper.getInstance().getPrompt(context, id);
         return new Prompt(pdf, floatingCanvas, settings, context, callback);
     }
@@ -48,13 +49,13 @@ public class PromptManager {
     }
 
     public static boolean update(Context context, Prompt p) {
-        Log.i(TAG, "Update prompt" + p.toString());
+        LogUtils.i(TAG, "Update prompt" + p.toString());
         RealmIOHelper.getInstance().updatePrompt(context, p.settings);
         return true;
     }
 
     private static String saveFile(Context ctx, File f, String fileName) throws IOException {
-        Log.i(TAG, "Save file " + f.getAbsolutePath() + " to " + fileName);
+        LogUtils.i(TAG, "Save file " + f.getAbsolutePath() + " to " + fileName);
         InputStream is = new FileInputStream(f);
         OutputStream os = ctx.openFileOutput(fileName, Context.MODE_PRIVATE);
         byte[] buff = new byte[1024];
@@ -78,12 +79,17 @@ public class PromptManager {
         update(ctx, prompt);
     }
 
+    public static void renamePrompt(Context ctx, long prompt_id, String newName){
+        PromptSettings prompt = RealmIOHelper.getInstance().getPrompt(ctx, prompt_id);
+        prompt.setName(newName);
+        RealmIOHelper.getInstance().updatePrompt(ctx, prompt);
+    }
+
     public static void delete(Context ctx, long promptId) {
         //Remove saved file
         PromptSettings ps = RealmIOHelper.getInstance().getPrompt(ctx, promptId);
         File f = new File(ps.getPdfFullPath());
         f.delete();
-
         RealmIOHelper.getInstance().deletePrompt(ctx, promptId);
     }
 }
