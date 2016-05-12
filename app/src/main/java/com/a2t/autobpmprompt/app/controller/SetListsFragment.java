@@ -5,12 +5,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
-import android.widget.ListView;
 
 import com.a2t.a2tlib.content.compat.A2TFragment;
 import com.a2t.autobpmprompt.R;
@@ -25,9 +23,6 @@ import java.util.List;
 
 import io.realm.RealmList;
 
-/**
- * Created by Alex on 28/4/16.
- */
 public class SetListsFragment extends A2TFragment {
     boolean editMode = false;
     ExpandableListView setListsView;
@@ -44,12 +39,8 @@ public class SetListsFragment extends A2TFragment {
         if (setListsView == null) {
             setListsView = (ExpandableListView) rootView.findViewById(R.id.main_setlists);
         }
-
         loadSetLists(getActivity());
-
-        ExpandableListView setLists = (ExpandableListView) rootView.findViewById(R.id.main_setlists);
-        getActivity().registerForContextMenu(setLists);
-
+        getActivity().registerForContextMenu(setListsView);
         return rootView;
     }
 
@@ -69,11 +60,7 @@ public class SetListsFragment extends A2TFragment {
         SetListAdapter setListAdapter = new SetListAdapter(ctx, setLists, editMode, new SetListAdapterCallback() {
             @Override
             public void onPromptSelected(String setList, PromptSettings prompt, int position) {
-                Intent i = new Intent(ctx, PromptActivity.class);
-                i.putExtra("setListName", setList);
-                i.putExtra("promptId", prompt.getId());
-                i.putExtra("isEdit", false);
-                startActivity(i);
+                PromptManager.openPrompt(getActivity(), setList, prompt.getId());
             }
 
             @Override
@@ -112,9 +99,6 @@ public class SetListsFragment extends A2TFragment {
                 newFragment.show(getFragmentManager(), "areyousureprompt");
             }
         });
-        /*if (setListsView == null) {
-            setListsView = (ListView) getView().findViewById(R.id.main_setlists);
-        }*/
 
         setListsView.setAdapter(setListAdapter);
         setListAdapter.notifyDataSetChanged();

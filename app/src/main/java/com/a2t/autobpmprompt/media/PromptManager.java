@@ -2,11 +2,13 @@ package com.a2t.autobpmprompt.media;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.SurfaceView;
 
 import com.a2t.a2tlib.tools.LogUtils;
 import com.a2t.autobpmprompt.app.callback.PromptEventsCallback;
+import com.a2t.autobpmprompt.app.controller.PromptActivity;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.helpers.RealmIOHelper;
@@ -30,6 +32,13 @@ public class PromptManager {
         return new Prompt(pdf, floatingCanvas, settings, context, callback);
     }
 
+    public static void openPrompt(Context ctx, String setList, long id){
+        Intent i = new Intent(ctx, PromptActivity.class);
+        i.putExtra("setListName", setList);
+        i.putExtra("promptId", id);
+        i.putExtra("isEdit", false);
+        ctx.startActivity(i);
+    }
     public static boolean create(Context context, PromptSettings p) {
         RealmIOHelper r = RealmIOHelper.getInstance();
         p.setId(System.currentTimeMillis());

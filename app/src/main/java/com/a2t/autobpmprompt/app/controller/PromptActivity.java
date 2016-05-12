@@ -40,8 +40,6 @@ import java.util.TimerTask;
 
 
 public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDialogListener, RenamePromptDialog.RenamePromptDialogListener {
-    static final String TAG = "PROMPTACTIVITY";
-
     private static final int NOTIFICATION_TIME_MS = 5000;
     private static final int BLINK_LED_TIME_MS = 150;
     boolean isEdit = false;
@@ -345,7 +343,7 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
             renameTopButton.setVisibility(View.VISIBLE);
             deleteTopButton.setVisibility(View.VISIBLE);
         } else {
-            if(currentPrompt.getStatus() != Prompt.Status.PLAYING) {
+            if (currentPrompt.getStatus() != Prompt.Status.PLAYING) {
                 fab.show();
             }
             frameControls.setVisibility(View.VISIBLE);
@@ -453,18 +451,27 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
     public boolean dispatchTouchEvent(@NonNull MotionEvent ev) {
         float x = ev.getX();
         float y = ev.getY();
+
+        int mwidth = markers.getWidth();
+        int mheight = markers.getHeight();
+        float mx = markers.getX();
+        float my = markers.getY();
         if (isEdit) {
             float aX = x - surfaceOffsetX;
             float aY = y - surfaceOffsetY;
 
-            if (aX >= 0 && aY >= 0) {
-                lastMarkerX = (aX - currentPrompt.getCurrentXOffset()) / currentPrompt.getCurrentZoom();
-                lastMarkerY = (aY - currentPrompt.getCurrentYOffset()) / currentPrompt.getCurrentZoom();
+            boolean isMarkerClick = x > mx && x < mx + mwidth && y > my && y < my + mheight;
 
-                ldebug("Draw click in " + aX + ":" + aY);
-                ldebug("Real marker position: " + lastMarkerX + ":" + lastMarkerY);
+            if (!isMarkerClick) {
+                if (aX >= 0 && aY >= 0) {
+                    lastMarkerX = (aX - currentPrompt.getCurrentXOffset()) / currentPrompt.getCurrentZoom();
+                    lastMarkerY = (aY - currentPrompt.getCurrentYOffset()) / currentPrompt.getCurrentZoom();
 
-                currentPrompt.drawClickMarker(aX, aY);
+                    ldebug("Draw click in " + aX + ":" + aY);
+                    ldebug("Real marker position: " + lastMarkerX + ":" + lastMarkerY);
+
+                    currentPrompt.drawClickMarker(aX, aY);
+                }
             }
             return super.dispatchTouchEvent(ev);
         } else {
@@ -472,11 +479,6 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
             int cheight = frameControls.getHeight();
             float cx = frameControls.getX();
             float cy = frameControls.getY();
-
-            int mwidth = markers.getWidth();
-            int mheight = markers.getHeight();
-            float mx = markers.getX();
-            float my = markers.getY();
 
             int swidth = topBarNotifiactions.getWidth();
             int sheight = topBarNotifiactions.getHeight();
@@ -649,7 +651,7 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
                 return true;
             case R.id.action_edit:
                 DialogFragment d = MarkerDialog.editMarkerDialog(currentAdapter.getItem(info.position));
-                d.show(getSupportFragmentManager(),"edit");
+                d.show(getSupportFragmentManager(), "edit");
                 return true;
             default:
                 return false;

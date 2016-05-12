@@ -69,6 +69,18 @@ public class RealmIOHelper {
         return list;
     }
 
+    public List<PromptSettings> getAllPrompts(Context ctx) {
+        List<PromptSettings> allPrompts = new ArrayList<>();
+        List<SetList> setLists = getAllSetLists(ctx);
+        for(SetList s : setLists) {
+            for (PromptSettings p : s.getPrompts()) {
+                p.setSetList(s.getTitle());
+                allPrompts.add(p);
+            }
+        }
+        return allPrompts;
+    }
+
 //    public List<PromptSettings> getAllPromptSettings(Context ctx) {
 //        RealmResults<PromptSettings> results = mPromptSettings.getAll(ctx);
 //        List<PromptSettings> list = new ArrayList<>();

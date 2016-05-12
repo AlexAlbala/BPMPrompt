@@ -108,16 +108,16 @@
                             android:text="@string/done_button"
                             android:textSize="@dimen/abc_text_size_small_material" />
 
-                        <Button
+                        <!--<Button
                             android:id="@+id/prompt_rename_top_button"
                             style="?metaButtonBarStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:onClick="renamePrompt"
                             android:text="@string/rename_button"
-                            android:textSize="@dimen/abc_text_size_small_material" />
+                            android:textSize="@dimen/abc_text_size_small_material" />-->
 
-                        <Button
+                        <!--<Button
                             android:id="@+id/prompt_delete_top_button"
                             style="?metaButtonBarStyle"
                             android:layout_width="wrap_content"
@@ -125,7 +125,7 @@
                             android:onClick="deletePrompt"
                             android:text="@string/delete_button"
                             android:textColor="#FFFF0000"
-                            android:textSize="@dimen/abc_text_size_small_material" />
+                            android:textSize="@dimen/abc_text_size_small_material" />-->
                     </LinearLayout>
 
 
