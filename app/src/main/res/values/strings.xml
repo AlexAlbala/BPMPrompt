@@ -50,6 +50,7 @@
     <string name="stop_button">Stop</string>
     <string name="cant_create_marker">Cannot create marker</string>
     <string name="must_click_marker">Before you create marker you must click the location in the prompt</string>
+    <string name="click_marker_please">Please click where you want to add a marker</string>
     <string name="markers_list">Markers</string>
     <string name="prompt_beat_number">Beat: %1$d</string>
     <string name="prompt_bar_number">Bar: %1$d</string>

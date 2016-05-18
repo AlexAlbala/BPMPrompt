@@ -14,6 +14,7 @@ import com.a2t.autobpmprompt.media.prompt.PromptViewManager;
 import com.joanzapata.pdfview.PDFView;
 
 import java.io.File;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -96,8 +97,16 @@ public class Prompt {
         pdf.drawClickMarker(x, y);
     }
 
-    public void drawMarkerMatched(Marker marker) {
-        pdf.drawMarkerMatched(marker);
+    public void drawMatchedMarker(Marker marker) {
+        pdf.drawMatchedMarker(marker);
+    }
+
+    public void drawMarkers() {
+        pdf.drawMarkers();
+    }
+
+    public void setCurrentMarkers(List<Marker> markers) {
+        pdf.setCurrentMarkers(markers);
     }
 
     public int getCurrentPage() {
@@ -139,6 +148,7 @@ public class Prompt {
             period = 20000 / settings.getBpm();
         }
         Log.i(TAG, "Period timer: " + period);
+        pdf.enableDrawMarkers(false);
         clearCanvas();
 
         mCallback.onPlay();
@@ -159,6 +169,9 @@ public class Prompt {
     }
 
     public void pause() {
+        clearCanvas();
+        pdf.enableDrawMarkers(true);
+        drawMarkers();
         resetTimer();
         mCallback.onPause();
         mStatus = Status.PAUSED;
@@ -167,6 +180,8 @@ public class Prompt {
     public void stop() {
         resetTimer();
         clearCanvas();
+        pdf.enableDrawMarkers(true);
+        drawMarkers();
         currentBeat = 0;
         currentBar = 1;
 

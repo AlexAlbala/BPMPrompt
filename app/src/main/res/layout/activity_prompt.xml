@@ -214,7 +214,7 @@
 
         </FrameLayout>
 
-        <FrameLayout
+        <!--<FrameLayout
             android:id="@+id/frame_marker_list"
             android:layout_width="@dimen/activity_prompt_markers_bar"
             android:layout_height="fill_parent"
@@ -245,7 +245,7 @@
                     android:cacheColorHint="#00000000" />
             </LinearLayout>
 
-        </FrameLayout>
+        </FrameLayout>-->
 
 
         <FrameLayout
@@ -338,6 +338,21 @@
         android:tint="@android:color/white"
         app:backgroundTint="@color/primary_color"
         app:layout_anchor="@id/prompt_coordinator"
-        app:layout_anchorGravity="bottom|center" />
+        app:layout_anchorGravity="bottom|center"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_add_marker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:layout_marginStart="60dp"
+        android:clickable="true"
+        android:onClick="addMarker"
+        android:scaleType="centerCrop"
+        android:src="@android:drawable/ic_input_add"
+        android:tint="@android:color/white"
+        app:backgroundTint="@color/primary_color"
+        app:layout_anchor="@id/fab_edit"
+        app:layout_anchorGravity="end|center"/>
 </android.support.design.widget.CoordinatorLayout>
 

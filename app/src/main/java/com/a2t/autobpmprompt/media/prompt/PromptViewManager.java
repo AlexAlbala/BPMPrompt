@@ -8,6 +8,7 @@ import android.graphics.PorterDuff;
 import android.util.Log;
 import android.view.SurfaceView;
 
+import com.a2t.a2tlib.tools.LogUtils;
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.callback.PromptViewCallback;
 import com.a2t.a2tlib.tools.SimpleCallback;
@@ -18,8 +19,8 @@ import com.joanzapata.pdfview.listener.OnLoadCompleteListener;
 import com.joanzapata.pdfview.listener.OnPageChangeListener;
 
 import java.io.File;
+import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
 
 
 public class PromptViewManager {
@@ -30,6 +31,8 @@ public class PromptViewManager {
     //Native:
     //https://code.google.com/p/apv/
 
+    private List<Marker> currentMarkers;
+
     private PDFView pdfview;
     private Activity activity;
     private SurfaceView mFloatingCanvas;
@@ -39,11 +42,14 @@ public class PromptViewManager {
     private int clickSquareSize;
 
     private Timer markerRefreshTimer;
-    private final int REFRESH_THRESHOLD_MS = 100;
+    private final int REFRESH_THRESHOLD_MS = 30;
+    private final int MARKER_FRAMES_SKIP = 1;
 
     private Marker lastMarkerPainted;
     private float lastXClick;
     private float lastYClick;
+    private int marker_frame_count = 0;
+    private boolean drawMarkers = true;
 
     //private final int MOVEMENT_PX = 1;
 
@@ -77,19 +83,24 @@ public class PromptViewManager {
                 .onDraw(new OnDrawListener() {
                     @Override
                     public void onLayerDrawn(Canvas canvas, float v, float v1, int i) {
-                        markerRefreshTimer.cancel();
+                        if (drawMarkers && ((marker_frame_count++) == MARKER_FRAMES_SKIP) && currentMarkers != null) {
+                            drawMarkers();
+                            marker_frame_count = 0;
+                        }
+
+                        /*markerRefreshTimer.cancel();
                         markerRefreshTimer = new Timer();
                         markerRefreshTimer.schedule(new TimerTask() {
                             @Override
                             public void run() {
-                                if (lastMarkerPainted != null) {
-                                    drawMarkerMatched(lastMarkerPainted);
-                                } else {
-                                    //clear();
-                                    drawClickMarker(lastXClick, lastYClick);
+                                if(currentMarkers != null) {
+                                    try {
+                                    } catch(Exception e){
+                                        LogUtils.v(TAG, "Marker exception " + e.getMessage());
+                                    }
                                 }
                             }
-                        }, REFRESH_THRESHOLD_MS);
+                        }, REFRESH_THRESHOLD_MS);*/
 
                         mCallback.onDraw(canvas, v, v1, i);
                     }
@@ -115,6 +126,10 @@ public class PromptViewManager {
         this.activity = mActivity;
         this.mFloatingCanvas = floatingCanvas;
         return true;
+    }
+
+    public void enableDrawMarkers(boolean enable){
+        drawMarkers = enable;
     }
 
     public void centerAt(final float x, final float y, SimpleCallback callback) {
@@ -222,7 +237,7 @@ public class PromptViewManager {
     }
 
     private void drawClickOnCanvas(Canvas canvas, float x, float y) {
-        canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
+        //canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
 //        canvas.drawLine(0, y, mFloatingCanvas.getWidth(), y, clickMarkerPaint);
 
         //HORIZONTAL SEPARATOR
@@ -247,13 +262,24 @@ public class PromptViewManager {
         lastMarkerPainted = null;
     }
 
-    public void drawMarkerMatched(Marker marker) {
-        lastMarkerPainted = marker;
+    public synchronized void drawMarkers() {
         Canvas canvas = mFloatingCanvas.getHolder().lockCanvas();
         canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
+        for (Marker m : currentMarkers) {
+            paintMarker(canvas, m, false);
+        }
+        mFloatingCanvas.getHolder().unlockCanvasAndPost(canvas);
+    }
+
+    public void setCurrentMarkers(List<Marker> currentMarkers) {
+        this.currentMarkers = currentMarkers;
+    }
+
+    private void paintMarker(Canvas canvas, Marker marker, boolean highlighted) {
+        //canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
         float x = marker.getOffsetX() * getCurrentZoom() + getCurrentXOffset();
         float y = marker.getOffsetY() * getCurrentZoom() + getCurrentYOffset();
-        Log.i(TAG, "Draw marker " + x + ":" + y);
+        LogUtils.d(TAG, "Draw marker " + x + ":" + y);
         if (x >= 1 && y >= 1) {
 
             drawClickOnCanvas(canvas, x, y);
@@ -270,7 +296,13 @@ public class PromptViewManager {
 
             //canvas.drawText(marker.getTitle(), x + clickSquareSize * 2, y, clickMarkerPaint);
         }
+    }
 
+    public synchronized void drawMatchedMarker(Marker marker) {
+        lastMarkerPainted = marker;
+        Canvas canvas = mFloatingCanvas.getHolder().lockCanvas();
+        canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
+        paintMarker(canvas, marker, true);
         mFloatingCanvas.getHolder().unlockCanvasAndPost(canvas);
     }
 }
