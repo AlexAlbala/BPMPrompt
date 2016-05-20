@@ -1,15 +1,15 @@
 package com.a2t.autobpmprompt.app.controller;
 
+import com.a2t.a2tlib.content.ProgressDialogFactory;
 import com.a2t.a2tlib.content.compat.A2TActivity;
 import com.a2t.autobpmprompt.R;
-import com.a2t.autobpmprompt.app.adapter.MarkersAdapter;
-import com.a2t.autobpmprompt.app.callback.MarkerAdapterCallback;
 import com.a2t.autobpmprompt.app.callback.PromptEventsCallback;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.media.Prompt;
 import com.a2t.autobpmprompt.media.PromptManager;
 import com.joanzapata.pdfview.PDFView;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -22,7 +22,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,7 +35,7 @@ import java.util.TimerTask;
 public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDialogListener, RenamePromptDialog.RenamePromptDialogListener {
     private static final int NOTIFICATION_TIME_MS = 5000;
     private static final int BLINK_LED_TIME_MS = 150;
-    boolean isEdit = false;
+    //boolean isEdit = false;
     boolean contentVisible = true;
     boolean isClick = false;
     boolean addingMarker = false;
@@ -52,6 +51,8 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
     //ListView markers;
     SurfaceView floatingCanvas;
 
+    ProgressDialog progress;
+
     /*********
      * TOP BAR
      *******/
@@ -59,7 +60,7 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
     TextView currentBar;
     TextView currentBpm;
     //Button editTopButton;
-    Button doneTopButton;
+    //Button doneTopButton;
     //Button renameTopButton;
     //Button deleteTopButton;
     ImageView ledImage;
@@ -82,40 +83,6 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
 
     int nCurrentBeat;
     int nCurrentBar;
-
-    private void blinkLed() {
-        if (blinkTimer != null) {
-            ledImage.setImageResource(R.drawable.ledon);
-            blinkTimer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            ledImage.setImageResource(R.drawable.ledoff);
-                        }
-                    });
-                }
-            }, BLINK_LED_TIME_MS);
-        }
-    }
-
-    Runnable changeBar = new Runnable() {
-        @Override
-        public void run() {
-            currentBar.setText(String.valueOf(nCurrentBar));
-            blinkLed();
-        }
-    };
-
-    Runnable changeBeat = new Runnable() {
-        @Override
-        public void run() {
-            currentBeat.setText(String.valueOf(nCurrentBeat));
-            blinkLed();
-        }
-    };
-
 
     PromptEventsCallback promptEventsCallback = new PromptEventsCallback() {
         @Override
@@ -158,11 +125,131 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
         }
 
         @Override
+        public void onLoaded() {
+            ProgressDialogFactory.dismiss(progress);
+        }
+
+        @Override
         public void onMarkerMatched(Marker match) {
             ldebug("MARKER: " + match.getTitle() + " " + match.getOffsetX() + ":" + match.getOffsetY());
             highlightMarker(match, true);
         }
     };
+
+    Runnable changeBar = new Runnable() {
+        @Override
+        public void run() {
+            currentBar.setText(String.valueOf(nCurrentBar));
+            blinkLed();
+        }
+    };
+
+    Runnable changeBeat = new Runnable() {
+        @Override
+        public void run() {
+            currentBeat.setText(String.valueOf(nCurrentBeat));
+            blinkLed();
+        }
+    };
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_prompt);
+
+        /****************** LAYOUT ELEMENTS LOAD ******************************************/
+        currentBar = (TextView) findViewById(R.id.prompt_current_bar);
+        ledImage = (ImageView) findViewById(R.id.led_top_bar);
+        currentBeat = (TextView) findViewById(R.id.prompt_current_beat);
+        currentBpm = (TextView) findViewById(R.id.prompt_current_bpm);
+
+        Typeface digitalTypeface = Typeface.createFromAsset(getAssets(), "fonts/digital.ttf");
+
+        currentBeat.setTypeface(digitalTypeface);
+        currentBpm.setTypeface(digitalTypeface);
+        currentBar.setTypeface(digitalTypeface);
+
+
+        controlsView = findViewById(R.id.fullscreen_content_controls);
+        contentsFullscreen = findViewById(R.id.contents_fullscreen);
+        frameControls = findViewById(R.id.frame_content_controls);
+        //frameMarkers = findViewById(R.id.frame_marker_list);
+        pdfview = (PDFView) findViewById(R.id.pdfview);
+        //markers = (ListView) findViewById(R.id.prompt_markers);
+        floatingCanvas = (SurfaceView) findViewById(R.id.prompt_floating_canvas);
+
+        //editTopButton = (Button) findViewById(R.id.prompt_edit_top_button);
+        //doneTopButton = (Button) findViewById(R.id.prompt_done_top_button);
+        //renameTopButton = (Button) findViewById(R.id.prompt_rename_top_button);
+        //deleteTopButton = (Button) findViewById(R.id.prompt_delete_top_button);
+
+        currentMarkerNote = (TextView) findViewById(R.id.currentMarker_note);
+        currentMarkerTitle = (TextView) findViewById(R.id.currentMarker_title);
+        currentMarkerBeat = (TextView) findViewById(R.id.currentMarker_beat);
+        currentMarkerBar = (TextView) findViewById(R.id.currentMarker_bar);
+
+        topBarNotifiactions = findViewById(R.id.frame_top_notification);
+
+        fab = (FloatingActionButton) findViewById(R.id.fab_edit);
+        fab_marker = (FloatingActionButton) findViewById(R.id.fab_add_marker);
+        /**********************************************************************************/
+
+        /******************* RETRIEVE VARIABLES ********************************************/
+        //this.isEdit = getIntent().getBooleanExtra("isEdit", false);
+        long idPrompt = getIntent().getLongExtra("promptId", -1);
+        /***********************************************************************************/
+
+        /******************* INITIALIZE DIMENSIONS && COLORS *******************************/
+        //surfaceOffsetX = (int) getResources().getDimension(R.dimen.activity_prompt_markers_bar);
+        surfaceOffsetX = 0;
+        surfaceOffsetY = (int) getResources().getDimension(R.dimen.activity_prompt_top_bar) + getStatusBarHeight();
+        /***********************************************************************************/
+
+        /******************* PROMPT LOADING ************************************************/
+        progress = ProgressDialogFactory.createIndeterminated(this,R.string.loading,ProgressDialog.STYLE_SPINNER, true, false);
+        currentPrompt = PromptManager.load(idPrompt, pdfview, floatingCanvas, PromptActivity.this, promptEventsCallback);
+        currentBpm.setText(String.valueOf(currentPrompt.settings.getBpm()));
+        /**********************************************************************************/
+
+        lastMarkerX = -1;
+        lastMarkerY = -1;
+        blinkTimer = new Timer();
+
+        //registerForContextMenu(markers);
+        floatingCanvas.getHolder().addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder holder) {
+                requestPromptLayout();
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder holder) {
+
+            }
+        });
+    }
+
+    private void blinkLed() {
+        if (blinkTimer != null) {
+            ledImage.setImageResource(R.drawable.ledon);
+            blinkTimer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            ledImage.setImageResource(R.drawable.ledoff);
+                        }
+                    });
+                }
+            }, BLINK_LED_TIME_MS);
+        }
+    }
 
     private void setMarkers() {
         List<Marker> list = new ArrayList<>();
@@ -247,87 +334,6 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
         }
     }*/
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_prompt);
-
-        /****************** LAYOUT ELEMENTS LOAD ******************************************/
-        currentBar = (TextView) findViewById(R.id.prompt_current_bar);
-        ledImage = (ImageView) findViewById(R.id.led_top_bar);
-        currentBeat = (TextView) findViewById(R.id.prompt_current_beat);
-        currentBpm = (TextView) findViewById(R.id.prompt_current_bpm);
-
-        Typeface digitalTypeface = Typeface.createFromAsset(getAssets(), "fonts/digital.ttf");
-
-        currentBeat.setTypeface(digitalTypeface);
-        currentBpm.setTypeface(digitalTypeface);
-        currentBar.setTypeface(digitalTypeface);
-
-
-        controlsView = findViewById(R.id.fullscreen_content_controls);
-        contentsFullscreen = findViewById(R.id.contents_fullscreen);
-        frameControls = findViewById(R.id.frame_content_controls);
-        //frameMarkers = findViewById(R.id.frame_marker_list);
-        pdfview = (PDFView) findViewById(R.id.pdfview);
-        //markers = (ListView) findViewById(R.id.prompt_markers);
-        floatingCanvas = (SurfaceView) findViewById(R.id.prompt_floating_canvas);
-
-        //editTopButton = (Button) findViewById(R.id.prompt_edit_top_button);
-        doneTopButton = (Button) findViewById(R.id.prompt_done_top_button);
-        //renameTopButton = (Button) findViewById(R.id.prompt_rename_top_button);
-        //deleteTopButton = (Button) findViewById(R.id.prompt_delete_top_button);
-
-        currentMarkerNote = (TextView) findViewById(R.id.currentMarker_note);
-        currentMarkerTitle = (TextView) findViewById(R.id.currentMarker_title);
-        currentMarkerBeat = (TextView) findViewById(R.id.currentMarker_beat);
-        currentMarkerBar = (TextView) findViewById(R.id.currentMarker_bar);
-
-        topBarNotifiactions = findViewById(R.id.frame_top_notification);
-
-        fab = (FloatingActionButton) findViewById(R.id.fab_edit);
-        fab_marker = (FloatingActionButton) findViewById(R.id.fab_add_marker);
-        /**********************************************************************************/
-
-        /******************* RETRIEVE VARIABLES ********************************************/
-        this.isEdit = getIntent().getBooleanExtra("isEdit", false);
-        long idPrompt = getIntent().getLongExtra("promptId", -1);
-        /***********************************************************************************/
-
-        /******************* INITIALIZE DIMENSIONS && COLORS *******************************/
-        //surfaceOffsetX = (int) getResources().getDimension(R.dimen.activity_prompt_markers_bar);
-        surfaceOffsetX = 0;
-        surfaceOffsetY = (int) getResources().getDimension(R.dimen.activity_prompt_top_bar) + getStatusBarHeight();
-        /***********************************************************************************/
-
-        /******************* PROMPT LOADING ************************************************/
-        currentPrompt = PromptManager.load(idPrompt, pdfview, floatingCanvas, PromptActivity.this, promptEventsCallback);
-        currentBpm.setText(String.valueOf(currentPrompt.settings.getBpm()));
-        /**********************************************************************************/
-
-        lastMarkerX = -1;
-        lastMarkerY = -1;
-        blinkTimer = new Timer();
-
-        //registerForContextMenu(markers);
-        floatingCanvas.getHolder().addCallback(new SurfaceHolder.Callback() {
-            @Override
-            public void surfaceCreated(SurfaceHolder holder) {
-                configure();
-            }
-
-            @Override
-            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-
-            }
-
-            @Override
-            public void surfaceDestroyed(SurfaceHolder holder) {
-
-            }
-        });
-    }
-
     //Hide top bar when the window has loaded
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
@@ -350,54 +356,31 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
         super.onDestroy();
     }
 
-    private void configure() {
+    private void requestPromptLayout() {
         //Clear canvas if needed
         currentPrompt.clearCanvas();
         lastMarkerX = -1;
         lastMarkerY = -1;
+        //currentPrompt.editMode(isEdit);
 
-        if (isEdit) {
+        /*if (isEdit) {
             hideFab();
             frameControls.setVisibility(View.INVISIBLE);
             //editTopButton.setVisibility(View.GONE);
             doneTopButton.setVisibility(View.VISIBLE);
             //renameTopButton.setVisibility(View.VISIBLE);
             //deleteTopButton.setVisibility(View.VISIBLE);
-        } else {
-            if (currentPrompt.getStatus() != Prompt.Status.PLAYING) {
-                showFab();
-            }
-            frameControls.setVisibility(View.VISIBLE);
-            //editTopButton.setVisibility(View.VISIBLE);
-            doneTopButton.setVisibility(View.GONE);
-            //renameTopButton.setVisibility(View.GONE);
-            //deleteTopButton.setVisibility(View.GONE);
+
+        } else {*/
+        if (currentPrompt.getStatus() != Prompt.Status.PLAYING) {
+            showFab();
         }
-
-        //TODO: Sure is the best way to do that ?
-        MarkersAdapter m = new MarkersAdapter(getApplicationContext(), currentPrompt.settings.getMarkers(), isEdit, new MarkerAdapterCallback() {
-            @Override
-            public void onCreateMarkerClick() {
-                createNewMarker();
-            }
-
-            /*@Override
-            public void onMarkerRemoved(Marker m) {
-                PromptManager.deleteMarkerFromPrompt(getApplicationContext(), currentPrompt, m);
-            }*/
-
-            /*@Override
-            public void onMarkerClicked(Marker m) {
-                currentPrompt.notifyMarker(m);
-            }*/
-        });
-        //markers.setAdapter(m);
-        //markers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-        //    @Override
-        //    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        //        currentPrompt.notifyMarker(((CustomArrayAdapter<Marker>) markers.getAdapter()).getItem(position));
-        //    }
-        //});
+        //frameControls.setVisibility(View.VISIBLE);
+        //editTopButton.setVisibility(View.VISIBLE);
+        //doneTopButton.setVisibility(View.GONE);
+        //renameTopButton.setVisibility(View.GONE);
+        //deleteTopButton.setVisibility(View.GONE);
+        //}
         setMarkers();
     }
 
@@ -426,12 +409,12 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
         }
     }
 
-    private void hideFab(){
+    private void hideFab() {
         fab.hide();
         fab_marker.hide();
     }
 
-    private void showFab(){
+    private void showFab() {
         fab.show();
         fab_marker.show();
     }
@@ -456,20 +439,20 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
         currentPrompt.settings.setBpm(Integer.parseInt(currentBpm.getText().toString()));
         currentPrompt.prepareSave();
         PromptManager.update(getApplicationContext(), currentPrompt);
-        isEdit = false;
-        configure();
+        //isEdit = false;
+        requestPromptLayout();
     }
 
     @Override
     public void onBackPressed() {
-        if (isEdit) {
+        /*if (isEdit) {
             //TODO: Reload values !!
             isEdit = false;
-            configure();
-        } else {
-            currentPrompt.stop();
-            super.onBackPressed();
-        }
+            requestPromptLayout();
+        } else {*/
+        currentPrompt.stop();
+        super.onBackPressed();
+        //}
     }
 
     private int getStatusBarHeight() {
@@ -493,10 +476,9 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
         //int mheight = markers.getHeight();
         //float mx = markers.getX();
         //float my = markers.getY();
-        if (isEdit || addingMarker) {
-            float aX = x - surfaceOffsetX;
-            float aY = y - surfaceOffsetY;
-
+        float aX = x - surfaceOffsetX;
+        float aY = y - surfaceOffsetY;
+        if (addingMarker) {
             //boolean isMarkerClick = x > mx && x < mx + mwidth && y > my && y < my + mheight;
 
             if (aX >= 0 && aY >= 0) {
@@ -506,9 +488,7 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
                 ldebug("Draw click in " + aX + ":" + aY);
                 ldebug("Real marker position: " + lastMarkerX + ":" + lastMarkerY);
 
-                if (addingMarker) {
-                    createNewMarker();
-                }
+                createNewMarker();
                 currentPrompt.drawClickMarker(aX, aY);
             }
             return super.dispatchTouchEvent(ev);
@@ -526,21 +506,28 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
             boolean isControlsClick = x > cx && x < cx + cwidth && y > cy && y < cy + cheight;
             //boolean isMarkerClick = x > mx && x < mx + mwidth && y > my && y < my + mheight;
             boolean isTopClick = x > sx && x < sx + swidth && y > sy && y < sy + sheight;
+            Marker mClicked = currentPrompt.getClickedMarker(aX, aY);
+            boolean isMarkerClick = mClicked != null;
 
             switch (ev.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     isClick = true;
                     break;
                 case MotionEvent.ACTION_UP:
-                    if (isClick && !isControlsClick && /*!isMarkerClick &&*/ !isTopClick) {
+                    if (isClick && !isControlsClick && !isMarkerClick && !isTopClick) {
                         if (contentVisible) {
                             hideRightBar();
-                            //hideLeftBar();
                         } else {
                             showRightBar();
-                            //showLeftBar();
                         }
                         contentVisible = !contentVisible;
+                    } else if (isMarkerClick) {
+                        ldebug("Marker clicked " + mClicked.getTitle());
+                        if (currentPrompt.getStatus() != Prompt.Status.PLAYING) {
+                            DialogFragment d = MarkerDialog.editMarkerDialog(mClicked);
+                            d.show(getSupportFragmentManager(), "edit");
+                        }
+                        return true;
                     }
                     break;
                 case MotionEvent.ACTION_MOVE:
@@ -585,17 +572,27 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
     }
 
     private void showTopBar() {
-        topBarNotifiactions.animate()
-                .translationY(0)
-                .setDuration(getResources().getInteger(
-                        android.R.integer.config_shortAnimTime));
+        runOnUiThread(new TimerTask() {
+            @Override
+            public void run() {
+                topBarNotifiactions.animate()
+                        .translationY(0)
+                        .setDuration(getResources().getInteger(
+                                android.R.integer.config_shortAnimTime));
+            }
+        });
     }
 
     private void hideTopBar() {
-        topBarNotifiactions.animate()
-                .translationY(-1 * topBarNotifiactions.getHeight())
-                .setDuration(getResources().getInteger(
-                        android.R.integer.config_shortAnimTime));
+        runOnUiThread(new TimerTask() {
+            @Override
+            public void run() {
+                topBarNotifiactions.animate()
+                        .translationY(-1 * topBarNotifiactions.getHeight())
+                        .setDuration(getResources().getInteger(
+                                android.R.integer.config_shortAnimTime));
+            }
+        });
     }
 
     @Override
@@ -619,14 +616,24 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
 
         currentPrompt.settings.getMarkers().add(m);
         promptSave(null);
-        configure();
+        requestPromptLayout();
     }
 
     @Override
     public void onMarkerEdited(DialogFragment dialog, String title, String note, int bar, int beat, int page, float positionX, float positionY) {
-        //TODO: Edit marker !
         ldebug("Marker edited: " + title);
 
+        for (int i = 0; i < currentPrompt.settings.getMarkers().size(); i++) {
+            Marker m = currentPrompt.settings.getMarkers().get(i);
+            if (m.getTitle().equals(title)) {
+                m.setNote(note);
+                m.setBar(bar);
+                m.setBeat(beat);
+                currentPrompt.settings.getMarkers().set(i, m);
+                promptSave(null);
+                return;
+            }
+        }
     }
 
     @Override
@@ -634,11 +641,28 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
         ldebug("Marker canceled");
     }
 
-    public void switchToEdit(View view) {
-        isEdit = true;
+    @Override
+    public void onMarkerDeleted(DialogFragment dialog, String title) {
+        ldebug("Marker deleted: " + title);
+
+        for (int i = 0; i < currentPrompt.settings.getMarkers().size(); i++) {
+            Marker m = currentPrompt.settings.getMarkers().get(i);
+            if (m.getTitle().equals(title)) {
+                currentPrompt.settings.getMarkers().remove(i);
+                PromptManager.deleteMarkerFromPrompt(getApplicationContext(), currentPrompt, m);
+                currentPrompt.setCurrentMarkers(currentPrompt.settings.getMarkers());
+                currentPrompt.drawMarkers();
+                return;
+            }
+        }
+    }
+
+    public void editPromptClicked(View view) {
+        //TODO: Edit prompt dialog
+        //isEdit = true;
         //showLeftBar();
-        hideRightBar();
-        configure();
+        //hideRightBar();
+        //requestPromptLayout();
     }
 
     public void deletePrompt(View view) {
@@ -658,8 +682,8 @@ public class PromptActivity extends A2TActivity implements MarkerDialog.MarkerDi
     @Override
     public void onPromptRename(DialogFragment dialog, long prompt_id, String name) {
         PromptManager.renamePrompt(getApplicationContext(), currentPrompt, name);
-        isEdit = false;
-        configure();
+        //isEdit = false;
+        requestPromptLayout();
     }
 
     @Override

@@ -39,7 +39,7 @@ public class Prompt {
     public int currentBar;
     public int currentBeat;
 
-    public Prompt(PDFView pdfView, SurfaceView floatingCanvas, PromptSettings _settings, Activity context, PromptEventsCallback callback) {
+    public Prompt(PDFView pdfView, SurfaceView floatingCanvas, PromptSettings _settings, Activity context, final PromptEventsCallback callback) {
         settings = _settings;
 
         File f = new File(settings.getPdfFullPath());
@@ -55,6 +55,8 @@ public class Prompt {
                 if (settings.getOffsetX() != 0.0f || settings.getOffsetY() != 0.0f) {
                     pdf.moveTo(settings.getOffsetX(), settings.getOffsetY(), null);
                 }
+
+                callback.onLoaded();
             }
 
             @Override
@@ -105,6 +107,11 @@ public class Prompt {
         pdf.drawMarkers();
     }
 
+    /*public void editMode(boolean edit) {
+        clearCanvas();
+        pdf.enableDrawMarkers(!edit);
+    }*/
+
     public void setCurrentMarkers(List<Marker> markers) {
         pdf.setCurrentMarkers(markers);
     }
@@ -137,6 +144,14 @@ public class Prompt {
             }
         }
         return null;
+    }
+
+    public boolean isMarkerClick(float x, float y) {
+        return pdf.isMarkerClick(x, y);
+    }
+
+    public Marker getClickedMarker(float x, float y) {
+        return pdf.getClickedMarker(x, y);
     }
 
     public void play() {

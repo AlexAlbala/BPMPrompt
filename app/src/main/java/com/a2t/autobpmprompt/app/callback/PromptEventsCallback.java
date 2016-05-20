@@ -10,5 +10,6 @@ public interface PromptEventsCallback {
     void onPlay();
     void onPause();
     void onStop();
+    void onLoaded();
     void onMarkerMatched(Marker match);
 }

@@ -56,7 +56,7 @@ public class MarkerDialog extends DialogFragment {
         View dialogView = inflater.inflate(R.layout.dialog_marker, null);
 
 
-        Bundle b = getArguments();
+        final Bundle b = getArguments();
         final boolean isEdit = b.getBoolean("edit");
 
         mX = b.getFloat("xOffset");
@@ -75,14 +75,15 @@ public class MarkerDialog extends DialogFragment {
                         int mBar = Integer.parseInt(bar.getText().toString());
                         int mBeat = Integer.parseInt(beat.getText().toString());
 
-                        if(isEdit){
+                        if (isEdit) {
                             mListener.onMarkerEdited(MarkerDialog.this, mTitle, mNote, mBar, mBeat, mPage, mX, mY);
                         } else {
                             mListener.onMarkerCreated(MarkerDialog.this, mTitle, mNote, mBar, mBeat, mPage, mX, mY);
                         }
                     }
-                })
-                .setNegativeButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
+                });
+
+                builder.setNeutralButton(R.string.cancel_button, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // User cancelled the dialog
                         mListener.onMarkerCancelled(MarkerDialog.this);
@@ -94,9 +95,16 @@ public class MarkerDialog extends DialogFragment {
         bar = (EditText) dialogView.findViewById(R.id.marker_bar);
         beat = (EditText) dialogView.findViewById(R.id.marker_beat);
 
-        if(isEdit) {
+        if (isEdit) {
             if (StringUtils.isNotEmpty(b.getString("title"))) {
-                title.setText(b.getString("title"));
+                final String markerTitle = b.getString("title");
+                title.setText(markerTitle);
+                builder.setNegativeButton(R.string.delete_button, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User cancelled the dialog
+                        mListener.onMarkerDeleted(MarkerDialog.this, markerTitle);
+                    }
+                });
             }
 
             if (StringUtils.isNotEmpty(b.getString("note"))) {
@@ -117,9 +125,11 @@ public class MarkerDialog extends DialogFragment {
 
     public interface MarkerDialogListener {
         void onMarkerCreated(DialogFragment dialog, String title, String note, int bar, int beat, int page, float positionX, float positionY);
+
         void onMarkerEdited(DialogFragment dialog, String title, String note, int bar, int beat, int page, float positionX, float positionY);
 
         void onMarkerCancelled(DialogFragment dialog);
+        void onMarkerDeleted(DialogFragment dialog, String title);
     }
 
     // Override the Fragment.onAttach() method to instantiate the PDFDialogResultListener

@@ -5,8 +5,11 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceView;
+import android.view.View;
 
 import com.a2t.a2tlib.tools.LogUtils;
 import com.a2t.autobpmprompt.R;
@@ -43,7 +46,7 @@ public class PromptViewManager {
 
     private Timer markerRefreshTimer;
     private final int REFRESH_THRESHOLD_MS = 30;
-    private final int MARKER_FRAMES_SKIP = 1;
+    private final int MARKER_FRAMES_SKIP = 0;
 
     private Marker lastMarkerPainted;
     private float lastXClick;
@@ -53,7 +56,7 @@ public class PromptViewManager {
 
     //private final int MOVEMENT_PX = 1;
 
-    public PromptViewManager(File pdf, PDFView pdfview, SurfaceView floatingCanvas, Activity activity, PromptViewCallback callback) {
+    public PromptViewManager(File pdf, final PDFView pdfview, SurfaceView floatingCanvas, Activity activity, PromptViewCallback callback) {
         mCallback = callback;
         clickSquareSize = (int) activity.getResources().getDimension(R.dimen.click_square_size);
         clickMarkerColor = activity.getResources().getColor(R.color.click_marker_color);
@@ -62,6 +65,22 @@ public class PromptViewManager {
         clickMarkerPaint.setStrokeWidth(activity.getResources().getDimension(R.dimen.click_stroke_size));
         markerRefreshTimer = new Timer();
         this.loadPDF(pdf, pdfview, floatingCanvas, activity);
+    }
+
+    public boolean isMarkerClick(float x, float y) {
+        return getClickedMarker(x, y) != null;
+    }
+
+    public Marker getClickedMarker(float x, float y) {
+        for (Marker m : currentMarkers) {
+            float pos_x = m.getOffsetX() * getCurrentZoom() + getCurrentXOffset();
+            float pos_y = m.getOffsetY() * getCurrentZoom() + getCurrentYOffset();
+
+            if (x < pos_x + clickSquareSize && x > pos_x - clickSquareSize && y > pos_y - clickSquareSize && y < pos_y + clickSquareSize) {
+                return m;
+            }
+        }
+        return null;
     }
 
     public static boolean loadThumbnail(File pdfFile, PDFView pdfview) {
@@ -128,7 +147,7 @@ public class PromptViewManager {
         return true;
     }
 
-    public void enableDrawMarkers(boolean enable){
+    public void enableDrawMarkers(boolean enable) {
         drawMarkers = enable;
     }
 
@@ -245,8 +264,20 @@ public class PromptViewManager {
 
         //SQUARE
         //Horizontal lines
-        canvas.drawLine(x - clickSquareSize, y - clickSquareSize, x + clickSquareSize, y + clickSquareSize, clickMarkerPaint);
-        canvas.drawLine(x - clickSquareSize, y + clickSquareSize, x + clickSquareSize, y - clickSquareSize, clickMarkerPaint);
+        //canvas.drawLine(x - clickSquareSize, y - clickSquareSize, x + clickSquareSize, y + clickSquareSize, clickMarkerPaint);
+        //canvas.drawLine(x - clickSquareSize, y + clickSquareSize, x + clickSquareSize, y - clickSquareSize, clickMarkerPaint);
+
+        Drawable d;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            d = activity.getResources().getDrawable(R.drawable.note_4, activity.getTheme());
+        } else {
+            d = activity.getResources().getDrawable(R.drawable.note_4);
+        }
+
+        if (d != null) {
+            d.setBounds((int) (x - clickSquareSize), (int) (y - clickSquareSize), (int) (x + clickSquareSize), (int) (y + clickSquareSize));
+            d.draw(canvas);
+        }
 
         //Vertical lines
         //canvas.drawLine(x - clickSquareSize, y - clickSquareSize, x - clickSquareSize, y + clickSquareSize, clickMarkerPaint);
@@ -264,11 +295,13 @@ public class PromptViewManager {
 
     public synchronized void drawMarkers() {
         Canvas canvas = mFloatingCanvas.getHolder().lockCanvas();
-        canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
-        for (Marker m : currentMarkers) {
-            paintMarker(canvas, m, false);
+        if (canvas != null) {
+            canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
+            for (Marker m : currentMarkers) {
+                paintMarker(canvas, m, false);
+            }
+            mFloatingCanvas.getHolder().unlockCanvasAndPost(canvas);
         }
-        mFloatingCanvas.getHolder().unlockCanvasAndPost(canvas);
     }
 
     public void setCurrentMarkers(List<Marker> currentMarkers) {

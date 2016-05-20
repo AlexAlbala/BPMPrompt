@@ -12,7 +12,7 @@
         android:background="@color/prompt_bg">
 
 
-        <LinearLayout
+        <RelativeLayout
             android:id="@+id/contents_fullscreen"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -38,6 +38,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="2dp"
                         android:layout_marginTop="2dp"
+                        android:layout_centerHorizontal="true"
                         android:background="@drawable/transport_bg"
                         android:orientation="horizontal"
                         android:weightSum="10">
@@ -95,18 +96,18 @@
                             style="?metaButtonBarStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:onClick="switchToEdit"
+                            android:onClick="editPromptClicked"
                             android:text="@string/edit_button"
                             android:textSize="@dimen/abc_text_size_small_material" />-->
 
-                        <Button
+                        <!--<Button
                             android:id="@+id/prompt_done_top_button"
                             style="?metaButtonBarStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:onClick="promptSave"
                             android:text="@string/done_button"
-                            android:textSize="@dimen/abc_text_size_small_material" />
+                            android:textSize="@dimen/abc_text_size_small_material" />-->
 
                         <!--<Button
                             android:id="@+id/prompt_rename_top_button"
@@ -143,12 +144,46 @@
                     <SurfaceView
                         android:id="@+id/prompt_floating_canvas"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent" />
+                        android:layout_height="match_parent"/>
                 </FrameLayout>
 
 
             </LinearLayout>
-        </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:gravity="center"
+                android:orientation="horizontal">
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/fab_edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:clickable="true"
+                    android:onClick="editPromptClicked"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/edit"
+                    android:tint="@android:color/black"
+                    app:backgroundTint="@android:color/white"/>
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/fab_add_marker"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"
+                    android:clickable="true"
+                    android:onClick="addMarker"
+                    android:scaleType="centerCrop"
+                    android:src="@android:drawable/ic_input_add"
+                    android:tint="@android:color/black"
+                    app:backgroundTint="@android:color/white"/>
+            </LinearLayout>
+        </RelativeLayout>
 
 
         <!-- This FramLinearLayoutts its children based on system windows using
@@ -184,9 +219,9 @@
                         android:clickable="true"
                         android:onClick="promptPlay"
                         android:scaleType="centerCrop"
-                        android:src="@android:drawable/ic_media_play"
-                        android:tint="@android:color/white"
-                        app:backgroundTint="@color/primary_color" />
+                        android:src="@drawable/play"
+                        android:tint="@android:color/black"
+                        app:backgroundTint="@android:color/white" />
 
                     <android.support.design.widget.FloatingActionButton
                         android:layout_width="wrap_content"
@@ -195,9 +230,9 @@
                         android:clickable="true"
                         android:onClick="promptPause"
                         android:scaleType="centerCrop"
-                        android:src="@android:drawable/ic_media_pause"
-                        android:tint="@android:color/white"
-                        app:backgroundTint="@color/primary_color" />
+                        android:src="@drawable/pause"
+                        android:tint="@android:color/black"
+                        app:backgroundTint="@android:color/white" />
 
                     <android.support.design.widget.FloatingActionButton
                         android:layout_width="wrap_content"
@@ -206,9 +241,9 @@
                         android:clickable="true"
                         android:onClick="promptStop"
                         android:scaleType="centerCrop"
-                        android:src="@android:drawable/checkbox_off_background"
-                        android:tint="@android:color/white"
-                        app:backgroundTint="@color/primary_color" />
+                        android:src="@drawable/stop"
+                        android:tint="@android:color/holo_red_dark"
+                        app:backgroundTint="@android:color/white" />
                 </LinearLayout>
             </RelativeLayout>
 
@@ -326,33 +361,8 @@
         </FrameLayout>
     </FrameLayout>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_edit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
-        android:clickable="true"
-        android:onClick="switchToEdit"
-        android:scaleType="centerCrop"
-        android:src="@drawable/edit"
-        android:tint="@android:color/white"
-        app:backgroundTint="@color/primary_color"
-        app:layout_anchor="@id/prompt_coordinator"
-        app:layout_anchorGravity="bottom|center"/>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_add_marker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/activity_vertical_margin"
-        android:layout_marginStart="60dp"
-        android:clickable="true"
-        android:onClick="addMarker"
-        android:scaleType="centerCrop"
-        android:src="@android:drawable/ic_input_add"
-        android:tint="@android:color/white"
-        app:backgroundTint="@color/primary_color"
-        app:layout_anchor="@id/fab_edit"
-        app:layout_anchorGravity="end|center"/>
+
+
 </android.support.design.widget.CoordinatorLayout>
 

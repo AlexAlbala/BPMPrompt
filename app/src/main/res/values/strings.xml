@@ -67,6 +67,7 @@
 
     <!-- GLOBAL APP -->
     <string name="app_name">Auto BPM Prompt</string>
+    <string name="loading">Loading…</string>
 
     <!-- MENU -->
     <string name="rename_setlist_menu">Rename setlist</string>
