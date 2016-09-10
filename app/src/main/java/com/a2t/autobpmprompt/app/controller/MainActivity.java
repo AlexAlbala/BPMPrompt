@@ -1,12 +1,12 @@
 package com.a2t.autobpmprompt.app.controller;
 
-import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextMenu;
 import android.view.Menu;
@@ -15,6 +15,8 @@ import android.view.View;
 import android.widget.ExpandableListView;
 
 import com.a2t.a2tlib.content.compat.A2TActivity;
+import com.a2t.a2tlib.tools.BuildUtils;
+import com.a2t.a2tlib.tools.SharedPreferencesManager;
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.adapter.MainPagerAdapter;
 import com.a2t.autobpmprompt.app.adapter.SetListAdapter;
@@ -22,6 +24,8 @@ import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.app.model.SetList;
 import com.a2t.autobpmprompt.helpers.RealmIOHelper;
 import com.a2t.autobpmprompt.media.PromptManager;
+import com.a2t.autobpmprompt.media.audio.Recorder;
+import com.splunk.mint.Mint;
 
 import io.realm.RealmList;
 
@@ -34,6 +38,13 @@ public class MainActivity extends A2TActivity implements SetListDialog.SetListDi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        boolean debug = BuildUtils.isDebugBuild();
+        if(!debug) {
+            Mint.initAndStartSession(this, "41722d1c");
+        }
+
+
         RealmIOHelper.getInstance().debug(getApplicationContext());
         fab = (FloatingActionButton) findViewById(R.id.fab_add);
 
@@ -70,6 +81,11 @@ public class MainActivity extends A2TActivity implements SetListDialog.SetListDi
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        SharedPreferencesManager.debug(this, false);
+
+        Recorder r = new Recorder();
+        r.findAudioRecord();
     }
 
     public void fabButton(View view) {
@@ -84,23 +100,27 @@ public class MainActivity extends A2TActivity implements SetListDialog.SetListDi
 
     @Override
     protected void onResume() {
-        ldebug("onResume");
         super.onResume();
+        reloadData();
     }
 
     @Override
     protected void onStart() {
-        ldebug("onStart");
         super.onStart();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.action_settings) {
+            Intent i = new Intent(this, SettingsActivity.class);
+            startActivity(i);
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -143,42 +163,38 @@ public class MainActivity extends A2TActivity implements SetListDialog.SetListDi
 
     }
 
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+    /*public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
 
         super.onCreateContextMenu(menu, v, menuInfo);
-        ExpandableListView.ExpandableListContextMenuInfo info =
-                (ExpandableListView.ExpandableListContextMenuInfo) menuInfo;
-        int type = ExpandableListView.getPackedPositionType(info.packedPosition);
-        int group = ExpandableListView.getPackedPositionGroup(info.packedPosition);
-        int child = ExpandableListView.getPackedPositionChild(info.packedPosition);
+        linfo(v.toString());
+        linfo("aaaa" + (v.getTag() == null));
+        MenuTag m = (MenuTag)v.getTag();
+        String type = m.type;
+        int group = m.groupPosition;
+        int child = m.childPosition;
 
-        if (type == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
+        if (type.equals("setlist")) {
             //String page = mListStringArray[group][child];
             //menu.setHeaderTitle(page);
-            menu.add(group, 0, 0, R.string.rename_setlist_menu);
-            menu.add(group, 1, 1, R.string.delete_setlist_menu);
+            menu.add(group, child, 0, R.string.rename_setlist_menu);
+            menu.add(group, child, 1, R.string.delete_setlist_menu);
 
-        } else if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-            menu.add(group, 0, 0, R.string.rename_prompt_menu);
-            menu.add(group, 1, 1, R.string.delete_prompt_menu);
+        } else if (type.equals("prompt")) {
+            menu.add(group, child, 0, R.string.rename_prompt_menu);
+            menu.add(group, child, 1, R.string.delete_prompt_menu);
         }
     }
 
 
     public boolean onContextItemSelected(MenuItem menuItem) {
-        MainPagerAdapter adapter = (MainPagerAdapter) viewPager.getAdapter();
-        SetListsFragment sFragment = (SetListsFragment) adapter.getRegisteredFragment(0);
-        SetListAdapter s = sFragment.getSetListViewAdapter();
+        int groupPos = menuItem.getGroupId();
+        int childPos = menuItem.getItemId();
 
-        ExpandableListView.ExpandableListContextMenuInfo info =
-                (ExpandableListView.ExpandableListContextMenuInfo) menuItem.getMenuInfo();
-        int groupPos, childPos;
-        int type = ExpandableListView.getPackedPositionType(info.packedPosition);
-        if (type == ExpandableListView.PACKED_POSITION_TYPE_CHILD) {
-            groupPos = ExpandableListView.getPackedPositionGroup(info.packedPosition);
-            childPos = ExpandableListView.getPackedPositionChild(info.packedPosition);
-            PromptSettings prompt = (PromptSettings) s.getChild(groupPos, childPos);
+        String type = childPos == -1 ? "setlist" : "prompt";
+        if (type.equals("prompt")) {
 
+            //PromptSettings prompt = (PromptSettings) s.getChild(groupPos, childPos);
+            PromptSettings prompt = new PromptSettings();
 
             Bundle b = new Bundle();
             b.putString("type", "prompt");
@@ -197,10 +213,9 @@ public class MainActivity extends A2TActivity implements SetListDialog.SetListDi
                 d.show(getSupportFragmentManager(), "deleteprompt");
 
             }
-        } else if (type == ExpandableListView.PACKED_POSITION_TYPE_GROUP) {
-            groupPos = ExpandableListView.getPackedPositionGroup(info.packedPosition);
-            SetList setList = (SetList) s.getGroup(groupPos);
-
+        } else if (type.equals("setlist")) {
+            //SetList setList = (SetList) s.getGroup(groupPos);
+            SetList setList = new SetList();
             Bundle b = new Bundle();
             b.putString("type", "setlist");
             b.putString("setListName", setList.getTitle());
@@ -218,7 +233,7 @@ public class MainActivity extends A2TActivity implements SetListDialog.SetListDi
         }
 
         return super.onContextItemSelected(menuItem);
-    }
+    }*/
 
 
     @Override

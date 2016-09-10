@@ -1,25 +1,28 @@
 package com.a2t.autobpmprompt.media.prompt;
 
 import android.app.Activity;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
 
 import com.a2t.a2tlib.tools.LogUtils;
+import com.a2t.a2tlib.tools.SharedPreferencesManager;
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.callback.PromptViewCallback;
 import com.a2t.a2tlib.tools.SimpleCallback;
 import com.a2t.autobpmprompt.app.model.Marker;
-import com.joanzapata.pdfview.PDFView;
-import com.joanzapata.pdfview.listener.OnDrawListener;
-import com.joanzapata.pdfview.listener.OnLoadCompleteListener;
-import com.joanzapata.pdfview.listener.OnPageChangeListener;
+import com.github.barteksc.pdfviewer.PDFView;
+import com.github.barteksc.pdfviewer.listener.OnDrawListener;
+import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
+import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 
 import java.io.File;
 import java.util.List;
@@ -87,17 +90,17 @@ public class PromptViewManager {
         pdfview.fromFile(pdfFile)
                 .defaultPage(0)
                 .pages(0)
-                .showMinimap(false)
                 .enableSwipe(false)
                 .load();
+
+        pdfview.useBestQuality(false);
 
         return true;
     }
 
     public boolean loadPDF(File pdfFile, final PDFView pdfview, SurfaceView floatingCanvas, Activity mActivity) {
+        boolean vertical = SharedPreferencesManager.getString(mActivity, "pref_orientation").equals(mActivity.getResources().getString(R.string.prf_sheet_orientation_vertical));
         pdfview.fromFile(pdfFile)
-                .defaultPage(1)
-                .showMinimap(false)
                 .enableSwipe(true)
                 .onDraw(new OnDrawListener() {
                     @Override
@@ -135,9 +138,10 @@ public class PromptViewManager {
                     public void onPageChanged(int i, int i1) {
                         mCallback.onPageChanged(i, i1);
                     }
-                }).swipeVertical(true)
+                }).swipeHorizontal(!vertical)
                 .load();
 
+        pdfview.useBestQuality(true);
         floatingCanvas.setZOrderOnTop(true);
         floatingCanvas.getHolder().setFormat(PixelFormat.TRANSPARENT);
 
@@ -152,7 +156,7 @@ public class PromptViewManager {
     }
 
     public void centerAt(final float x, final float y, SimpleCallback callback) {
-        Log.i(TAG, "Center at " + x + ":" + y);
+        LogUtils.i(TAG, "Center at " + x + ":" + y);
         float moveX = x - (pdfview.getWidth() / (2 * pdfview.getZoom()));
         float moveY = y - (pdfview.getHeight() / (2 * pdfview.getZoom()));
 
@@ -170,7 +174,7 @@ public class PromptViewManager {
                     if (_x > 0) _x = 0;
                     if (_y > 0) _y = 0;
 
-                    Log.i(TAG, "Going to move to " + x + ":" + y + " -> " + _x + ":" + _y);
+                    LogUtils.i(TAG, "Going to move to " + x + ":" + y + " -> " + _x + ":" + _y);
 
                     /*float tx, ty;
                     for (tx = pdfview.getCurrentXOffset(), ty = pdfview.getCurrentYOffset(); tx > _x || ty > _y; tx -= MOVEMENT_PX, ty -= MOVEMENT_PX) {
@@ -231,7 +235,7 @@ public class PromptViewManager {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                pdfview.jumpTo(page);
+                pdfview.jumpTo(page + 1);
             }
         });
     }
@@ -250,12 +254,12 @@ public class PromptViewManager {
         if (x >= 1 && y >= 1) {
 
             Canvas canvas = mFloatingCanvas.getHolder().lockCanvas();
-            drawClickOnCanvas(canvas, x, y);
+            drawClickOnCanvas(canvas, -1, x, y);
             mFloatingCanvas.getHolder().unlockCanvasAndPost(canvas);
         }
     }
 
-    private void drawClickOnCanvas(Canvas canvas, float x, float y) {
+    private void drawClickOnCanvas(Canvas canvas, int color, float x, float y) {
         //canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
 //        canvas.drawLine(0, y, mFloatingCanvas.getWidth(), y, clickMarkerPaint);
 
@@ -269,10 +273,15 @@ public class PromptViewManager {
 
         Drawable d;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-            d = activity.getResources().getDrawable(R.drawable.note_4, activity.getTheme());
+            d = activity.getResources().getDrawable(R.drawable.bubble, activity.getTheme());
+            if (d != null && color > -1) {
+                d.setTint(color);
+                d.setColorFilter(color, PorterDuff.Mode.ADD);
+            }
         } else {
-            d = activity.getResources().getDrawable(R.drawable.note_4);
+            d = activity.getResources().getDrawable(R.drawable.bubble);
         }
+
 
         if (d != null) {
             d.setBounds((int) (x - clickSquareSize), (int) (y - clickSquareSize), (int) (x + clickSquareSize), (int) (y + clickSquareSize));
@@ -306,6 +315,7 @@ public class PromptViewManager {
 
     public void setCurrentMarkers(List<Marker> currentMarkers) {
         this.currentMarkers = currentMarkers;
+        drawMarkers();
     }
 
     private void paintMarker(Canvas canvas, Marker marker, boolean highlighted) {
@@ -315,7 +325,27 @@ public class PromptViewManager {
         LogUtils.d(TAG, "Draw marker " + x + ":" + y);
         if (x >= 1 && y >= 1) {
 
-            drawClickOnCanvas(canvas, x, y);
+            drawClickOnCanvas(canvas, marker.getColor(), x, y);
+
+            Paint markerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            markerPaint.setColor(marker.getColor());
+            float pixels = TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_SP,
+                    marker.getTextSize(),
+                    Resources.getSystem().getDisplayMetrics()
+            );
+            markerPaint.setTextSize(pixels);
+            //clickMarkerPaint.setStrokeWidth(activity.getResources().getDimension(R.dimen.click_stroke_size));
+
+
+            if (marker.getPrintTitle() > 0) {
+                float textMeasuredSize = markerPaint.measureText(marker.getTitle());
+                if (marker.getPrintTitle() == 1) { //above
+                    canvas.drawText(marker.getTitle(), x - (textMeasuredSize / 2), y - clickSquareSize, markerPaint);
+                } else {//below
+                    canvas.drawText(marker.getTitle(), x - (textMeasuredSize / 2), y + clickSquareSize, markerPaint);
+                }
+            }
 
             /*
             //Horizontal lines

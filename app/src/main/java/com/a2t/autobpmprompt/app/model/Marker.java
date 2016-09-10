@@ -68,6 +68,47 @@ public class Marker extends RealmObject {
         this.page = page;
     }
 
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
+    }
+
+    public int getPrintTitle() {
+        return printTitle;
+    }
+
+    public void setPrintTitle(int printTitle) {
+        this.printTitle = printTitle;
+    }
+
+    public int getTextSize() {
+        return textSize;
+    }
+
+    public void setTextSize(int textSize) {
+        this.textSize = textSize;
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = color;
+    }
+
+    public boolean isNotify() {
+        return notify;
+    }
+
+    public void setNotify(boolean notify) {
+        this.notify = notify;
+    }
+
     @PrimaryKey
     private int id;
     private int bar;
@@ -77,6 +118,12 @@ public class Marker extends RealmObject {
     private float offsetX;
     private float offsetY;
     private int page;
+    private int type; //0 - full marker, 1 - text
+    private int printTitle; //0 - no, 1 - above, 2 - below
+    private int color;
+    private int textSize;
+
+    private boolean notify;
 
     public Marker() {
 

@@ -5,15 +5,18 @@ import android.graphics.Canvas;
 import android.util.Log;
 import android.view.SurfaceView;
 
+import com.a2t.a2tlib.tools.LogUtils;
+import com.a2t.a2tlib.tools.SharedPreferencesManager;
 import com.a2t.autobpmprompt.app.callback.PromptEventsCallback;
 import com.a2t.autobpmprompt.app.callback.PromptViewCallback;
 import com.a2t.a2tlib.tools.SimpleCallback;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.media.prompt.PromptViewManager;
-import com.joanzapata.pdfview.PDFView;
+import com.github.barteksc.pdfviewer.PDFView;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -104,7 +107,7 @@ public class Prompt {
     }
 
     public void drawMarkers() {
-        pdf.drawMarkers();
+            pdf.drawMarkers();
     }
 
     /*public void editMode(boolean edit) {
@@ -113,7 +116,11 @@ public class Prompt {
     }*/
 
     public void setCurrentMarkers(List<Marker> markers) {
-        pdf.setCurrentMarkers(markers);
+            pdf.setCurrentMarkers(markers);
+    }
+
+    public void setCurrentPage(int page){
+        pdf.setCurrentPage(page);
     }
 
     public int getCurrentPage() {
@@ -126,15 +133,17 @@ public class Prompt {
 
     public void notifyMarker(final Marker m) {
         if (m.getPage() != pdf.getCurrentPage()) {
+            LogUtils.d(TAG, "from page " + pdf.getCurrentPage() + " to page " + m.getPage());
             pdf.setCurrentPage(m.getPage());
+            mCallback.onMarkerMatched(m);
+        } else {
+            pdf.centerAt(m.getOffsetX(), m.getOffsetY(), new SimpleCallback() {
+                @Override
+                public void done() {
+                    mCallback.onMarkerMatched(m);
+                }
+            });
         }
-
-        pdf.centerAt(m.getOffsetX(), m.getOffsetY(), new SimpleCallback() {
-            @Override
-            public void done() {
-                mCallback.onMarkerMatched(m);
-            }
-        });
     }
 
     private Marker matchMarker() {

@@ -41,8 +41,8 @@ public class MainPagerAdapter extends FragmentStatePagerAdapter {
         super(fm);
     }
 
-    private Fragment getFragmentByPosition(int position){
-        switch(position){
+    private Fragment getFragmentByPosition(int position) {
+        switch (position) {
             case 0:
                 return new SetListsFragment();
             case 1:
@@ -57,8 +57,11 @@ public class MainPagerAdapter extends FragmentStatePagerAdapter {
         return 2;
     }
 
-    public void updateData(Context ctx){
-        ((SetListsFragment)getRegisteredFragment(0)).loadSetLists(ctx);
-        notifyDataSetChanged();
+    public void updateData(Context ctx) {
+        SetListsFragment slf = ((SetListsFragment) getRegisteredFragment(0));
+        if (slf != null) {
+            slf.loadSetLists(ctx);
+        }
+        //notifyDataSetChanged();
     }
 }

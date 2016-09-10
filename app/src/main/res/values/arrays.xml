@@ -1,0 +1,18 @@
+<resources>
+
+    <!-- Declare custom theme attributes that allow changing which styles are
+         used for button bars depending on the API level.
+         ?android:attr/buttonBarStyle is new as of API 11 so this is
+         necessary to support previous API levels. -->
+    <string-array name="prf_orientation_values">
+        <item>@string/prf_sheet_orientation_vertical</item>
+        <item>@string/prf_sheet_orientation_horizontal</item>
+    </string-array>
+
+    <string-array name="marker_text_options">
+        <item>@string/showtext_none</item>
+        <item>@string/showtext_above</item>
+        <item>@string/showtext_below</item>
+    </string-array>
+
+</resources>

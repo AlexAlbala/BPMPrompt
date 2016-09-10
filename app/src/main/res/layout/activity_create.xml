@@ -77,7 +77,7 @@
             android:layout_gravity="center_horizontal">
 
             <!-- pdf preview -->
-            <com.joanzapata.pdfview.PDFView
+            <com.github.barteksc.pdfviewer.PDFView
                 android:id="@+id/create_pdfpreview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />

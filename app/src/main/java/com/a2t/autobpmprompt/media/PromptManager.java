@@ -12,13 +12,14 @@ import com.a2t.autobpmprompt.app.controller.PromptActivity;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.helpers.RealmIOHelper;
-import com.joanzapata.pdfview.PDFView;
+import com.github.barteksc.pdfviewer.PDFView;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmList;
@@ -58,8 +59,12 @@ public class PromptManager {
     }
 
     public static boolean update(Context context, Prompt p) {
+        return update(context, p.settings);
+    }
+
+    public static boolean update(Context context, PromptSettings p) {
         LogUtils.i(TAG, "Update prompt" + p.toString());
-        RealmIOHelper.getInstance().updatePrompt(context, p.settings);
+        RealmIOHelper.getInstance().updatePrompt(context, p);
         return true;
     }
 
@@ -100,5 +105,9 @@ public class PromptManager {
         File f = new File(ps.getPdfFullPath());
         f.delete();
         RealmIOHelper.getInstance().deletePrompt(ctx, promptId);
+    }
+
+    public static List<PromptSettings> getAllPtomptsFromSetList(Context ctx, String setList){
+        return RealmIOHelper.getInstance().getAllPromptsFromSetList(ctx, setList);
     }
 }

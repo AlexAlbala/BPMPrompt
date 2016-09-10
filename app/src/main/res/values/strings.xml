@@ -10,7 +10,7 @@
     <string name="prompt_create_new">Create new…</string>
 
     <!-- MENU -->
-    <string name="action_settings">Play demo</string>
+    <string name="action_settings">Settings</string>
     <string name="action_create">Create</string>
     <string name="action_delete">Delete</string>
     <string name="action_edit">Edit</string>
@@ -34,6 +34,11 @@
     <string name="placeholder_bar">Bar</string>
     <string name="placeholder_beat">Beat</string>
     <string name="placeholder_note">Note</string>
+    <string name="showtext_none">Don\'t show text</string>
+    <string name="showtext_above">Show text above marker</string>
+    <string name="showtext_below">Show text below marker</string>
+    <string name="pick_a_color">Pick a color</string>
+    <string name="select_text_size">Select text size</string>
 
     <!-- SETLIST DIALOG -->
     <string name="create_setlist_title">Create SetList</string>
@@ -68,6 +73,7 @@
     <!-- GLOBAL APP -->
     <string name="app_name">Auto BPM Prompt</string>
     <string name="loading">Loading…</string>
+    <string name="field_required">This field is required</string>
 
     <!-- MENU -->
     <string name="rename_setlist_menu">Rename setlist</string>
@@ -76,5 +82,15 @@
     <string name="rename_prompt_menu">Rename prompt</string>
     <string name="delete_prompt_menu">Delete prompt</string>
 
+    <!-- PREFERENCES -->
+    <string name="prf_grp_sheet">Sheet</string>
+    <string name="prf_sheet_orientation">Sheet orienation</string>
+    <string name="prf_sheet_orientation_summary">Defines the orientation of the page scrolling</string>
+    <string name="prf_sheet_orientation_horizontal">Horizontal</string>
+    <string name="prf_sheet_orientation_vertical">Vertical</string>
+
+    <string name="prf_grp_display">Display</string>
+    <string name="prf_display_show_markers">Show markers</string>
+    <string name="prf_display_show_markers_summary">Enable if you want to see the markers in the prompt</string>
 
 </resources>

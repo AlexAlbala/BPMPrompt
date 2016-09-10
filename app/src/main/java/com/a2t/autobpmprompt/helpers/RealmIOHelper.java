@@ -12,6 +12,8 @@ import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.SetList;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import io.realm.RealmList;
@@ -70,15 +72,42 @@ public class RealmIOHelper {
     }
 
     public List<PromptSettings> getAllPrompts(Context ctx) {
-        List<PromptSettings> allPrompts = new ArrayList<>();
+        /*List<PromptSettings> allPrompts = new ArrayList<>();
         List<SetList> setLists = getAllSetLists(ctx);
-        for(SetList s : setLists) {
+        for (SetList s : setLists) {
             for (PromptSettings p : s.getPrompts()) {
                 p.setSetList(s.getTitle());
                 allPrompts.add(p);
             }
         }
-        return allPrompts;
+        return allPrompts;*/
+
+        return mPromptSettings.getAll(ctx);
+    }
+
+    public SetList getSetListByName(Context ctx, String name) {
+        return mSetLists.getOne(ctx, "name", name);
+    }
+
+    public List<PromptSettings> getAllPromptsFromSetList(Context ctx, String setList) {
+        //SetList s = getSetListByName(ctx, setList);
+
+        List<PromptSettings> prompts = mPromptSettings.getByQuery(ctx, mPromptSettings.getRealm(ctx).where(PromptSettings.class).equalTo("setList", setList), "setListPosition", false);
+//        Collections.sort(prompts, new Comparator<PromptSettings>() {
+//            @Override
+//            public int compare(PromptSettings lhs, PromptSettings rhs) {
+//                if (lhs.getSetListPosition() == rhs.getSetListPosition()) {
+//                    return 0;
+//                } else {
+//                    if (lhs.getSetListPosition() > rhs.getSetListPosition()) {
+//                        return 1;
+//                    } else {
+//                        return -1;
+//                    }
+//                }
+//            }
+//        });
+        return prompts;
     }
 
 //    public List<PromptSettings> getAllPromptSettings(Context ctx) {
@@ -91,6 +120,9 @@ public class RealmIOHelper {
 //    }
 
     public void updatePrompt(Context ctx, PromptSettings updatedPrompt) {
+        /*for (Marker m : updatedPrompt.getMarkers()) {
+            mMarker.updateOne(ctx, m);
+        }*/
         mPromptSettings.updateOne(ctx, updatedPrompt);
     }
 
@@ -103,6 +135,10 @@ public class RealmIOHelper {
         to.setBar(from.getBar());
         to.setBeat(from.getBeat());
         to.setPage(from.getPage());
+        to.setPrintTitle(from.getPrintTitle());
+        to.setType(from.getType());
+        to.setColor(from.getColor());
+        to.setTextSize(from.getTextSize());
     }
 
     private void CopySetList(SetList from, SetList to) {
@@ -136,17 +172,18 @@ public class RealmIOHelper {
         to.setOffsetY(from.getOffsetY());
         to.setZoom(from.getZoom());
         to.setId(from.getId());
+        to.setSetListPosition(from.getSetListPosition());
     }
 
     public PromptSettings getPrompt(Context ctx, long id) {
-        PromptSettings ps =  mPromptSettings.getOne(ctx, "id", id);
+        PromptSettings ps = mPromptSettings.getOne(ctx, "id", id);
         PromptSettings returned = new PromptSettings();
         CopyPromptSettings(ps, returned);
         return returned;
     }
 
     public void debug(Context ctx) {
-        if(BuildUtils.isDebugBuild()) {
+        if (BuildUtils.isDebugBuild()) {
             RealmResults<Marker> lm = mMarker.getAll(ctx);
             LogUtils.i(TAG, "*********************************");
             LogUtils.i(TAG, "FOUND " + lm.size() + " MARKERS");
@@ -177,7 +214,7 @@ public class RealmIOHelper {
     public void deleteSetList(Context ctx, String setList) {
         SetList set = mSetLists.getOne(ctx, "title", setList);
 
-        for(PromptSettings ps : set.getPrompts()){
+        for (PromptSettings ps : set.getPrompts()) {
             deletePrompt(ctx, ps.getId());
         }
 
@@ -202,7 +239,7 @@ public class RealmIOHelper {
     public void deletePrompt(Context ctx, long promptID) {
         PromptSettings p = mPromptSettings.getOne(ctx, "id", promptID);
 
-        for(Marker m : p.getMarkers()){
+        for (Marker m : p.getMarkers()) {
             deleteMarker(ctx, m);
         }
 

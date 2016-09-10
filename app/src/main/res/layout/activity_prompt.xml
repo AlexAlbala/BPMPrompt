@@ -33,6 +33,14 @@
                     android:background="@android:color/transparent"
                     android:cacheColorHint="#00000000">
 
+                    <ImageButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/activity_horizontal_margin"
+                        android:layout_centerVertical="true"
+                        android:onClick="toggleSetlist"
+                        android:src="@android:drawable/ic_menu_more"/>
+
                     <LinearLayout
                         android:layout_width="@dimen/transport_width"
                         android:layout_height="wrap_content"
@@ -136,7 +144,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
-                    <com.joanzapata.pdfview.PDFView
+                    <com.github.barteksc.pdfviewer.PDFView
                         android:id="@+id/pdfview"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent" />
@@ -359,10 +367,21 @@
                 </LinearLayout>
             </LinearLayout>
         </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/prompt_set_list_prompts_container"
+            android:layout_width="200dp"
+            android:layout_height="400dp"
+            android:background="@android:color/white"
+            android:layout_marginTop="@dimen/activity_prompt_top_bar">
+            <ListView
+                android:id="@+id/prompt_set_list_prompts"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+            </ListView>
+        </FrameLayout>
     </FrameLayout>
-
-
-
 
 </android.support.design.widget.CoordinatorLayout>
 

@@ -92,8 +92,8 @@ public class SetListAdapter extends BaseExpandableListAdapter {
             // well set up the ViewHolder
             cellView = new GroupViewHolderItem();
             cellView.setListItem = (TextView) convertView.findViewById(R.id.setlist_title);
-            cellView.renameBtn = (ImageButton) convertView.findViewById(R.id.setlist_rename_btn);
-            cellView.deleteBtn = (ImageButton) convertView.findViewById(R.id.setlist_delete_btn);
+            //cellView.renameBtn = (ImageButton) convertView.findViewById(R.id.setlist_rename_btn);
+            //cellView.deleteBtn = (ImageButton) convertView.findViewById(R.id.setlist_delete_btn);
 
             // store the holder with the view.
             convertView.setTag(cellView);
@@ -146,20 +146,20 @@ public class SetListAdapter extends BaseExpandableListAdapter {
         final PromptSettings prompt = (PromptSettings) getChild(groupPosition, position);
 
         //if (convertView == null) {
-            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.row_setlist_inner, parent, false);
+        LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        convertView = inflater.inflate(R.layout.row_setlist_inner, parent, false);
 
-            // well set up the ViewHolder
-            cellView = new ChildViewHolderItem();
-            cellView.pdfItem = (TextView) convertView.findViewById(R.id.row_setlist_name);
-            cellView.barItem = (TextView) convertView.findViewById(R.id.row_setlist_beat);
-            cellView.bpmItem = (TextView) convertView.findViewById(R.id.row_setlist_bpm);
+        // well set up the ViewHolder
+        cellView = new ChildViewHolderItem();
+        cellView.pdfItem = (TextView) convertView.findViewById(R.id.row_setlist_name);
+        cellView.barItem = (TextView) convertView.findViewById(R.id.row_setlist_beat);
+        cellView.bpmItem = (TextView) convertView.findViewById(R.id.row_setlist_bpm);
 
-            // store the holder with the view.
-            convertView.setTag(cellView);
+        // store the holder with the view.
+        convertView.setTag(cellView);
         //} else {
-            // we've just avoided calling findViewById() on resource everytime
-            // just use the viewHolder
+        // we've just avoided calling findViewById() on resource everytime
+        // just use the viewHolder
         //    cellView = (ChildViewHolderItem) convertView.getTag();
         //}
 
@@ -169,19 +169,22 @@ public class SetListAdapter extends BaseExpandableListAdapter {
             cellView.barItem.setText(prompt.getCfgBarUpper() + " / " + prompt.getCfgBarLower());
             cellView.pdfItem.setTextSize(TypedValue.COMPLEX_UNIT_PX, mContext.getResources().getDimensionPixelSize(R.dimen.heading3));
 
-
-            cellView.pdfItem.setOnClickListener(new View.OnClickListener() {
+            View.OnClickListener onClickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mCallback.onPromptSelected(((SetList) getGroup(groupPosition)).getTitle(), prompt, groupPosition);
+                    //mCallback.onPromptSelected(((SetList) getGroup(groupPosition)).getTitle(), prompt, groupPosition);
+
                 }
-            });
+            };
+
+            cellView.pdfItem.setOnClickListener(onClickListener);
+            convertView.setOnClickListener(onClickListener);
 
             final View finalConvertView = convertView;
             View.OnLongClickListener onLongClickListener = new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    ((A2TActivity)mContext).openContextMenu(finalConvertView);
+                    ((A2TActivity) mContext).openContextMenu(finalConvertView);
                     return true;
                 }
             };
@@ -195,7 +198,7 @@ public class SetListAdapter extends BaseExpandableListAdapter {
             cellView.pdfItem.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mCallback.onCreatePromptClicked(((SetList) getGroup(groupPosition)).getTitle());
+                    mCallback.onCreatePromptClicked(((SetList) getGroup(groupPosition)).getTitle(), position);
 
                 }
             });

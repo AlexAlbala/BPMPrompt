@@ -7,6 +7,7 @@
     tools:context=".app.controller.MainActivity">
 
     <LinearLayout
+        android:id="@+id/main_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
@@ -54,7 +55,7 @@
         android:src="@android:drawable/ic_input_add"
         android:tint="@android:color/white"
         app:backgroundTint="@color/primary_color"
-        app:layout_anchor="@id/main_coordinator"
+        app:layout_anchor="@id/main_layout"
         app:layout_anchorGravity="bottom|right" />
 
 

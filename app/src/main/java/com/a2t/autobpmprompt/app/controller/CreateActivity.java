@@ -14,7 +14,7 @@ import com.a2t.autobpmprompt.media.PromptManager;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.media.audiotools.TapTempo;
 import com.a2t.autobpmprompt.media.prompt.PromptViewManager;
-import com.joanzapata.pdfview.PDFView;
+import com.github.barteksc.pdfviewer.PDFView;
 
 import java.io.File;
 
@@ -27,6 +27,7 @@ public class CreateActivity extends A2TActivity implements PDFDialog.PDFDialogRe
     PDFView pdfPreview;
     File pdfFile;
     String setList;
+    int setListPosition;
     TapTempo t;
 
     @Override
@@ -41,6 +42,7 @@ public class CreateActivity extends A2TActivity implements PDFDialog.PDFDialogRe
         pdfPreview = (PDFView)findViewById(R.id.create_pdfpreview);
 
         setList = getIntent().getStringExtra("setListName");
+        setListPosition = getIntent().getIntExtra("setListPosition", -1);
 
         t = new TapTempo();
     }
@@ -69,6 +71,7 @@ public class CreateActivity extends A2TActivity implements PDFDialog.PDFDialogRe
         promptSettings.setCfgBarUpper(Integer.parseInt(upper.getText().toString()));
         promptSettings.setCfgBarLower(Integer.parseInt(lower.getText().toString()));
         promptSettings.setSetList(setList);
+        promptSettings.setSetListPosition(setListPosition);
 
         PromptManager.create(getApplicationContext(), promptSettings);
 

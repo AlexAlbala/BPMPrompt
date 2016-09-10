@@ -4,6 +4,7 @@
 
     <uses-permission android:name="ANDROID.PERMISSION.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -24,6 +25,12 @@
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_prompt"
             android:theme="@style/FullScreen"/>
+
+        <activity
+            android:name=".app.controller.SettingsActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_prompt"
+            android:theme="@style/AppTheme"/>
         <activity
             android:name=".app.controller.CreateActivity"
             android:theme="@style/AppTheme"

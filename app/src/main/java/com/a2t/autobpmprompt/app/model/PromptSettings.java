@@ -26,9 +26,8 @@ public class PromptSettings extends RealmObject {
     private int bpm;
 
 
-    //ONLY FOR INNER TRACKING... I'M NOT SURE OF THAT....
-    @Ignore
     private String setList;
+    private int setListPosition;
 
     public String getSetList() {
         return setList;
@@ -124,5 +123,13 @@ public class PromptSettings extends RealmObject {
 
     public PromptSettings() {
 
+    }
+
+    public int getSetListPosition() {
+        return setListPosition;
+    }
+
+    public void setSetListPosition(int setListPosition) {
+        this.setListPosition = setListPosition;
     }
 }
