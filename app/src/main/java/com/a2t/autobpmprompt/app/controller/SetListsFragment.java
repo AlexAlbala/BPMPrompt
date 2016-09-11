@@ -21,6 +21,7 @@ import com.a2t.autobpmprompt.app.adapter.SetListAdapter;
 import com.a2t.autobpmprompt.app.callback.SetListAdapterCallback;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.app.model.SetList;
+import com.a2t.autobpmprompt.app.model.TempoRecord;
 import com.a2t.autobpmprompt.helpers.RealmIOHelper;
 import com.a2t.autobpmprompt.media.PromptManager;
 
@@ -115,9 +116,10 @@ public class SetListsFragment extends A2TFragment {
         ImageButton deleteBtn = (ImageButton) convertView.findViewById(R.id.setlist_inner_delete_btn);
 
         if (prompt != null) {
+            TempoRecord tr = prompt.getTempoTrack().get(0);
             pdfItem.setText(prompt.getName());
-            bpmItem.setText(prompt.getBpm() + " bpm");
-            barItem.setText(prompt.getCfgBarUpper() + " / " + prompt.getCfgBarLower());
+            bpmItem.setText(tr.getBpm() + " bpm");
+            barItem.setText(tr.getUpper() + " / " + tr.getLower());
             pdfItem.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimensionPixelSize(R.dimen.heading3));
 
             View.OnClickListener onClickListener = new View.OnClickListener() {

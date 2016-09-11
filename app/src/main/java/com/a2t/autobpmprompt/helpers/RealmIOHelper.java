@@ -4,12 +4,14 @@ import android.content.Context;
 import android.util.Log;
 
 import com.a2t.a2tlib.database.RealmDriver;
+import com.a2t.a2tlib.database.RealmFactory;
 import com.a2t.a2tlib.tools.BuildUtils;
 import com.a2t.a2tlib.tools.LogUtils;
 import com.a2t.autobpmprompt.BuildConfig;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.SetList;
+import com.a2t.autobpmprompt.app.model.TempoRecord;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,11 +28,13 @@ public class RealmIOHelper {
     RealmDriver<SetList> mSetLists;
     RealmDriver<PromptSettings> mPromptSettings;
     RealmDriver<Marker> mMarker;
+    RealmDriver<TempoRecord> mTempo;
 
     private RealmIOHelper() {
         mSetLists = new RealmDriver<>(SetList.class);
         mPromptSettings = new RealmDriver<>(PromptSettings.class);
         mMarker = new RealmDriver<>(Marker.class);
+        mTempo = new RealmDriver<>(TempoRecord.class);
     }
 
     public static RealmIOHelper getInstance() {
@@ -154,6 +158,7 @@ public class RealmIOHelper {
 
     private void CopyPromptSettings(PromptSettings from, PromptSettings to) {
         to.setMarkers(new RealmList<Marker>());
+        to.setTempoTrack(new RealmList<TempoRecord>());
 
         for (Marker m : from.getMarkers()) {
             Marker newMarker = new Marker();
@@ -161,12 +166,15 @@ public class RealmIOHelper {
             to.getMarkers().add(newMarker);
         }
 
+        for (TempoRecord tr : from.getTempoTrack()) {
+            TempoRecord newTr = new TempoRecord();
+            CopyTempoRecord(tr, newTr);
+            to.getTempoTrack().add(newTr);
+        }
+
         //to.setMarkers(from.getMarkers());
         to.setPdfFullPath(from.getPdfFullPath());
-        to.setBpm(from.getBpm());
         to.setSetList(from.getSetList());
-        to.setCfgBarUpper(from.getCfgBarUpper());
-        to.setCfgBarLower(from.getCfgBarLower());
         to.setName(from.getName());
         to.setOffsetX(from.getOffsetX());
         to.setOffsetY(from.getOffsetY());
@@ -174,6 +182,15 @@ public class RealmIOHelper {
         to.setId(from.getId());
         to.setSetListPosition(from.getSetListPosition());
     }
+
+    private void CopyTempoRecord(TempoRecord from, TempoRecord to) {
+        to.setBar(from.getBar());
+        to.setBeat(from.getBeat());
+        to.setBpm(from.getBpm());
+        to.setUpper(from.getUpper());
+        to.setLower(from.getLower());
+    }
+
 
     public PromptSettings getPrompt(Context ctx, long id) {
         PromptSettings ps = mPromptSettings.getOne(ctx, "id", id);
@@ -207,6 +224,14 @@ public class RealmIOHelper {
 
             for (SetList s : ls) {
                 LogUtils.i(TAG, s.toString());
+            }
+
+            RealmResults<TempoRecord> ltr = mTempo.getAll(ctx);
+            LogUtils.i(TAG, "*********************************");
+            LogUtils.i(TAG, "FOUND " + ltr.size() + " TEMPORECORDS");
+            LogUtils.i(TAG, "*********************************");
+            for (TempoRecord tr : ltr) {
+                LogUtils.i(TAG, tr.toString());
             }
         }
     }

@@ -284,7 +284,7 @@ public class PromptViewManager {
 
 
         if (d != null) {
-            d.setBounds((int) (x - clickSquareSize), (int) (y - clickSquareSize), (int) (x + clickSquareSize), (int) (y + clickSquareSize));
+            d.setBounds((int) (x - clickSquareSize * getCurrentZoom()), (int) (y - clickSquareSize * getCurrentZoom()), (int) (x + clickSquareSize * getCurrentZoom()), (int) (y + clickSquareSize * getCurrentZoom()));
             d.draw(canvas);
         }
 
@@ -331,12 +331,11 @@ public class PromptViewManager {
             markerPaint.setColor(marker.getColor());
             float pixels = TypedValue.applyDimension(
                     TypedValue.COMPLEX_UNIT_SP,
-                    marker.getTextSize(),
+                    marker.getTextSize() * getCurrentZoom(),
                     Resources.getSystem().getDisplayMetrics()
             );
             markerPaint.setTextSize(pixels);
             //clickMarkerPaint.setStrokeWidth(activity.getResources().getDimension(R.dimen.click_stroke_size));
-
 
             if (marker.getPrintTitle() > 0) {
                 float textMeasuredSize = markerPaint.measureText(marker.getTitle());

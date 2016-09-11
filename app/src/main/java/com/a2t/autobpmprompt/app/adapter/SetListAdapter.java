@@ -22,6 +22,7 @@ import com.a2t.autobpmprompt.app.callback.PDFGridCallback;
 import com.a2t.autobpmprompt.app.callback.SetListAdapterCallback;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.app.model.SetList;
+import com.a2t.autobpmprompt.app.model.TempoRecord;
 import com.a2t.autobpmprompt.media.prompt.PromptPDFFile;
 
 import java.io.File;
@@ -164,9 +165,10 @@ public class SetListAdapter extends BaseExpandableListAdapter {
         //}
 
         if (prompt != null) {
+            TempoRecord tr = prompt.getTempoTrack().get(0);
             cellView.pdfItem.setText(prompt.getName());
-            cellView.bpmItem.setText(prompt.getBpm() + " bpm");
-            cellView.barItem.setText(prompt.getCfgBarUpper() + " / " + prompt.getCfgBarLower());
+            cellView.bpmItem.setText(tr.getBpm() + " bpm");
+            cellView.barItem.setText(tr.getUpper() + " / " + tr.getLower());
             cellView.pdfItem.setTextSize(TypedValue.COMPLEX_UNIT_PX, mContext.getResources().getDimensionPixelSize(R.dimen.heading3));
 
             View.OnClickListener onClickListener = new View.OnClickListener() {

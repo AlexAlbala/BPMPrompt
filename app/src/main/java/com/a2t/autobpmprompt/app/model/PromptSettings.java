@@ -14,20 +14,24 @@ public class PromptSettings extends RealmObject {
 
     private String pdfFullPath;
 
-    //CONFIG
-    private int cfgBarUpper;
-    private int cfgBarLower;
-
     private float offsetX;
     private float offsetY;
     private float zoom;
 
-    //STATE
-    private int bpm;
-
 
     private String setList;
     private int setListPosition;
+
+    private RealmList<TempoRecord> tempoTrack;
+
+
+    public RealmList<TempoRecord> getTempoTrack() {
+        return tempoTrack;
+    }
+
+    public void setTempoTrack(RealmList<TempoRecord> tempoTrack) {
+        this.tempoTrack = tempoTrack;
+    }
 
     public String getSetList() {
         return setList;
@@ -54,30 +58,6 @@ public class PromptSettings extends RealmObject {
 
     public void setPdfFullPath(String pdfFullPath) {
         this.pdfFullPath = pdfFullPath;
-    }
-
-    public int getCfgBarUpper() {
-        return cfgBarUpper;
-    }
-
-    public void setCfgBarUpper(int cfgBarUpper) {
-        this.cfgBarUpper = cfgBarUpper;
-    }
-
-    public int getCfgBarLower() {
-        return cfgBarLower;
-    }
-
-    public void setCfgBarLower(int cfgBarLower) {
-        this.cfgBarLower = cfgBarLower;
-    }
-
-    public int getBpm() {
-        return bpm;
-    }
-
-    public void setBpm(int bpm) {
-        this.bpm = bpm;
     }
 
     public RealmList<Marker> getMarkers() {

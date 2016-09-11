@@ -138,6 +138,16 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
             ldebug("MARKER: " + match.getTitle() + " " + match.getOffsetX() + ":" + match.getOffsetY());
             highlightMarker(match, true);
         }
+
+        @Override
+        public void onTempoChanged(final int bpm) {
+            runOnUiThread(new TimerTask() {
+                @Override
+                public void run() {
+                    currentBpm.setText(String.valueOf(bpm));
+                }
+            });
+        }
     };
 
     Runnable changeBar = new Runnable() {
@@ -367,7 +377,6 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
         }
 
         setMarkers();
-        currentBpm.setText(String.valueOf(currentPrompt.settings.getBpm()));
     }
 
     private void createNewMarker() {
@@ -422,7 +431,7 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
 
     public void promptSave(View v) {
         currentPrompt.stop();
-        currentPrompt.settings.setBpm(Integer.parseInt(currentBpm.getText().toString()));
+        //currentPrompt.settings.setBpm(Integer.parseInt(currentBpm.getText().toString()));
         currentPrompt.prepareSave();
         PromptManager.update(getApplicationContext(), currentPrompt);
         //isEdit = false;
@@ -658,11 +667,10 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
 
     @Override
     public void onPromptUpdated(String title, int bpm, int upper_tempo, int lower_tempo) {
-        ldebug("YEAH");
         currentPrompt.settings.setName(title);
-        currentPrompt.settings.setBpm(bpm);
-        currentPrompt.settings.setCfgBarUpper(upper_tempo);
-        currentPrompt.settings.setCfgBarLower(lower_tempo);
+        //currentPrompt.settings.setBpm(bpm);
+        //currentPrompt.settings.setCfgBarUpper(upper_tempo);
+        //currentPrompt.settings.setCfgBarLower(lower_tempo);
         PromptManager.update(this, currentPrompt);
         requestPromptLayout();
     }

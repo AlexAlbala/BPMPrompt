@@ -12,6 +12,7 @@ import com.a2t.autobpmprompt.app.callback.PromptViewCallback;
 import com.a2t.a2tlib.tools.SimpleCallback;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
+import com.a2t.autobpmprompt.app.model.TempoRecord;
 import com.a2t.autobpmprompt.media.prompt.PromptViewManager;
 import com.github.barteksc.pdfviewer.PDFView;
 
@@ -76,6 +77,7 @@ public class Prompt {
         this.mCallback = callback;
         mCallback.onBeat(1);
         mCallback.onBar(1);
+        mCallback.onTempoChanged(getInitialTempo());
         mStatus = Status.STOPPED;
     }
 
@@ -84,6 +86,19 @@ public class Prompt {
         if (m != null) {
             notifyMarker(m);
         }
+
+        TempoRecord tr = trackTempo();
+        if (tr != null) {
+            tempoChanged(tr);
+        }
+    }
+
+    private int getInitialTempo() {
+        return getInitialTempoRecord().getBpm();
+    }
+
+    private TempoRecord getInitialTempoRecord() {
+        return settings.getTempoTrack().first();
     }
 
     public float getCurrentXOffset() {
@@ -107,7 +122,7 @@ public class Prompt {
     }
 
     public void drawMarkers() {
-            pdf.drawMarkers();
+        pdf.drawMarkers();
     }
 
     /*public void editMode(boolean edit) {
@@ -116,10 +131,10 @@ public class Prompt {
     }*/
 
     public void setCurrentMarkers(List<Marker> markers) {
-            pdf.setCurrentMarkers(markers);
+        pdf.setCurrentMarkers(markers);
     }
 
-    public void setCurrentPage(int page){
+    public void setCurrentPage(int page) {
         pdf.setCurrentPage(page);
     }
 
@@ -146,10 +161,24 @@ public class Prompt {
         }
     }
 
+    private void tempoChanged(TempoRecord tr) {
+        configureTimer(tr);
+        mCallback.onTempoChanged(tr.getBpm());
+    }
+
     private Marker matchMarker() {
         for (Marker m : settings.getMarkers()) {
             if (m.getBar() == currentBar && m.getBeat() == currentBeat) {
                 return m;
+            }
+        }
+        return null;
+    }
+
+    private TempoRecord trackTempo() {
+        for (TempoRecord tr : settings.getTempoTrack()) {
+            if (tr.getBar() == currentBar && tr.getBeat() == currentBeat) {
+                return tr;
             }
         }
         return null;
@@ -163,32 +192,43 @@ public class Prompt {
         return pdf.getClickedMarker(x, y);
     }
 
-    public void play() {
-        int period;
-        int upper = settings.getCfgBarUpper();
-        if (upper == 2 || upper == 3 || upper == 4) { //Simple bar
-            period = 60000 / settings.getBpm();
-        } else { //Complex bar
-            period = 20000 / settings.getBpm();
+    private void beat(TempoRecord currentTempo) {
+        currentBeat++;
+        if (currentBeat > currentTempo.getUpper()) {
+            currentBar++;
+            currentBeat = 1;
+            mCallback.onBar(currentBar);
         }
-        Log.i(TAG, "Period timer: " + period);
+        updatePosition();
+        mCallback.onBeat(currentBeat);
+    }
+
+    private void configureTimer(final TempoRecord tempo) {
+        int tempoBpm = tempo.getBpm();
+        int tempoUpper = tempo.getUpper();
+        resetTimer();
+        int period;
+        if (tempoUpper == 2 || tempoUpper == 3 || tempoUpper == 4) { //Simple bar
+            period = 60000 / tempoBpm;
+        } else { //Complex bar
+            period = 20000 / tempoBpm;
+        }
+        LogUtils.d(TAG, "Period timer: " + period + "ms " + tempoBpm + "bpm");
+
+        bpmCounterTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                beat(tempo);
+            }
+        }, 0, period);
+    }
+
+    public void play() {
         pdf.enableDrawMarkers(false);
         clearCanvas();
 
         mCallback.onPlay();
-        bpmCounterTimer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                currentBeat++;
-                if (currentBeat > settings.getCfgBarUpper()) {
-                    currentBar++;
-                    currentBeat = 1;
-                    mCallback.onBar(currentBar);
-                }
-                updatePosition();
-                mCallback.onBeat(currentBeat);
-            }
-        }, 0, period);
+        configureTimer(getInitialTempoRecord());
         mStatus = Status.PLAYING;
     }
 
@@ -216,8 +256,10 @@ public class Prompt {
     }
 
     private void resetTimer() {
-        bpmCounterTimer.cancel();
-        bpmCounterTimer = new Timer();
+        if (bpmCounterTimer != null) {
+            bpmCounterTimer.cancel();
+            bpmCounterTimer = new Timer();
+        }
     }
 
     public void close() {

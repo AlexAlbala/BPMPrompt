@@ -14,6 +14,7 @@ import com.a2t.a2tlib.tools.StringUtils;
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
+import com.a2t.autobpmprompt.app.model.TempoRecord;
 
 
 public class EditPromptDialog extends DialogFragment {
@@ -29,10 +30,11 @@ public class EditPromptDialog extends DialogFragment {
         Bundle args = new Bundle();
         args.putBoolean("edit", true);
 
+        TempoRecord tr = ps.getTempoTrack().get(0);
         args.putString("title", ps.getName());
-        args.putInt("bpm", ps.getBpm());
-        args.putInt("upper_tempo", ps.getCfgBarUpper());
-        args.putInt("lower_tempo", ps.getCfgBarLower());
+        args.putInt("bpm", tr.getBpm());
+        args.putInt("upper_tempo", tr.getUpper());
+        args.putInt("lower_tempo", tr.getLower());
 
         md.setArguments(args);
         return md;

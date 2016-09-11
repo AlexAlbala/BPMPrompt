@@ -10,6 +10,7 @@ import android.widget.EditText;
 
 import com.a2t.a2tlib.content.compat.A2TActivity;
 import com.a2t.autobpmprompt.R;
+import com.a2t.autobpmprompt.app.model.TempoRecord;
 import com.a2t.autobpmprompt.media.PromptManager;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.media.audiotools.TapTempo;
@@ -17,6 +18,10 @@ import com.a2t.autobpmprompt.media.prompt.PromptViewManager;
 import com.github.barteksc.pdfviewer.PDFView;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+import io.realm.RealmList;
 
 
 public class CreateActivity extends A2TActivity implements PDFDialog.PDFDialogResultListener {
@@ -67,9 +72,15 @@ public class CreateActivity extends A2TActivity implements PDFDialog.PDFDialogRe
         PromptSettings promptSettings = new PromptSettings();
         promptSettings.setName(name.getText().toString());
         promptSettings.setPdfFullPath(pdfFile.getAbsolutePath());
-        promptSettings.setBpm(Integer.parseInt(bpm.getText().toString()));
-        promptSettings.setCfgBarUpper(Integer.parseInt(upper.getText().toString()));
-        promptSettings.setCfgBarLower(Integer.parseInt(lower.getText().toString()));
+        RealmList<TempoRecord> tempoTrack = new RealmList<>();
+        TempoRecord tr = new TempoRecord();
+        tr.setBar(1);
+        tr.setBeat(1);
+        tr.setBpm(Integer.parseInt(bpm.getText().toString()));
+        tr.setUpper(Integer.parseInt(upper.getText().toString()));
+        tr.setLower(Integer.parseInt(lower.getText().toString()));
+        tempoTrack.add(tr);
+        promptSettings.setTempoTrack(tempoTrack);
         promptSettings.setSetList(setList);
         promptSettings.setSetListPosition(setListPosition);
 

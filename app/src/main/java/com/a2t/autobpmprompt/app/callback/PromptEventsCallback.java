@@ -12,4 +12,5 @@ public interface PromptEventsCallback {
     void onStop();
     void onLoaded();
     void onMarkerMatched(Marker match);
+    void onTempoChanged(int bpm);
 }
