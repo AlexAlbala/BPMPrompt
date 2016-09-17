@@ -109,6 +109,22 @@ public class Marker extends RealmObject {
         this.notify = notify;
     }
 
+    public boolean isShowAlways() {
+        return showAlways;
+    }
+
+    public void setShowAlways(boolean showAlways) {
+        this.showAlways = showAlways;
+    }
+
+    public boolean isPrintInCanvasOnMatch() {
+        return printInCanvasOnMatch;
+    }
+
+    public void setPrintInCanvasOnMatch(boolean printInCanvasOnMatch) {
+        this.printInCanvasOnMatch = printInCanvasOnMatch;
+    }
+
     @PrimaryKey
     private int id;
     private int bar;
@@ -124,6 +140,9 @@ public class Marker extends RealmObject {
     private int textSize;
 
     private boolean notify;
+    private boolean showAlways;
+
+    private boolean printInCanvasOnMatch;
 
     public Marker() {
 

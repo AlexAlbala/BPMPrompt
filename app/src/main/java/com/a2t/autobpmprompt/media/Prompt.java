@@ -70,7 +70,7 @@ public class Prompt {
 
             @Override
             public void onPageChanged(int i, int i1) {
-
+                callback.onPageChanged(i, i1);
             }
         });
         bpmCounterTimer = new Timer();
@@ -121,8 +121,12 @@ public class Prompt {
         pdf.drawMatchedMarker(marker);
     }
 
-    public void drawMarkers() {
-        pdf.drawMarkers();
+    //public void drawMarkers() {
+        //pdf.drawMarkers();
+    //}
+
+    public int getNumberOfPages() {
+        return pdf.getPageCount();
     }
 
     /*public void editMode(boolean edit) {
@@ -235,7 +239,7 @@ public class Prompt {
     public void pause() {
         clearCanvas();
         pdf.enableDrawMarkers(true);
-        drawMarkers();
+        //drawMarkers();
         resetTimer();
         mCallback.onPause();
         mStatus = Status.PAUSED;
@@ -245,7 +249,7 @@ public class Prompt {
         resetTimer();
         clearCanvas();
         pdf.enableDrawMarkers(true);
-        drawMarkers();
+        //drawMarkers();
         currentBeat = 0;
         currentBar = 1;
 

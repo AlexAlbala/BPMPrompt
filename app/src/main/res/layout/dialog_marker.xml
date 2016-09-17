@@ -1,8 +1,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="10dp"
-    android:layout_marginTop="10dp"
+    android:layout_marginBottom="@dimen/activity_vertical_margin"
+    android:layout_marginTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
     android:paddingEnd="@dimen/activity_horizontal_margin"
     android:paddingStart="@dimen/activity_horizontal_margin">
@@ -71,14 +71,41 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <CheckBox
+            android:id="@+id/marker_show_always"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="@string/marker_show_always" />
+
+        <CheckBox
+            android:id="@+id/marker_notify"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/marker_notify" />
+
+        <CheckBox
+            android:id="@+id/marker_print"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="@string/marker_print_on_canvas" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="horizontal">
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:text="@string/pick_a_color"
+            android:layout_weight="1"
             android:gravity="center"
-            android:layout_weight="1" />
+            android:text="@string/pick_a_color" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -86,9 +113,9 @@
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:gravity="center"
             android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:gravity="center">
 
             <View
                 android:id="@+id/marker_color_picker_view"
@@ -101,6 +128,7 @@
         </LinearLayout>
     </LinearLayout>
 
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -108,10 +136,10 @@
 
         <TextView
             android:layout_width="0dp"
-            android:text="@string/select_text_size"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:gravity="center"
-            android:layout_weight="1" />
+            android:text="@string/select_text_size" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -120,15 +148,16 @@
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:gravity="center"
-            android:layout_weight="1">
+            android:layout_weight="1"
+            android:gravity="center">
+
             <NumberPicker
                 android:id="@+id/marker_number_picker_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
             </NumberPicker>
-            </LinearLayout>
+        </LinearLayout>
 
 
     </LinearLayout>

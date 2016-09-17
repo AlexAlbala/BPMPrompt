@@ -39,6 +39,9 @@
     <string name="showtext_below">Show text below marker</string>
     <string name="pick_a_color">Pick a color</string>
     <string name="select_text_size">Select text size</string>
+    <string name="marker_notify">Notify marker</string>
+    <string name="marker_show_always">Show always</string>
+    <string name="marker_print_on_canvas">Print over sheet</string>
 
     <!-- SETLIST DIALOG -->
     <string name="create_setlist_title">Create SetList</string>

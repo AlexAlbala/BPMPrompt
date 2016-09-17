@@ -7,6 +7,7 @@ import com.a2t.autobpmprompt.app.adapter.SimplePromptListAdapter;
 import com.a2t.autobpmprompt.app.callback.PromptEventsCallback;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
+import com.a2t.autobpmprompt.app.model.TempoRecord;
 import com.a2t.autobpmprompt.media.Prompt;
 import com.a2t.autobpmprompt.media.PromptManager;
 import com.github.barteksc.pdfviewer.PDFView;
@@ -14,6 +15,7 @@ import com.github.barteksc.pdfviewer.PDFView;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.graphics.Typeface;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -36,6 +38,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import io.realm.RealmList;
 
 
 public class PromptActivity extends A2TActivity implements EditPromptDialog.PromptDialogListener, MarkerDialog.MarkerDialogListener, RenamePromptDialog.RenamePromptDialogListener {
@@ -61,6 +65,12 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
 
     ListView setListPrompts;
 
+    /********
+     * PAGINATION
+     ********/
+
+    ImageView pagerRight;
+    ImageView pagerLeft;
     /*********
      * TOP BAR
      *******/
@@ -87,6 +97,8 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
 
     int nCurrentBeat;
     int nCurrentBar;
+
+    List<PromptSettings> promptsFromCurrentSetList;
 
     PromptEventsCallback promptEventsCallback = new PromptEventsCallback() {
         @Override
@@ -136,7 +148,7 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
         @Override
         public void onMarkerMatched(Marker match) {
             ldebug("MARKER: " + match.getTitle() + " " + match.getOffsetX() + ":" + match.getOffsetY());
-            highlightMarker(match, true);
+            highlightMarker(match);
         }
 
         @Override
@@ -147,6 +159,27 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
                     currentBpm.setText(String.valueOf(bpm));
                 }
             });
+        }
+
+        @Override
+        public void onPageChanged(int page, int pageCount) {
+            ldebug("page changed " + page);
+
+            if (page == 0) {
+                pagerLeft.setVisibility(View.GONE);
+                if (pageCount > 1) {
+                    pagerRight.setVisibility(View.VISIBLE);
+                } else {
+                    pagerRight.setVisibility(View.GONE);
+                }
+            } else if (page > 0) {
+                pagerLeft.setVisibility(View.VISIBLE);
+                if (pageCount > (page + 1)) {
+                    pagerRight.setVisibility(View.VISIBLE);
+                } else {
+                    pagerRight.setVisibility(View.GONE);
+                }
+            }
         }
     };
 
@@ -220,6 +253,10 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
         currentPrompt = PromptManager.load(idPrompt, pdfview, floatingCanvas, PromptActivity.this, promptEventsCallback);
         /**********************************************************************************/
 
+        pagerRight = (ImageView) findViewById(R.id.prompt_next_page);
+        pagerLeft = (ImageView) findViewById(R.id.prompt_previous_page);
+
+
         lastMarkerX = -1;
         lastMarkerY = -1;
         blinkTimer = new Timer();
@@ -243,7 +280,7 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
         });
 
         final String fromSetList = currentPrompt.settings.getSetList();
-        final List<PromptSettings> s = PromptManager.getAllPtomptsFromSetList(this, fromSetList);
+        promptsFromCurrentSetList = PromptManager.getAllPtomptsFromSetList(this, fromSetList);
 //
 //        ArrayList<Map<String, Object>> items = new ArrayList<>();
 //        for (int i = 0; i < s.size(); ++i) {
@@ -260,16 +297,70 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
 //                new int[]{R.id.row_simple_prompt_title},
 //                R.id.row_simple_prompt_title);
 //
-        setListPrompts.setAdapter(new SimplePromptListAdapter(this, s));
+        setListPrompts.setAdapter(new SimplePromptListAdapter(this, promptsFromCurrentSetList));
         setListPrompts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                PromptManager.openPrompt(PromptActivity.this, fromSetList, s.get(position).getId());
+                PromptManager.openPrompt(PromptActivity.this, fromSetList, promptsFromCurrentSetList.get(position).getId());
                 finish();
             }
         });
 
         findViewById(R.id.prompt_set_list_prompts_container).setVisibility(View.GONE);
+
+        findViewById(R.id.prompt_toggle_setlist).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleSetlist(v);
+            }
+        });
+
+        ImageView setlist_next = (ImageView) findViewById(R.id.prompt_setlist_next);
+        ImageView setlist_previous = (ImageView) findViewById(R.id.prompt_setlist_previous);
+
+        final int currentPropmtPosition = currentPrompt.settings.getSetListPosition();
+        if (currentPropmtPosition < (promptsFromCurrentSetList.size() - 1)) {
+            setlist_next.setVisibility(View.VISIBLE);
+            setlist_next.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    PromptManager.openPrompt(PromptActivity.this, fromSetList, promptsFromCurrentSetList.get(currentPropmtPosition + 1).getId());
+                    finish();
+                }
+            });
+        } else {
+            setlist_next.setVisibility(View.INVISIBLE);
+        }
+
+        if (currentPropmtPosition > 0) {
+            setlist_previous.setVisibility(View.VISIBLE);
+            setlist_previous.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    PromptManager.openPrompt(PromptActivity.this, fromSetList, promptsFromCurrentSetList.get(currentPropmtPosition - 1).getId());
+                    finish();
+                }
+            });
+        } else {
+            setlist_previous.setVisibility(View.INVISIBLE);
+        }
+
+
+        pagerRight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ldebug("next pager clicked " + currentPrompt.getCurrentPage());
+                currentPrompt.setCurrentPage(currentPrompt.getCurrentPage() + 1);
+            }
+        });
+
+        pagerLeft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ldebug("previous pager clicked");
+                currentPrompt.setCurrentPage(currentPrompt.getCurrentPage() - 1);
+            }
+        });
     }
 
     private void blinkLed() {
@@ -298,7 +389,7 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
         //currentPrompt.drawMarkers();
     }
 
-    private void highlightMarker(final Marker marker, boolean isNotification) {
+    private void highlightMarker(final Marker marker) {
         int position;
         boolean found = false;
         for (position = 0; position < currentPrompt.settings.getMarkers().size(); position++) {
@@ -311,13 +402,15 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
 
         final int p = position;
         final boolean f = found;
-        currentPrompt.drawMatchedMarker(marker);
+        if (marker.isPrintInCanvasOnMatch()) {
+            currentPrompt.drawMatchedMarker(marker);
+        }
 
         if (f) {
             //highlightMarkerAdapter(p);
         }
 
-        if (isNotification) {
+        if (marker.isNotify()) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -498,18 +591,30 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
             float sx = topBarNotifiactions.getX();
             float sy = topBarNotifiactions.getY();
 
+            int ppwidth = pagerLeft.getWidth();
+            int ppheight = pagerLeft.getHeight();
+            float ppx = pagerLeft.getX();
+            float ppy = pagerLeft.getY();
+
+            int npwidth = pagerRight.getWidth();
+            int npheight = pagerRight.getHeight();
+            float npx = pagerRight.getX();
+            float npy = pagerRight.getY();
+
             boolean isControlsClick = x > cx && x < cx + cwidth && y > cy && y < cy + cheight;
             //boolean isMarkerClick = x > mx && x < mx + mwidth && y > my && y < my + mheight;
             boolean isTopClick = x > sx && x < sx + swidth && y > sy && y < sy + sheight;
             Marker mClicked = currentPrompt.getClickedMarker(aX, aY);
             boolean isMarkerClick = mClicked != null;
+            boolean isPreviousPageClick = x > ppx && x < ppx + ppwidth && y > ppy && y < ppy + ppheight;
+            boolean isNextPageClick = x > npx && x < npx + npwidth && y > npy && y < npy + npheight;
 
             switch (ev.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     isClick = true;
                     break;
                 case MotionEvent.ACTION_UP:
-                    if (isClick && !isControlsClick && !isMarkerClick && !isTopClick) {
+                    if (isClick && !isControlsClick && !isMarkerClick && !isTopClick && !isPreviousPageClick && !isNextPageClick) {
                         if (contentVisible) {
                             hideRightBar();
                         } else {
@@ -530,8 +635,11 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
                     break;
             }
             if (currentPrompt.getStatus() == Prompt.Status.PLAYING) {
-                return !isControlsClick || super.dispatchTouchEvent(ev); //if is control click, execute super.dispatch... and return it
-                //if not, java will execute return true :)
+                if (isControlsClick || isNextPageClick || isPreviousPageClick) {
+                    return super.dispatchTouchEvent(ev);
+                } else {
+                    return true;
+                }
             } else {
                 return super.dispatchTouchEvent(ev);
             }
@@ -621,7 +729,7 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
                 currentPrompt.settings.getMarkers().remove(i);
                 PromptManager.deleteMarkerFromPrompt(getApplicationContext(), currentPrompt, m);
                 currentPrompt.setCurrentMarkers(currentPrompt.settings.getMarkers());
-                currentPrompt.drawMarkers();
+                //currentPrompt.drawMarkers();
                 return;
             }
         }
@@ -668,6 +776,8 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
     @Override
     public void onPromptUpdated(String title, int bpm, int upper_tempo, int lower_tempo) {
         currentPrompt.settings.setName(title);
+        //RealmList<TempoRecord> t = new RealmList<>();
+        //currentPrompt.settings.setTempoTrack();
         //currentPrompt.settings.setBpm(bpm);
         //currentPrompt.settings.setCfgBarUpper(upper_tempo);
         //currentPrompt.settings.setCfgBarLower(lower_tempo);

@@ -143,6 +143,9 @@ public class RealmIOHelper {
         to.setType(from.getType());
         to.setColor(from.getColor());
         to.setTextSize(from.getTextSize());
+        to.setPrintInCanvasOnMatch(from.isPrintInCanvasOnMatch());
+        to.setNotify(from.isNotify());
+        to.setShowAlways(from.isShowAlways());
     }
 
     private void CopySetList(SetList from, SetList to) {

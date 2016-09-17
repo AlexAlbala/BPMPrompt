@@ -19,7 +19,6 @@ import com.a2t.a2tlib.tools.BuildUtils;
 import com.a2t.a2tlib.tools.SharedPreferencesManager;
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.adapter.MainPagerAdapter;
-import com.a2t.autobpmprompt.app.adapter.SetListAdapter;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.app.model.SetList;
 import com.a2t.autobpmprompt.helpers.RealmIOHelper;

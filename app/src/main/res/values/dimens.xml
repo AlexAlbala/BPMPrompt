@@ -14,6 +14,7 @@
     <dimen name="transport_width">170dp</dimen>
     <dimen name="transport_height">40dp</dimen>
     <dimen name="prompt_control_width">70dp</dimen>
+    <dimen name="prompt_pagers_size">60dp</dimen>
 
 
     <!-- CLICK PAINTS DIMENSIONS -->

@@ -13,4 +13,5 @@ public interface PromptEventsCallback {
     void onLoaded();
     void onMarkerMatched(Marker match);
     void onTempoChanged(int bpm);
+    void onPageChanged(int page, int pageCount);
 }

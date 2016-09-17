@@ -11,13 +11,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.a2t.a2tlib.content.compat.A2TActivity;
 import com.a2t.a2tlib.content.compat.A2TFragment;
 import com.a2t.autobpmprompt.R;
-import com.a2t.autobpmprompt.app.adapter.SetListAdapter;
 import com.a2t.autobpmprompt.app.callback.SetListAdapterCallback;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.app.model.SetList;
@@ -106,14 +106,17 @@ public class SetListsFragment extends A2TFragment {
         }
     }
 
-    private void inflateChildView(final PromptSettings prompt, ViewGroup parent, boolean last, final String setListTitle, final int setListPosition, final int position, LayoutInflater inflater, final SetListAdapterCallback mCallback) {
+    private void inflateChildView(final PromptSettings prompt, ViewGroup parent, boolean last, final String setListTitle, final int setListPosition, final int positionInSetList, LayoutInflater inflater, final SetListAdapterCallback mCallback) {
 
-        View convertView = inflater.inflate(R.layout.row_setlist_inner, parent, false);
-        TextView pdfItem = (TextView) convertView.findViewById(R.id.row_setlist_name);
-        TextView barItem = (TextView) convertView.findViewById(R.id.row_setlist_beat);
-        TextView bpmItem = (TextView) convertView.findViewById(R.id.row_setlist_bpm);
+        View convertView = inflater.inflate(R.layout.row_prompt, parent, false);
+        TextView pdfItem = (TextView) convertView.findViewById(R.id.row_prompt_name);
+        TextView barItem = (TextView) convertView.findViewById(R.id.row_prompt_beat);
+        TextView bpmItem = (TextView) convertView.findViewById(R.id.row_prompt_bpm);
+        TextView setListItem = (TextView) convertView.findViewById(R.id.row_prompt_setlist);
+        ImageButton deleteBtn = (ImageButton) convertView.findViewById(R.id.row_prompt_delete_btn);
+        ImageView thumb = (ImageView) convertView.findViewById(R.id.row_prompt_thumb);
 
-        ImageButton deleteBtn = (ImageButton) convertView.findViewById(R.id.setlist_inner_delete_btn);
+        setListItem.setVisibility(View.GONE);
 
         if (prompt != null) {
             TempoRecord tr = prompt.getTempoTrack().get(0);
@@ -132,7 +135,7 @@ public class SetListsFragment extends A2TFragment {
             deleteBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mCallback.onRemovePromptClicked(setListTitle,prompt,position);
+                    mCallback.onRemovePromptClicked(setListTitle, prompt, positionInSetList);
                 }
             });
 
@@ -142,7 +145,7 @@ public class SetListsFragment extends A2TFragment {
             final View finalConvertView = convertView;
             MenuTag m = new MenuTag();
             m.type = "prompt";
-            m.childPosition = position;
+            m.childPosition = positionInSetList;
             m.groupPosition = setListPosition;
             finalConvertView.setTag(m);
             View.OnLongClickListener onLongClickListener = new View.OnLongClickListener() {
@@ -157,14 +160,17 @@ public class SetListsFragment extends A2TFragment {
 
         } else if (last) {
             pdfItem.setText(R.string.prompt_create_new);
-            pdfItem.setTextSize(TypedValue.COMPLEX_UNIT_PX, 2*getResources().getDimensionPixelSize(R.dimen.normal_text));
+            pdfItem.setTextSize(TypedValue.COMPLEX_UNIT_PX, 2 * getResources().getDimensionPixelSize(R.dimen.normal_text));
 
             pdfItem.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mCallback.onCreatePromptClicked(setListTitle, setListPosition);
+                    mCallback.onCreatePromptClicked(setListTitle, positionInSetList);
                 }
             });
+
+            deleteBtn.setVisibility(View.GONE);
+            thumb.setVisibility(View.GONE);
         }
 
         setListsView.addView(convertView);

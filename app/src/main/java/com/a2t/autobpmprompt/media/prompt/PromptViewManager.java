@@ -19,6 +19,7 @@ import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.callback.PromptViewCallback;
 import com.a2t.a2tlib.tools.SimpleCallback;
 import com.a2t.autobpmprompt.app.model.Marker;
+import com.a2t.autobpmprompt.app.model.MarkerType;
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.listener.OnDrawListener;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
@@ -105,7 +106,7 @@ public class PromptViewManager {
                 .onDraw(new OnDrawListener() {
                     @Override
                     public void onLayerDrawn(Canvas canvas, float v, float v1, int i) {
-                        if (drawMarkers && ((marker_frame_count++) == MARKER_FRAMES_SKIP) && currentMarkers != null) {
+                        if (((marker_frame_count++) == MARKER_FRAMES_SKIP) && currentMarkers != null) {
                             drawMarkers();
                             marker_frame_count = 0;
                         }
@@ -135,8 +136,8 @@ public class PromptViewManager {
                 })
                 .onPageChange(new OnPageChangeListener() {
                     @Override
-                    public void onPageChanged(int i, int i1) {
-                        mCallback.onPageChanged(i, i1);
+                    public void onPageChanged(int page, int pageCount) {
+                        mCallback.onPageChanged(page, pageCount);
                     }
                 }).swipeHorizontal(!vertical)
                 .load();
@@ -151,8 +152,13 @@ public class PromptViewManager {
         return true;
     }
 
+    public int getPageCount() {
+        return pdfview.getPageCount();
+    }
+
     public void enableDrawMarkers(boolean enable) {
         drawMarkers = enable;
+        drawMarkers();
     }
 
     public void centerAt(final float x, final float y, SimpleCallback callback) {
@@ -235,7 +241,7 @@ public class PromptViewManager {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                pdfview.jumpTo(page + 1);
+                pdfview.jumpTo(page);
             }
         });
     }
@@ -307,7 +313,13 @@ public class PromptViewManager {
         if (canvas != null) {
             canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
             for (Marker m : currentMarkers) {
-                paintMarker(canvas, m, false);
+                if (m.isShowAlways() || drawMarkers) {
+                    if (m.getType() == MarkerType.MARKER) {
+                        paintMarker(canvas, m, false);
+                    } else if (m.getType() == MarkerType.TEXT_ONLY) {
+                        paintTextMarker(canvas, m, false);
+                    }
+                }
             }
             mFloatingCanvas.getHolder().unlockCanvasAndPost(canvas);
         }
@@ -344,6 +356,42 @@ public class PromptViewManager {
                 } else {//below
                     canvas.drawText(marker.getTitle(), x - (textMeasuredSize / 2), y + clickSquareSize, markerPaint);
                 }
+            }
+
+            /*
+            //Horizontal lines
+            canvas.drawLine(x - clickSquareSize, y - clickSquareSize, x + clickSquareSize, y - clickSquareSize, clickMarkerPaint);
+            canvas.drawLine(x - clickSquareSize, y + clickSquareSize, x + clickSquareSize, y + clickSquareSize, clickMarkerPaint);
+
+            //Vertical lines
+            canvas.drawLine(x - clickSquareSize, y - clickSquareSize, x - clickSquareSize, y + clickSquareSize, clickMarkerPaint);
+            canvas.drawLine(x + clickSquareSize, y - clickSquareSize, x + clickSquareSize, y + clickSquareSize, clickMarkerPaint);
+            */
+
+            //canvas.drawText(marker.getTitle(), x + clickSquareSize * 2, y, clickMarkerPaint);
+        }
+    }
+
+    private void paintTextMarker(Canvas canvas, Marker marker, boolean highlighted) {
+        //canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
+        float x = marker.getOffsetX() * getCurrentZoom() + getCurrentXOffset();
+        float y = marker.getOffsetY() * getCurrentZoom() + getCurrentYOffset();
+        LogUtils.d(TAG, "Draw marker " + x + ":" + y);
+        if (x >= 1 && y >= 1) {
+
+            Paint markerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            markerPaint.setColor(marker.getColor());
+            float pixels = TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_SP,
+                    marker.getTextSize() * getCurrentZoom(),
+                    Resources.getSystem().getDisplayMetrics()
+            );
+            markerPaint.setTextSize(pixels);
+            //clickMarkerPaint.setStrokeWidth(activity.getResources().getDimension(R.dimen.click_stroke_size));
+
+            if (marker.getPrintTitle() > 0) {
+                float textMeasuredSize = markerPaint.measureText(marker.getTitle());
+                canvas.drawText(marker.getTitle(), x - (textMeasuredSize / 2), y, markerPaint);
             }
 
             /*

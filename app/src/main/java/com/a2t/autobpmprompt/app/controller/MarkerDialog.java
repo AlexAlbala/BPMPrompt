@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.NumberPicker;
 import android.widget.Spinner;
@@ -49,6 +50,11 @@ public class MarkerDialog extends DialogFragment {
     TextInputLayout bar_layout;
     TextInputLayout beat_layout;
     NumberPicker number_picker;
+
+    CheckBox notify;
+    CheckBox showAlways;
+    CheckBox printOnCanvas;
+
     View color_picker;
     float mX;
     float mY;
@@ -144,6 +150,9 @@ public class MarkerDialog extends DialogFragment {
                             m.setColor(currentMarkerColor);
                             m.setTextSize(markerTextSize);
                             m.setPrintTitle(markerDialogText.getSelectedItemPosition());
+                            m.setPrintInCanvasOnMatch(printOnCanvas.isChecked());
+                            m.setNotify(notify.isChecked());
+                            m.setShowAlways(showAlways.isChecked());
                             if (isEdit) {
                                 mListener.onMarkerEdited(MarkerDialog.this, m);
                             } else {
