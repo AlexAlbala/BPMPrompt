@@ -313,7 +313,8 @@ public class PromptViewManager {
         if (canvas != null) {
             canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
             for (Marker m : currentMarkers) {
-                if (m.isShowAlways() || drawMarkers) {
+                Log.d(TAG, "Show always " + m.isShowAlways());
+                if (m.isShowAlways() || drawMarkers || m.equals(lastMarkerPainted)) {
                     if (m.getType() == MarkerType.MARKER) {
                         paintMarker(canvas, m, false);
                     } else if (m.getType() == MarkerType.TEXT_ONLY) {

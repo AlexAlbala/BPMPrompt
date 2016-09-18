@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.NumberPicker;
+import android.widget.RadioButton;
 import android.widget.Spinner;
 
 import com.a2t.a2tlib.tools.LogUtils;
@@ -24,6 +25,7 @@ import com.a2t.a2tlib.tools.StringUtils;
 import com.a2t.a2tlib.tools.VersionUtils;
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.model.Marker;
+import com.a2t.autobpmprompt.app.model.MarkerType;
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.OnColorSelectedListener;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
@@ -55,6 +57,9 @@ public class MarkerDialog extends DialogFragment {
     CheckBox showAlways;
     CheckBox printOnCanvas;
 
+    RadioButton typeMarkerRadio;
+    RadioButton typeNoteRadio;
+
     View color_picker;
     float mX;
     float mY;
@@ -80,6 +85,11 @@ public class MarkerDialog extends DialogFragment {
 
         args.putInt("color", m.getColor());
         args.putInt("textSize", m.getTextSize());
+        args.putInt("type", m.getType());
+
+        args.putBoolean("showAlways", m.isShowAlways());
+        args.putBoolean("notify", m.isNotify());
+        args.putBoolean("printOnCanvas", m.isPrintInCanvasOnMatch());
 
         md.setArguments(args);
         return md;
@@ -150,9 +160,19 @@ public class MarkerDialog extends DialogFragment {
                             m.setColor(currentMarkerColor);
                             m.setTextSize(markerTextSize);
                             m.setPrintTitle(markerDialogText.getSelectedItemPosition());
-                            m.setPrintInCanvasOnMatch(printOnCanvas.isChecked());
-                            m.setNotify(notify.isChecked());
-                            m.setShowAlways(showAlways.isChecked());
+
+                            if (typeMarkerRadio.isChecked()) {
+                                m.setShowAlways(showAlways.isChecked());
+                                m.setPrintInCanvasOnMatch(printOnCanvas.isChecked());
+                                m.setNotify(notify.isChecked());
+                                m.setType(MarkerType.MARKER);
+                            } else {
+                                m.setNotify(false);
+                                m.setShowAlways(true);
+                                m.setPrintInCanvasOnMatch(true);
+                                m.setType(MarkerType.TEXT_ONLY);
+                            }
+
                             if (isEdit) {
                                 mListener.onMarkerEdited(MarkerDialog.this, m);
                             } else {
@@ -186,6 +206,13 @@ public class MarkerDialog extends DialogFragment {
         number_picker = (NumberPicker) dialogView.findViewById(R.id.marker_number_picker_view);
         color_picker = dialogView.findViewById(R.id.marker_color_picker_view);
 
+        showAlways = (CheckBox) dialogView.findViewById(R.id.marker_show_always);
+        notify = (CheckBox) dialogView.findViewById(R.id.marker_notify);
+        printOnCanvas = (CheckBox) dialogView.findViewById(R.id.marker_print);
+
+        typeMarkerRadio = (RadioButton) dialogView.findViewById(R.id.marker_type_marker);
+        typeNoteRadio = (RadioButton) dialogView.findViewById(R.id.marker_type_note);
+
         color_picker.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -197,7 +224,6 @@ public class MarkerDialog extends DialogFragment {
 
         number_picker.setMinValue(5);
         number_picker.setMaxValue(80);
-        LogUtils.d("MarkerDialog", "marker size: " + markerTextSize);
         number_picker.setValue(markerTextSize);
         number_picker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
@@ -205,6 +231,32 @@ public class MarkerDialog extends DialogFragment {
                 markerTextSize = newVal;
             }
         });
+
+        View.OnClickListener radioClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (v.getId() == R.id.marker_type_marker) {
+                    bar_layout.setVisibility(View.VISIBLE);
+                    beat_layout.setVisibility(View.VISIBLE);
+                    markerDialogText.setVisibility(View.VISIBLE);
+                    showAlways.setVisibility(View.VISIBLE);
+                    notify.setVisibility(View.VISIBLE);
+                    note_layout.setVisibility(View.VISIBLE);
+                    printOnCanvas.setVisibility(View.VISIBLE);
+                } else if (v.getId() == R.id.marker_type_note) {
+                    bar_layout.setVisibility(View.GONE);
+                    beat_layout.setVisibility(View.GONE);
+                    markerDialogText.setVisibility(View.GONE);
+                    showAlways.setVisibility(View.GONE);
+                    notify.setVisibility(View.GONE);
+                    note_layout.setVisibility(View.GONE);
+                    printOnCanvas.setVisibility(View.GONE);
+                }
+            }
+        };
+
+        typeMarkerRadio.setOnClickListener(radioClickListener);
+        typeNoteRadio.setOnClickListener(radioClickListener);
 
 
         if (isEdit) {
@@ -234,6 +286,16 @@ public class MarkerDialog extends DialogFragment {
                 beat.setText(String.valueOf(b.getInt("beat")));
             }
 
+            notify.setChecked(b.getBoolean("notify", false));
+            showAlways.setChecked(b.getBoolean("showAlways", false));
+            printOnCanvas.setChecked(b.getBoolean("printOnCanvas", false));
+
+            int t = b.getInt("type", -1);
+            if (t == MarkerType.MARKER) {
+                typeMarkerRadio.performClick();
+            } else {
+                typeNoteRadio.performClick();
+            }
         }
 
 

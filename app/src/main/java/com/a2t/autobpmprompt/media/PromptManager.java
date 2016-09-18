@@ -63,7 +63,7 @@ public class PromptManager {
     }
 
     public static boolean update(Context context, PromptSettings p) {
-        LogUtils.i(TAG, "Update prompt" + p.toString());
+        LogUtils.i(TAG, "Update prompt " + p.toString());
         RealmIOHelper.getInstance().updatePrompt(context, p);
         return true;
     }

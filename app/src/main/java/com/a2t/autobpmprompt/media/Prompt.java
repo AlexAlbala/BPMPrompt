@@ -11,6 +11,7 @@ import com.a2t.autobpmprompt.app.callback.PromptEventsCallback;
 import com.a2t.autobpmprompt.app.callback.PromptViewCallback;
 import com.a2t.a2tlib.tools.SimpleCallback;
 import com.a2t.autobpmprompt.app.model.Marker;
+import com.a2t.autobpmprompt.app.model.MarkerType;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.app.model.TempoRecord;
 import com.a2t.autobpmprompt.media.prompt.PromptViewManager;
@@ -83,7 +84,7 @@ public class Prompt {
 
     private void updatePosition() {
         Marker m = matchMarker();
-        if (m != null) {
+        if (m != null && m.getType() == MarkerType.MARKER) {
             notifyMarker(m);
         }
 
@@ -122,7 +123,7 @@ public class Prompt {
     }
 
     //public void drawMarkers() {
-        //pdf.drawMarkers();
+    //pdf.drawMarkers();
     //}
 
     public int getNumberOfPages() {
@@ -228,8 +229,8 @@ public class Prompt {
     }
 
     public void play() {
-        pdf.enableDrawMarkers(false);
         clearCanvas();
+        pdf.enableDrawMarkers(false);
 
         mCallback.onPlay();
         configureTimer(getInitialTempoRecord());

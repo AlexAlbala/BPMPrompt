@@ -42,6 +42,8 @@
     <string name="marker_notify">Notify marker</string>
     <string name="marker_show_always">Show always</string>
     <string name="marker_print_on_canvas">Print over sheet</string>
+    <string name="marker_type_marker">Marker</string>
+    <string name="marker_type_note">Note</string>
 
     <!-- SETLIST DIALOG -->
     <string name="create_setlist_title">Create SetList</string>

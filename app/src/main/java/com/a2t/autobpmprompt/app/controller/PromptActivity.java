@@ -6,6 +6,7 @@ import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.adapter.SimplePromptListAdapter;
 import com.a2t.autobpmprompt.app.callback.PromptEventsCallback;
 import com.a2t.autobpmprompt.app.model.Marker;
+import com.a2t.autobpmprompt.app.model.MarkerType;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.app.model.TempoRecord;
 import com.a2t.autobpmprompt.media.Prompt;
@@ -410,7 +411,7 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
             //highlightMarkerAdapter(p);
         }
 
-        if (marker.isNotify()) {
+        if (marker.isNotify() && marker.getType() == MarkerType.MARKER) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -428,6 +429,7 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
                 @Override
                 public void run() {
                     hideTopBar();
+                    currentPrompt.clearCanvas();
 
                     //if (f)
                     //resetMarkerAdapter(p);
