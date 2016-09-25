@@ -5,24 +5,23 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.widget.CardView;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.a2t.a2tlib.content.compat.A2TActivity;
 import com.a2t.a2tlib.content.compat.A2TFragment;
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.callback.SetListAdapterCallback;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.app.model.SetList;
 import com.a2t.autobpmprompt.app.model.TempoRecord;
-import com.a2t.autobpmprompt.helpers.RealmIOHelper;
+import com.a2t.autobpmprompt.app.database.RealmIOHelper;
 import com.a2t.autobpmprompt.media.PromptManager;
 
 import java.util.List;
@@ -99,24 +98,56 @@ public class SetListsFragment extends A2TFragment {
 
             setListsView.addView(convertView);
             int promptPosition = 0;
-            for (PromptSettings p : setList.getPrompts()) {
-                inflateChildView(p, parent, false, setList.getTitle(), position, promptPosition++, inflater, mCallback);
+            List<PromptSettings> ps = PromptManager.getAllPtomptsFromSetList(getActivity(), setList.getTitle());
+            for (PromptSettings p : ps) {
+                inflateChildView(p, parent, false, setList.getTitle(), position, promptPosition++, ps.size(), inflater, mCallback);
             }
-            inflateChildView(null, parent, true, setList.getTitle(), position, promptPosition, inflater, mCallback);
+            inflateChildView(null, parent, true, setList.getTitle(), position, promptPosition, -1, inflater, mCallback);
         }
     }
 
-    private void inflateChildView(final PromptSettings prompt, ViewGroup parent, boolean last, final String setListTitle, final int setListPosition, final int positionInSetList, LayoutInflater inflater, final SetListAdapterCallback mCallback) {
+    private void inflateChildView(final PromptSettings prompt, ViewGroup parent, boolean last, final String setListTitle, final int setListPosition, final int positionInSetList, final int totalCount, LayoutInflater inflater, final SetListAdapterCallback mCallback) {
 
         View convertView = inflater.inflate(R.layout.row_prompt, parent, false);
+        CardView card = (CardView) convertView.findViewById(R.id.card_view);
         TextView pdfItem = (TextView) convertView.findViewById(R.id.row_prompt_name);
         TextView barItem = (TextView) convertView.findViewById(R.id.row_prompt_beat);
         TextView bpmItem = (TextView) convertView.findViewById(R.id.row_prompt_bpm);
         TextView setListItem = (TextView) convertView.findViewById(R.id.row_prompt_setlist);
         ImageButton deleteBtn = (ImageButton) convertView.findViewById(R.id.row_prompt_delete_btn);
-        ImageView thumb = (ImageView) convertView.findViewById(R.id.row_prompt_thumb);
+        //ImageView thumb = (ImageView) convertView.findViewById(R.id.row_prompt_thumb);
+        TextView pos = (TextView) convertView.findViewById(R.id.row_prompt_number);
+
+        ImageView moveUp = (ImageView) convertView.findViewById(R.id.row_prompt_move_up);
+        ImageView moveDown = (ImageView) convertView.findViewById(R.id.row_prompt_move_down);
+
+        final ImageView showHide = (ImageView) convertView.findViewById(R.id.row_prompt_show_hide_btn);
 
         setListItem.setVisibility(View.GONE);
+
+        if (positionInSetList == 0) {
+            moveUp.setVisibility(View.INVISIBLE);
+        }
+
+        if (positionInSetList == totalCount - 1) {
+            moveDown.setVisibility(View.INVISIBLE);
+        }
+
+        moveUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PromptManager.reorderPromptInSetList(getActivity(), setListTitle, positionInSetList, positionInSetList - 1);
+                reloadData();
+            }
+        });
+
+        moveDown.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PromptManager.reorderPromptInSetList(getActivity(), setListTitle, positionInSetList, positionInSetList + 1);
+                reloadData();
+            }
+        });
 
         if (prompt != null) {
             TempoRecord tr = prompt.getTempoTrack().get(0);
@@ -124,6 +155,8 @@ public class SetListsFragment extends A2TFragment {
             bpmItem.setText(tr.getBpm() + " bpm");
             barItem.setText(tr.getUpper() + " / " + tr.getLower());
             pdfItem.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimensionPixelSize(R.dimen.heading3));
+
+            pos.setText(String.valueOf(prompt.getSetListPosition() + 1));
 
             View.OnClickListener onClickListener = new View.OnClickListener() {
                 @Override
@@ -139,7 +172,7 @@ public class SetListsFragment extends A2TFragment {
                 }
             });
 
-            pdfItem.setOnClickListener(onClickListener);
+            //pdfItem.setOnClickListener(onClickListener);
             convertView.setOnClickListener(onClickListener);
 
             final View finalConvertView = convertView;
@@ -156,13 +189,31 @@ public class SetListsFragment extends A2TFragment {
                 }
             };
             convertView.setOnLongClickListener(onLongClickListener);
-            pdfItem.setOnLongClickListener(onLongClickListener);
+            //pdfItem.setOnLongClickListener(onLongClickListener);
 
+            showHide.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    PromptSettings copied = new PromptSettings();
+                    RealmIOHelper.getInstance().CopyPromptSettings(prompt, copied);
+                    copied.setEnabled(!prompt.isEnabled());
+                    PromptManager.update(getActivity(), copied);
+                    PromptManager.reorderPromptInSetList(getActivity(), setListTitle, -1, -1);
+                    reloadData();
+                }
+            });
+
+            showHide.setImageResource(prompt.isEnabled() ? R.drawable.eye_close : R.drawable.eye_open);
+            if (!prompt.isEnabled()) {
+                card.setCardBackgroundColor(getResources().getColor(R.color.prompt_disabled));
+                pos.setVisibility(View.INVISIBLE);
+            }
         } else if (last) {
+            showHide.setVisibility(View.GONE);
             pdfItem.setText(R.string.prompt_create_new);
             pdfItem.setTextSize(TypedValue.COMPLEX_UNIT_PX, 2 * getResources().getDimensionPixelSize(R.dimen.normal_text));
 
-            pdfItem.setOnClickListener(new View.OnClickListener() {
+            convertView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     mCallback.onCreatePromptClicked(setListTitle, positionInSetList);
@@ -170,10 +221,18 @@ public class SetListsFragment extends A2TFragment {
             });
 
             deleteBtn.setVisibility(View.GONE);
-            thumb.setVisibility(View.GONE);
+            pos.setVisibility(View.GONE);
+
+            moveUp.setVisibility(View.GONE);
+            moveDown.setVisibility(View.GONE);
         }
 
         setListsView.addView(convertView);
+    }
+
+    private void reloadData() {
+        MainActivity m = (MainActivity) getActivity();
+        m.reloadData();
     }
 
 

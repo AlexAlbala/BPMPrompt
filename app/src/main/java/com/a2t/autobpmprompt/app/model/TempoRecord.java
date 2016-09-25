@@ -45,6 +45,16 @@ public class TempoRecord extends RealmObject {
         this.lower = lower;
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    @PrimaryKey
+    private long id;
 
     private int bar;
     private int beat;
@@ -53,6 +63,5 @@ public class TempoRecord extends RealmObject {
     private int lower;
 
     public TempoRecord() {
-
     }
 }

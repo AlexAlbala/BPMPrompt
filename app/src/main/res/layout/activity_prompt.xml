@@ -109,6 +109,17 @@
                             android:layout_weight="1"
                             android:src="@drawable/ledoff" />
                     </LinearLayout>
+                    <!--<LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentEnd="true"
+                        android:orientation="horizontal">
+                        <SeekBar
+                            android:id="@+id/prompt_volume"
+                            android:layout_width="@dimen/prompt_volume_seek"
+                            android:layout_height="match_parent" />
+
+                    </LinearLayout>-->
 
                     <LinearLayout
                         style="?metaButtonBarStyle"
@@ -410,15 +421,18 @@
 
         <FrameLayout
             android:id="@+id/prompt_set_list_prompts_container"
-            android:layout_width="200dp"
-            android:layout_height="400dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="top"
             android:layout_marginTop="@dimen/activity_prompt_top_bar"
-            android:background="@android:color/white">
+            android:background="@color/prompt_set_list_translucent">
 
             <ListView
                 android:id="@+id/prompt_set_list_prompts"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_gravity="center"
+                android:layout_width="@dimen/prompt_set_list_width"
+                android:layout_height="@dimen/prompt_set_list_height"
+                android:background="@drawable/setlist_prompt_bg">
 
             </ListView>
         </FrameLayout>

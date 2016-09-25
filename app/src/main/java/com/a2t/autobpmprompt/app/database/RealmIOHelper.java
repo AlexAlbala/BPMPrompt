@@ -1,4 +1,4 @@
-package com.a2t.autobpmprompt.helpers;
+package com.a2t.autobpmprompt.app.database;
 
 import android.content.Context;
 import android.util.Log;
@@ -7,17 +7,15 @@ import com.a2t.a2tlib.database.RealmDriver;
 import com.a2t.a2tlib.database.RealmFactory;
 import com.a2t.a2tlib.tools.BuildUtils;
 import com.a2t.a2tlib.tools.LogUtils;
-import com.a2t.autobpmprompt.BuildConfig;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.SetList;
 import com.a2t.autobpmprompt.app.model.TempoRecord;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
+import io.realm.RealmConfiguration;
 import io.realm.RealmList;
 import io.realm.RealmResults;
 
@@ -43,6 +41,16 @@ public class RealmIOHelper {
         }
 
         return INSTANCE;
+    }
+
+    public void configureDatabase(Context ctx) {
+        LogUtils.i(TAG, "INIT DB");
+        RealmConfiguration rc = new RealmConfiguration.Builder(ctx)
+                .schemaVersion(1)
+                .setModules(new BPMPromptModule())
+                .migration(new BPMPromptMigration())
+                .build();
+        RealmFactory.setRealmConfiguration(rc);
     }
 
     public void insertPrompt(Context ctx, PromptSettings settings) {
@@ -89,12 +97,19 @@ public class RealmIOHelper {
         return mPromptSettings.getAll(ctx);
     }
 
-    public SetList getSetListByName(Context ctx, String name) {
-        return mSetLists.getOne(ctx, "name", name);
+    public SetList getSetListByTitle(Context ctx, String title) {
+        SetList s = new SetList();
+        SetList orig = mSetLists.getOne(ctx, "title", title);
+        CopySetList(orig, s);
+        return s;
+    }
+
+    public void movePromptInSetList(Context ctx, String setList) {
+
     }
 
     public List<PromptSettings> getAllPromptsFromSetList(Context ctx, String setList) {
-        //SetList s = getSetListByName(ctx, setList);
+        //SetList s = getSetListByTitle(ctx, setList);
 
         List<PromptSettings> prompts = mPromptSettings.getByQuery(ctx, mPromptSettings.getRealm(ctx).where(PromptSettings.class).equalTo("setList", setList), "setListPosition", false);
 //        Collections.sort(prompts, new Comparator<PromptSettings>() {
@@ -159,7 +174,7 @@ public class RealmIOHelper {
         to.setTitle(from.getTitle());
     }
 
-    private void CopyPromptSettings(PromptSettings from, PromptSettings to) {
+    public void CopyPromptSettings(PromptSettings from, PromptSettings to) {
         to.setMarkers(new RealmList<Marker>());
         to.setTempoTrack(new RealmList<TempoRecord>());
 
@@ -184,9 +199,11 @@ public class RealmIOHelper {
         to.setZoom(from.getZoom());
         to.setId(from.getId());
         to.setSetListPosition(from.getSetListPosition());
+        to.setEnabled(from.isEnabled());
     }
 
     private void CopyTempoRecord(TempoRecord from, TempoRecord to) {
+        to.setId(from.getId());
         to.setBar(from.getBar());
         to.setBeat(from.getBeat());
         to.setBpm(from.getBpm());

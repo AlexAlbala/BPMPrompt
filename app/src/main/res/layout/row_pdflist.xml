@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="?android:attr/selectableItemBackground"
+    android:orientation="horizontal">
+
+    <!--<com.joanzapata.pdfview.PDFView-->
+    <!--android:id="@+id/cell_pdfpreview"-->
+    <!--android:layout_width="100dp"-->
+    <!--android:layout_height="150dp"-->
+    <!--android:layout_gravity="center"-->
+    <!--android:layout_marginBottom="10dp" />-->
+
+    <ImageView
+        android:layout_width="@dimen/pdf_thumb_width"
+        android:layout_height="@dimen/pdf_thumb_height"
+        android:layout_gravity="center"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:contentDescription="My description"
+        android:src="@drawable/sheetthumb" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/row_pdf_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/big_text"
+            android:textStyle="bold"
+            android:layout_gravity="center_vertical"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/row_pdf_path"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textSize="@dimen/small_text"
+            android:textColor="@android:color/darker_gray" />
+    </LinearLayout>
+</LinearLayout>

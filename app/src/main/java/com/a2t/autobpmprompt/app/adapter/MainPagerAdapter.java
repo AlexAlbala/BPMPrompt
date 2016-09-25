@@ -62,6 +62,11 @@ public class MainPagerAdapter extends FragmentStatePagerAdapter {
         if (slf != null) {
             slf.loadSetLists(ctx);
         }
+
+        AllSongsFragment alf = (AllSongsFragment) getRegisteredFragment(1);
+        if(alf != null) {
+            alf.reloadData();
+        }
         //notifyDataSetChanged();
     }
 }

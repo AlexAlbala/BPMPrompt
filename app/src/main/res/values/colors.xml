@@ -14,6 +14,8 @@
     <color name="prompt_bg">#ffffff</color>
     <color name="prompt_right_bar">@android:color/transparent</color>
     <color name="prompt_left_bar">#6f8e8e8e</color>
+    <color name="prompt_set_list_translucent">#7d6b6b6b</color>
+    <color name="prompt_disabled">#d6d6d6</color>
 
 
 

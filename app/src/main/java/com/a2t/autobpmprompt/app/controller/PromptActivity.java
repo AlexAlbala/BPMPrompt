@@ -8,7 +8,6 @@ import com.a2t.autobpmprompt.app.callback.PromptEventsCallback;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.MarkerType;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
-import com.a2t.autobpmprompt.app.model.TempoRecord;
 import com.a2t.autobpmprompt.media.Prompt;
 import com.a2t.autobpmprompt.media.PromptManager;
 import com.github.barteksc.pdfviewer.PDFView;
@@ -16,7 +15,7 @@ import com.github.barteksc.pdfviewer.PDFView;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.graphics.Typeface;
-import android.media.Image;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -30,26 +29,29 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import io.realm.RealmList;
 
 
 public class PromptActivity extends A2TActivity implements EditPromptDialog.PromptDialogListener, MarkerDialog.MarkerDialogListener, RenamePromptDialog.RenamePromptDialogListener {
     private static final int NOTIFICATION_TIME_MS = 5000;
     private static final int BLINK_LED_TIME_MS = 150;
+    private final static int MAX_VOLUME = 101;
+    private float volume = 100;
     //boolean isEdit = false;
     boolean contentVisible = true;
     boolean isClick = false;
     boolean addingMarker = false;
+
+    //MediaPlayer soundBeat;
+    //MediaPlayer soundBar;
 
     Timer blinkTimer;
 
@@ -105,12 +107,42 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
         @Override
         public void onBar(int bar) {
             nCurrentBar = bar;
+            //if(soundBar.isPlaying()){
+            //    soundBar.stop();
+            //}
+            //soundBar.stop();
+            //soundBar.release();
+            //soundBar = MediaPlayer.create(PromptActivity.this, R.raw.metronome_bar);
+            //soundBar.setVolume(volume, volume);
+            //soundBar.reset();
+            //try {
+            //    soundBar.prepare();
+            //} catch (IOException e) {
+            //    e.printStackTrace();
+            //}
+            //soundBar.start();
             runOnUiThread(changeBar);
         }
 
         @Override
         public void onBeat(int beat) {
             nCurrentBeat = beat;
+            //if(soundBeat.isPlaying()){
+            //    soundBeat.stop();
+            //}
+            //soundBeat.stop();
+            //if(beat > 1 || nCurrentBar == 1) {
+                //soundBeat.release();
+                //soundBeat = MediaPlayer.create(PromptActivity.this, R.raw.metronome_beat);
+                //soundBeat.setVolume(volume, volume);
+                //soundBeat.reset();
+                //try {
+                    //soundBeat.prepare();
+                //} catch (IOException e) {
+                    //e.printStackTrace();
+                //}
+                //soundBeat.start();
+            //}
             runOnUiThread(changeBeat);
         }
 
@@ -248,14 +280,63 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
         surfaceOffsetX = 0;
         surfaceOffsetY = (int) getResources().getDimension(R.dimen.activity_prompt_top_bar) + getStatusBarHeight();
         /***********************************************************************************/
+        /******************* SOUND *******************************/
+
+        //soundBeat = MediaPlayer.create(this, R.raw.metronome_beat);
+        //soundBar = MediaPlayer.create(this, R.raw.metronome_bar);
+
+
+
+        /*SeekBar volumeBar = (SeekBar) findViewById(R.id.prompt_volume);
+        volumeBar.setProgress(100);
+        volumeBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                volume = (float) (1 - (Math.log(MAX_VOLUME - progress) / Math.log(MAX_VOLUME)));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        MediaPlayer.OnCompletionListener completionListener = new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                //mp.stop();
+                //mp.reset();
+                //mp.release();
+            }
+        };
+
+        MediaPlayer.OnPreparedListener preparedListener = new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mp.start();
+            }
+        };*/
+
+        //soundBeat.setOnPreparedListener(preparedListener);
+        //soundBar.setOnPreparedListener(preparedListener);
+
+        //soundBeat.setOnCompletionListener(completionListener);
+        //soundBar.setOnCompletionListener(completionListener);
 
         /******************* PROMPT LOADING ************************************************/
         progress = ProgressDialogFactory.createIndeterminated(this, R.string.loading, ProgressDialog.STYLE_SPINNER, true, false);
+        System.gc();
         currentPrompt = PromptManager.load(idPrompt, pdfview, floatingCanvas, PromptActivity.this, promptEventsCallback);
         /**********************************************************************************/
 
         pagerRight = (ImageView) findViewById(R.id.prompt_next_page);
         pagerLeft = (ImageView) findViewById(R.id.prompt_previous_page);
+
 
 
         lastMarkerX = -1;
@@ -454,9 +535,14 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        currentPrompt.close();
+    }
+
+    @Override
     public void onDestroy() {
         lverbose("onDestroy");
-        currentPrompt.close();
         super.onDestroy();
     }
 

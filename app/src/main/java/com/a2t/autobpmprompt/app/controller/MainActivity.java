@@ -8,11 +8,9 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
-import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ExpandableListView;
 
 import com.a2t.a2tlib.content.compat.A2TActivity;
 import com.a2t.a2tlib.tools.BuildUtils;
@@ -21,7 +19,7 @@ import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.adapter.MainPagerAdapter;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.app.model.SetList;
-import com.a2t.autobpmprompt.helpers.RealmIOHelper;
+import com.a2t.autobpmprompt.app.database.RealmIOHelper;
 import com.a2t.autobpmprompt.media.PromptManager;
 import com.a2t.autobpmprompt.media.audio.Recorder;
 import com.splunk.mint.Mint;
@@ -37,14 +35,6 @@ public class MainActivity extends A2TActivity implements SetListDialog.SetListDi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        boolean debug = BuildUtils.isDebugBuild();
-        if(!debug) {
-            Mint.initAndStartSession(this, "41722d1c");
-        }
-
-
-        RealmIOHelper.getInstance().debug(getApplicationContext());
         fab = (FloatingActionButton) findViewById(R.id.fab_add);
 
 

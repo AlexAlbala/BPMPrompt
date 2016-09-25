@@ -27,6 +27,7 @@
     <string name="choose_pdf">Select a pdf file</string>
     <string name="submit">Create</string>
     <string name="select_pdf_title">Select PDF</string>
+    <string name="other">Other</string>
 
     <!-- MARKER DIALOG -->
     <string name="create_marker_title">Create Marker</string>

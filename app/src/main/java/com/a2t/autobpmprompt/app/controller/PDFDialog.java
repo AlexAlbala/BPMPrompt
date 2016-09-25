@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.GridView;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.a2t.autobpmprompt.R;
@@ -41,8 +42,8 @@ public class PDFDialog extends DialogFragment implements PDFGridCallback {
         AlertDialog dialog = builder.create();
 
         List<PromptPDFFile> pdfs = PDFFiles.findAllPDFs();
-        GridView gridview = (GridView) dialogView.findViewById(R.id.dialog_gridpdf);
-        gridview.setAdapter(new PDFGridAdapter(getActivity(), pdfs, false, false, this));
+        ListView gridview = (ListView) dialogView.findViewById(R.id.dialog_listpdf);
+        gridview.setAdapter(new PDFGridAdapter(getActivity(), pdfs, this));
         return dialog;
     }
 

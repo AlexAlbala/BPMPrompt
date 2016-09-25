@@ -5,9 +5,10 @@
 
     <TextView
         android:id="@+id/row_simple_prompt_title"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:textColor="@android:color/black"
-        android:textSize="@dimen/heading1" />
+        android:textSize="@dimen/heading2" />
 
 </LinearLayout>

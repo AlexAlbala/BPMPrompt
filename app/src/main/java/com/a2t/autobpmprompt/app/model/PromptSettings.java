@@ -22,6 +22,8 @@ public class PromptSettings extends RealmObject {
     private String setList;
     private int setListPosition;
 
+    private boolean enabled;
+
     private RealmList<TempoRecord> tempoTrack;
 
 
@@ -111,5 +113,13 @@ public class PromptSettings extends RealmObject {
 
     public void setSetListPosition(int setListPosition) {
         this.setListPosition = setListPosition;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 }

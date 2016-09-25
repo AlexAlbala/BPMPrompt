@@ -213,7 +213,7 @@ public class Prompt {
         int tempoUpper = tempo.getUpper();
         resetTimer();
         int period;
-        if (tempoUpper == 2 || tempoUpper == 3 || tempoUpper == 4) { //Simple bar
+        if (tempoUpper == 2 || tempoUpper == 3 || tempoUpper == 4 || tempoUpper == 5) { //Simple bar
             period = 60000 / tempoBpm;
         } else { //Complex bar
             period = 20000 / tempoBpm;
