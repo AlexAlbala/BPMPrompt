@@ -54,10 +54,11 @@ public class Prompt {
             @Override
             public void onLoad(int i) {
                 if (settings.getZoom() != 0.0f && settings.getZoom() != 1.0f) {
-                    Log.i(TAG, "Applying zoom: " + settings.getZoom());
+                    LogUtils.d(TAG, "Applying zoom: " + settings.getZoom());
                     pdf.zoomTo(settings.getZoom(), null);
                 }
                 if (settings.getOffsetX() != 0.0f || settings.getOffsetY() != 0.0f) {
+                    LogUtils.d(TAG, "Applying offset: " + settings.getOffsetX() + ":" + settings.getOffsetY());
                     pdf.moveTo(settings.getOffsetX(), settings.getOffsetY(), null);
                 }
 
@@ -135,7 +136,7 @@ public class Prompt {
         pdf.enableDrawMarkers(!edit);
     }*/
 
-    public void hideMarkers(boolean hide){
+    public void hideMarkers(boolean hide) {
         pdf.hideMarkers(hide);
     }
 
@@ -281,8 +282,8 @@ public class Prompt {
     }
 
     public void prepareSave() {
-        this.settings.setOffsetY(pdf.getCurrentXOffset());
-        this.settings.setOffsetY(pdf.getCurrentYOffset());
+        this.settings.setOffsetX(-1 * pdf.getCurrentXOffset());
+        this.settings.setOffsetY(-1 * pdf.getCurrentYOffset());
         this.settings.setZoom(pdf.getCurrentZoom());
     }
 }

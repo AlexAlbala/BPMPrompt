@@ -162,10 +162,10 @@ public class PromptViewManager {
         drawMarkers();
     }
 
-    public void hideMarkers(boolean hide){
+    public void hideMarkers(boolean hide) {
         hideMarkers = hide;
         clear();
-        if(!hide){
+        if (!hide) {
             drawMarkers();
         }
     }
@@ -189,7 +189,7 @@ public class PromptViewManager {
                     if (_x > 0) _x = 0;
                     if (_y > 0) _y = 0;
 
-                    LogUtils.i(TAG, "Going to move to " + x + ":" + y + " -> " + _x + ":" + _y);
+                    LogUtils.d(TAG, "Going to move to " + x + ":" + y + " -> " + _x + ":" + _y);
 
                     /*float tx, ty;
                     for (tx = pdfview.getCurrentXOffset(), ty = pdfview.getCurrentYOffset(); tx > _x || ty > _y; tx -= MOVEMENT_PX, ty -= MOVEMENT_PX) {
@@ -202,8 +202,9 @@ public class PromptViewManager {
 
                     pdfview.moveTo(_x, _y);
 
-                    if (callback != null)
+                    if (callback != null) {
                         callback.done();
+                    }
                 }
             });
         } else {
@@ -322,7 +323,6 @@ public class PromptViewManager {
         if (canvas != null) {
             canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
             for (Marker m : currentMarkers) {
-                Log.d(TAG, "Show always " + m.isShowAlways());
                 if (m.isShowAlways() || drawMarkers || m.equals(lastMarkerPainted)) {
                     if (m.getType() == MarkerType.MARKER) {
                         paintMarker(canvas, m, false);
@@ -344,7 +344,7 @@ public class PromptViewManager {
         //canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
         float x = marker.getOffsetX() * getCurrentZoom() + getCurrentXOffset();
         float y = marker.getOffsetY() * getCurrentZoom() + getCurrentYOffset();
-        LogUtils.d(TAG, "Draw marker " + x + ":" + y);
+        LogUtils.v(TAG, "Draw marker " + x + ":" + y);
         if (x >= 1 && y >= 1) {
 
             drawClickOnCanvas(canvas, marker.getColor(), x, y);
@@ -386,7 +386,7 @@ public class PromptViewManager {
         //canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
         float x = marker.getOffsetX() * getCurrentZoom() + getCurrentXOffset();
         float y = marker.getOffsetY() * getCurrentZoom() + getCurrentYOffset();
-        LogUtils.d(TAG, "Draw text marker " + x + ":" + y);
+        LogUtils.v(TAG, "Draw text marker " + x + ":" + y);
         if (x >= 1 && y >= 1) {
 
             Paint markerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);

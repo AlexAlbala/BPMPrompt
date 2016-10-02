@@ -85,6 +85,7 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
     TextView currentBar;
     TextView currentBpm;
     ImageView ledImage;
+    View topBarHeader;
 
     TextView currentMarkerTitle;
     TextView currentMarkerNote;
@@ -267,6 +268,7 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
         currentMarkerBar = (TextView) findViewById(R.id.currentMarker_bar);
 
         topBarNotifiactions = findViewById(R.id.frame_top_notification);
+        topBarHeader = findViewById(R.id.top_bar);
 
         fab = (FloatingActionButton) findViewById(R.id.fab_edit);
         fab_marker = (FloatingActionButton) findViewById(R.id.fab_add_marker);
@@ -565,6 +567,7 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
     @Override
     protected void onStop() {
         super.onStop();
+        promptSave(null);
         currentPrompt.close();
     }
 
@@ -642,7 +645,7 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
         currentPrompt.stop();
         //currentPrompt.settings.setBpm(Integer.parseInt(currentBpm.getText().toString()));
         currentPrompt.prepareSave();
-        PromptManager.update(getApplicationContext(), currentPrompt);
+        PromptManager.update(this, currentPrompt);
         //isEdit = false;
         requestPromptLayout();
     }
@@ -671,112 +674,122 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
 
     @Override
     public boolean dispatchTouchEvent(@NonNull MotionEvent ev) {
-        float x = ev.getX();
-        float y = ev.getY();
+        switch (ev.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                isClick = true;
+                break;
+            case MotionEvent.ACTION_UP:
+                if (isClick) {
+                    float x = ev.getX();
+                    float y = ev.getY();
 
-        //int mwidth = markers.getWidth();
-        //int mheight = markers.getHeight();
-        //float mx = markers.getX();
-        //float my = markers.getY();
-        float aX = x - surfaceOffsetX;
-        float aY = y - surfaceOffsetY;
-        if (addingMarker) {
-            //boolean isMarkerClick = x > mx && x < mx + mwidth && y > my && y < my + mheight;
+                    //int mwidth = markers.getWidth();
+                    //int mheight = markers.getHeight();
+                    //float mx = markers.getX();
+                    //float my = markers.getY();
+                    float aX = x - surfaceOffsetX;
+                    float aY = y - surfaceOffsetY;
+                    if (addingMarker) {
+                        //boolean isMarkerClick = x > mx && x < mx + mwidth && y > my && y < my + mheight;
 
-            if (aX >= 0 && aY >= 0) {
-                lastMarkerX = (aX - currentPrompt.getCurrentXOffset()) / currentPrompt.getCurrentZoom();
-                lastMarkerY = (aY - currentPrompt.getCurrentYOffset()) / currentPrompt.getCurrentZoom();
+                        if (aX >= 0 && aY >= 0) {
+                            lastMarkerX = (aX - currentPrompt.getCurrentXOffset()) / currentPrompt.getCurrentZoom();
+                            lastMarkerY = (aY - currentPrompt.getCurrentYOffset()) / currentPrompt.getCurrentZoom();
 
-                ldebug("Draw click in " + aX + ":" + aY);
-                ldebug("Real marker position: " + lastMarkerX + ":" + lastMarkerY);
+                            ldebug("Draw click in " + aX + ":" + aY);
+                            ldebug("Real marker position: " + lastMarkerX + ":" + lastMarkerY);
 
-                createNewMarker();
-                currentPrompt.drawClickMarker(aX, aY);
-            }
-            return super.dispatchTouchEvent(ev);
-        } else if (isSetListShown) {
-            int scwidth = setListListView.getWidth();
-            int scheight = setListListView.getHeight();
-            float scpx = setListListView.getX() + surfaceOffsetX;
-            float scpy = setListListView.getY() + surfaceOffsetY;
+                            createNewMarker();
+                            currentPrompt.drawClickMarker(aX, aY);
+                        }
+                        return super.dispatchTouchEvent(ev);
+                    } else if (isSetListShown) {
+                        int scwidth = setListListView.getWidth();
+                        int scheight = setListListView.getHeight();
+                        float scpx = setListListView.getX() + surfaceOffsetX;
+                        float scpy = setListListView.getY() + surfaceOffsetY;
 
-            boolean isSetListClick = x > scpx && x < scpx + scwidth && y > scpy && y < scpy + scheight;
+                        boolean isSetListClick = x > scpx && x < scpx + scwidth && y > scpy && y < scpy + scheight;
 
-            if (!isSetListClick) {
-                toggleSetlist(null);
-                return true;
-            } else {
-                return super.dispatchTouchEvent(ev);
-            }
-        } else {
-            int cwidth = frameControls.getWidth();
-            int cheight = frameControls.getHeight();
-            float cx = frameControls.getX();
-            float cy = frameControls.getY();
-
-            int swidth = topBarNotifiactions.getWidth();
-            int sheight = topBarNotifiactions.getHeight();
-            float sx = topBarNotifiactions.getX();
-            float sy = topBarNotifiactions.getY();
-
-            int ppwidth = pagerLeft.getWidth();
-            int ppheight = pagerLeft.getHeight();
-            float ppx = pagerLeft.getX();
-            float ppy = pagerLeft.getY();
-
-            int npwidth = pagerRight.getWidth();
-            int npheight = pagerRight.getHeight();
-            float npx = pagerRight.getX();
-            float npy = pagerRight.getY();
-
-            boolean isControlsClick = x > cx && x < cx + cwidth && y > cy && y < cy + cheight;
-            //boolean isMarkerClick = x > mx && x < mx + mwidth && y > my && y < my + mheight;
-            boolean isTopClick = x > sx && x < sx + swidth && y > sy && y < sy + sheight;
-            Marker mClicked = currentPrompt.getClickedMarker(aX, aY);
-            boolean isMarkerClick = mClicked != null;
-            boolean isPreviousPageClick = x > ppx && x < ppx + ppwidth && y > ppy && y < ppy + ppheight;
-            boolean isNextPageClick = x > npx && x < npx + npwidth && y > npy && y < npy + npheight;
-
-            switch (ev.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    isClick = true;
-                    break;
-                case MotionEvent.ACTION_UP:
-                    if (isClick && !isControlsClick && !isMarkerClick && !isTopClick && !isPreviousPageClick && !isNextPageClick) {
-                        if (contentVisible) {
-                            hideRightBar();
-                            hideFab();
+                        if (!isSetListClick) {
+                            toggleSetlist(null);
+                            return true;
                         } else {
-                            showRightBar();
-                            showFab();
+                            return super.dispatchTouchEvent(ev);
                         }
-                        contentVisible = !contentVisible;
-                    } else if (isMarkerClick) {
-                        ldebug("Marker clicked " + mClicked.getTitle());
-                        if (currentPrompt.getStatus() != Prompt.Status.PLAYING) {
-                            DialogFragment d = MarkerDialog.editMarkerDialog(mClicked);
-                            d.show(getSupportFragmentManager(), "edit");
-                        }
-                        return true;
-                    }
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    isClick = false;
-                    break;
-            }
-            if (currentPrompt.getStatus() == Prompt.Status.PLAYING) {
-                if (isControlsClick || isNextPageClick || isPreviousPageClick) {
-                    return super.dispatchTouchEvent(ev);
-                } else {
-                    return true;
-                }
-            } else {
-                return super.dispatchTouchEvent(ev);
-            }
-        }
-    }
+                    } else {
+                        int cwidth = frameControls.getWidth();
+                        int cheight = frameControls.getHeight();
+                        float cx = frameControls.getX();
+                        float cy = frameControls.getY();
 
-}
+                        int swidth = topBarNotifiactions.getWidth();
+                        int sheight = topBarNotifiactions.getHeight();
+                        float sx = topBarNotifiactions.getX();
+                        float sy = topBarNotifiactions.getY();
+
+                        int hwidth = topBarHeader.getWidth();
+                        int hheight = topBarHeader.getHeight();
+                        float hx = topBarHeader.getX();
+                        float hy = topBarHeader.getY();
+
+                        int ppwidth = pagerLeft.getWidth();
+                        int ppheight = pagerLeft.getHeight();
+                        float ppx = pagerLeft.getX();
+                        float ppy = pagerLeft.getY();
+
+                        int npwidth = pagerRight.getWidth();
+                        int npheight = pagerRight.getHeight();
+                        float npx = pagerRight.getX();
+                        float npy = pagerRight.getY();
+
+                        boolean isControlsClick = x > cx && x < cx + cwidth && y > cy && y < cy + cheight;
+                        //boolean isMarkerClick = x > mx && x < mx + mwidth && y > my && y < my + mheight;
+                        boolean isTopNotificationClick = x > sx && x < sx + swidth && y > sy && y < sy + sheight;
+                        boolean isTopBarClick = x > hx && x < hx + hwidth && y > hy && y < hy + surfaceOffsetY;
+                        Marker mClicked = currentPrompt.getClickedMarker(aX, aY);
+                        boolean isMarkerClick = mClicked != null;
+                        boolean isPreviousPageClick = x > ppx && x < ppx + ppwidth && y > ppy && y < ppy + ppheight;
+                        boolean isNextPageClick = x > npx && x < npx + npwidth && y > npy && y < npy + npheight;
+
+                        if (!isControlsClick && !isMarkerClick && !isTopBarClick && !isTopNotificationClick && !isPreviousPageClick && !isNextPageClick) {
+                            if (contentVisible) {
+                                hideRightBar();
+                                hideFab();
+                            } else {
+                                showRightBar();
+                                showFab();
+                            }
+                            contentVisible = !contentVisible;
+                        } else if (isMarkerClick) {
+                            ldebug("Marker clicked " + mClicked.getTitle());
+                            if (currentPrompt.getStatus() != Prompt.Status.PLAYING) {
+                                DialogFragment d = MarkerDialog.editMarkerDialog(mClicked);
+                                d.show(getSupportFragmentManager(), "edit");
+                            }
+                            return true;
+                        }
+                        if (currentPrompt.getStatus() == Prompt.Status.PLAYING) {
+                            if (isControlsClick || isNextPageClick || isPreviousPageClick) {
+                                return super.dispatchTouchEvent(ev);
+                            } else {
+                                return true;
+                            }
+                        } else {
+                            return super.dispatchTouchEvent(ev);
+                        }
+                    }
+                }
+                break;
+            case MotionEvent.ACTION_MOVE:
+                isClick = false;
+                break;
+            default:
+                isClick = false;
+                break;
+        }
+        return super.dispatchTouchEvent(ev);
+    }
 
     private void showRightBar() {
         controlsView.animate()
