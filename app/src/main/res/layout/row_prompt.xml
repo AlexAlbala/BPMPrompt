@@ -28,13 +28,15 @@
 
                 <TextView
                     android:id="@+id/row_prompt_number"
-                    android:layout_width="50dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="60dp"
                     android:layout_marginBottom="@dimen/activity_vertical_margin"
                     android:layout_marginTop="@dimen/activity_vertical_margin"
                     android:gravity="center"
+                    android:paddingLeft="@dimen/activity_horizontal_margin"
+                    android:paddingRight="5dp"
                     android:text="1"
-                    android:textSize="50sp"
+                    android:textSize="45sp"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -125,8 +127,8 @@
 
                 <ImageView
                     android:id="@+id/row_prompt_show_hide_btn"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
                     android:layout_marginTop="@dimen/activity_vertical_margin"
                     android:background="@android:color/transparent"
                     android:padding="5dp"

@@ -16,12 +16,13 @@ public class BPMPromptMigration implements RealmMigration{
         RealmSchema schema = realm.getSchema();
 
         /*if (oldVersion == 0) {
-            schema.get("Record")
-                    .addField("text", String.class);
-            oldVersion++;
-        }
+            schema.get("PromptSettings")
+                    .addField("objectPosition", String.class);
 
-        if (oldVersion == 1) {
+            oldVersion++;
+        }*/
+
+        /*if (oldVersion == 1) {
             schema.create("ContactID")
                     .addField("lookup_contact_id", String.class)
                     .setNullable("lookup_contact_id", false)

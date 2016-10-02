@@ -57,6 +57,7 @@ public class PromptViewManager {
     private float lastYClick;
     private int marker_frame_count = 0;
     private boolean drawMarkers = true;
+    private boolean hideMarkers = false;
 
     //private final int MOVEMENT_PX = 1;
 
@@ -106,7 +107,7 @@ public class PromptViewManager {
                 .onDraw(new OnDrawListener() {
                     @Override
                     public void onLayerDrawn(Canvas canvas, float v, float v1, int i) {
-                        if (((marker_frame_count++) == MARKER_FRAMES_SKIP) && currentMarkers != null) {
+                        if (!hideMarkers && ((marker_frame_count++) == MARKER_FRAMES_SKIP) && currentMarkers != null) {
                             drawMarkers();
                             marker_frame_count = 0;
                         }
@@ -159,6 +160,14 @@ public class PromptViewManager {
     public void enableDrawMarkers(boolean enable) {
         drawMarkers = enable;
         drawMarkers();
+    }
+
+    public void hideMarkers(boolean hide){
+        hideMarkers = hide;
+        clear();
+        if(!hide){
+            drawMarkers();
+        }
     }
 
     public void centerAt(final float x, final float y, SimpleCallback callback) {
@@ -377,7 +386,7 @@ public class PromptViewManager {
         //canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
         float x = marker.getOffsetX() * getCurrentZoom() + getCurrentXOffset();
         float y = marker.getOffsetY() * getCurrentZoom() + getCurrentYOffset();
-        LogUtils.d(TAG, "Draw marker " + x + ":" + y);
+        LogUtils.d(TAG, "Draw text marker " + x + ":" + y);
         if (x >= 1 && y >= 1) {
 
             Paint markerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -390,10 +399,8 @@ public class PromptViewManager {
             markerPaint.setTextSize(pixels);
             //clickMarkerPaint.setStrokeWidth(activity.getResources().getDimension(R.dimen.click_stroke_size));
 
-            if (marker.getPrintTitle() > 0) {
-                float textMeasuredSize = markerPaint.measureText(marker.getTitle());
-                canvas.drawText(marker.getTitle(), x - (textMeasuredSize / 2), y, markerPaint);
-            }
+            float textMeasuredSize = markerPaint.measureText(marker.getTitle());
+            canvas.drawText(marker.getTitle(), x - (textMeasuredSize / 2), y, markerPaint);
 
             /*
             //Horizontal lines

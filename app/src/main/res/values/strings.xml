@@ -96,6 +96,8 @@
     <string name="prf_sheet_orientation_vertical">Vertical</string>
 
     <string name="prf_grp_display">Display</string>
+    <string name="prf_display_show_pager">Show pager</string>
+    <string name="prf_display_show_pager_summary">Enable for showing pager navigation buttons</string>
     <string name="prf_display_show_markers">Show markers</string>
     <string name="prf_display_show_markers_summary">Enable if you want to see the markers in the prompt</string>
 

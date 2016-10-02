@@ -5,12 +5,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.SurfaceView;
 
+import com.a2t.a2tlib.database.RealmFactory;
 import com.a2t.a2tlib.tools.LogUtils;
 import com.a2t.autobpmprompt.app.callback.PromptEventsCallback;
 import com.a2t.autobpmprompt.app.controller.PromptActivity;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.app.database.RealmIOHelper;
+import com.a2t.autobpmprompt.app.model.SetList;
 import com.github.barteksc.pdfviewer.PDFView;
 
 import java.io.File;
@@ -21,7 +23,10 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
 import io.realm.RealmList;
+import io.realm.RealmResults;
+import io.realm.Sort;
 
 public class PromptManager {
     private static final String TAG = "Prompt manager";
@@ -38,6 +43,13 @@ public class PromptManager {
         i.putExtra("promptId", id);
         i.putExtra("isEdit", false);
         ctx.startActivity(i);
+    }
+
+    public static void openPromptAtPosition(Context ctx, String setList, int position, boolean enabled) {
+        PromptSettings p = RealmIOHelper.getInstance().getPromptBySetListAndPosition(ctx, setList, position, enabled);
+        if(p!= null) {
+            openPrompt(ctx, setList, p.getId());
+        }
     }
 
     public static boolean create(Context context, PromptSettings p) {
@@ -114,19 +126,23 @@ public class PromptManager {
 
     public static void reorderPromptInSetList(Context ctx, String setListTitle, int from, int to) {
         LogUtils.v(TAG, "moving prompt of setList " + setListTitle + " from " + from + " to " + to);
-        List<PromptSettings> prompts = RealmIOHelper.getInstance().getAllPromptsFromSetList(ctx, setListTitle);
+        Realm r = RealmFactory.getRealm(ctx);
+
+        SetList s = r.where(SetList.class).equalTo("title", setListTitle).findFirst();
         List<PromptSettings> copiedPrompts = new ArrayList<>();
 
-        for (PromptSettings ps : prompts) {
+        if (from != -1 && to != -1) {
+            r.beginTransaction();
+            //PromptSettings p = s.getPrompts().remove(from);
+            //s.getPrompts().add(to, p);
+            s.getPrompts().move(from, to);
+            r.commitTransaction();
+        }
+
+        for (PromptSettings ps : s.getPrompts()) {
             PromptSettings copied = new PromptSettings();
             RealmIOHelper.getInstance().CopyPromptSettings(ps, copied);
             copiedPrompts.add(copied);
-        }
-
-        if (from != -1 && to != -1) {
-            PromptSettings pfrom = copiedPrompts.get(from);
-            copiedPrompts.remove(from);
-            copiedPrompts.add(to, pfrom);
         }
 
         int position = 0;

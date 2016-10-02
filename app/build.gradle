@@ -8,8 +8,8 @@ android {
         applicationId "com.a2t.autobpmprompt"
         minSdkVersion 19
         targetSdkVersion 23
-        versionCode 11
-        versionName "0.1.10"
+        versionCode 16
+        versionName "0.1.15"
         multiDexEnabled true
     }
     buildTypes {

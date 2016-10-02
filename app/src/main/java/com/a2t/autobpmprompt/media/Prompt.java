@@ -135,6 +135,10 @@ public class Prompt {
         pdf.enableDrawMarkers(!edit);
     }*/
 
+    public void hideMarkers(boolean hide){
+        pdf.hideMarkers(hide);
+    }
+
     public void setCurrentMarkers(List<Marker> markers) {
         pdf.setCurrentMarkers(markers);
     }
@@ -173,7 +177,7 @@ public class Prompt {
 
     private Marker matchMarker() {
         for (Marker m : settings.getMarkers()) {
-            if (m.getBar() == currentBar && m.getBeat() == currentBeat) {
+            if (m.getType() == MarkerType.MARKER && m.getBar() == currentBar && m.getBeat() == currentBeat) {
                 return m;
             }
         }

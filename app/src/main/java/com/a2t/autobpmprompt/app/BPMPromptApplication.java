@@ -7,9 +7,6 @@ import com.a2t.a2tlib.tools.SharedPreferencesManager;
 import com.a2t.autobpmprompt.app.database.RealmIOHelper;
 import com.splunk.mint.Mint;
 
-/**
- * Created by Alex on 21/9/16.
- */
 public class BPMPromptApplication extends Application {
     @Override
     public void onCreate() {
@@ -20,9 +17,7 @@ public class BPMPromptApplication extends Application {
         if (debug) {
             SharedPreferencesManager.debug(this, false);
             RealmIOHelper.getInstance().debug(this);
-        }
-
-        if (!debug) {
+        } else {
             Mint.initAndStartSession(this, "41722d1c");
         }
     }

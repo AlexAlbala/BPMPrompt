@@ -97,6 +97,22 @@ public class RealmIOHelper {
         return mPromptSettings.getAll(ctx);
     }
 
+    public PromptSettings getPromptBySetListAndPosition(Context ctx, String setList, int position, boolean enabled) {
+        PromptSettings prompt = mPromptSettings.getOneByQuery(ctx, mPromptSettings.getRealm(ctx).where(PromptSettings.class).equalTo("setList", setList).equalTo("setListPosition", position).equalTo("enabled", enabled));
+
+        /*List<PromptSettings> allPrompts = new ArrayList<>();
+        List<SetList> setLists = getAllSetLists(ctx);
+        for (SetList s : setLists) {
+            for (PromptSettings p : s.getPrompts()) {
+                p.setSetList(s.getTitle());
+                allPrompts.add(p);
+            }
+        }
+        return allPrompts;*/
+
+        return prompt;
+    }
+
     public SetList getSetListByTitle(Context ctx, String title) {
         SetList s = new SetList();
         SetList orig = mSetLists.getOne(ctx, "title", title);
@@ -109,9 +125,9 @@ public class RealmIOHelper {
     }
 
     public List<PromptSettings> getAllPromptsFromSetList(Context ctx, String setList) {
-        //SetList s = getSetListByTitle(ctx, setList);
+        SetList s = getSetListByTitle(ctx, setList);
 
-        List<PromptSettings> prompts = mPromptSettings.getByQuery(ctx, mPromptSettings.getRealm(ctx).where(PromptSettings.class).equalTo("setList", setList), "setListPosition", false);
+//        List<PromptSettings> prompts = mPromptSettings.getByQuery(ctx, mPromptSettings.getRealm(ctx).where(PromptSettings.class).equalTo("setList", setList), null, false);
 //        Collections.sort(prompts, new Comparator<PromptSettings>() {
 //            @Override
 //            public int compare(PromptSettings lhs, PromptSettings rhs) {
@@ -126,7 +142,7 @@ public class RealmIOHelper {
 //                }
 //            }
 //        });
-        return prompts;
+        return s.getPrompts();
     }
 
 //    public List<PromptSettings> getAllPromptSettings(Context ctx) {

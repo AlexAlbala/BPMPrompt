@@ -13,10 +13,10 @@
     <PreferenceCategory
         android:key="pref_key_storage_settings"
         android:title="@string/prf_grp_display">
-        <!--<CheckBoxPreference
+        <CheckBoxPreference
             android:defaultValue="true"
-            android:key="pref_show_markers"
-            android:summary="@string/prf_display_show_markers_summary"
-            android:title="@string/prf_display_show_markers" />-->
+            android:key="pref_show_pager"
+            android:summary="@string/prf_display_show_pager_summary"
+            android:title="@string/prf_display_show_pager" />
     </PreferenceCategory>
 </PreferenceScreen>

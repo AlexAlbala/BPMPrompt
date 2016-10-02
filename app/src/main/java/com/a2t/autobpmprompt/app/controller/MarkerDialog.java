@@ -21,9 +21,11 @@ import android.widget.Spinner;
 
 import com.a2t.a2tlib.tools.LogUtils;
 import com.a2t.a2tlib.tools.PhoneUtils;
+import com.a2t.a2tlib.tools.SharedPreferencesManager;
 import com.a2t.a2tlib.tools.StringUtils;
 import com.a2t.a2tlib.tools.VersionUtils;
 import com.a2t.autobpmprompt.R;
+import com.a2t.autobpmprompt.app.VARIABLES;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.MarkerType;
 import com.flask.colorpicker.ColorPickerView;
@@ -106,7 +108,6 @@ public class MarkerDialog extends DialogFragment {
 
         View dialogView = inflater.inflate(R.layout.dialog_marker, null);
 
-
         final Bundle b = getArguments();
         final boolean isEdit = b.getBoolean("edit");
 
@@ -115,16 +116,26 @@ public class MarkerDialog extends DialogFragment {
         mPage = b.getInt("page");
         mId = b.getInt("id");
         mTextOption = b.getInt("textOption", 0);
-        markerTextSize = b.getInt("textSize", 14);
+        markerTextSize = b.getInt("textSize", 0);
 
+        int lastSize = SharedPreferencesManager.getInt(getActivity(), VARIABLES.SHARED_PREFERENCES_LAST_MARKER_SIZE, -1);
         if (markerTextSize == 0) {
-            markerTextSize = 14;
+            if(lastSize == -1) {
+                markerTextSize = 14;
+            } else{
+                markerTextSize = lastSize;
+            }
         }
 
-        if (VersionUtils.isMarshmallowAndOver()) {
-            originalMarkerColor = b.getInt("color", getResources().getColor(android.R.color.black, getActivity().getTheme()));
-        } else {
-            originalMarkerColor = b.getInt("color", getResources().getColor(android.R.color.black));
+        int lastColor = SharedPreferencesManager.getInt(getActivity(), VARIABLES.SHARED_PREFERENCES_LAST_MARKER_COLOR, -1);
+        if(lastColor == -1) {
+            if (VersionUtils.isMarshmallowAndOver()) {
+                originalMarkerColor = b.getInt("color", getResources().getColor(android.R.color.black, getActivity().getTheme()));
+            } else {
+                originalMarkerColor = b.getInt("color", getResources().getColor(android.R.color.black));
+            }
+        } else{
+            originalMarkerColor = b.getInt("color", lastColor);
         }
         currentMarkerColor = originalMarkerColor;
 
@@ -139,21 +150,14 @@ public class MarkerDialog extends DialogFragment {
                         String mNote = note.getText().toString();
                         if (StringUtils.isEmpty(mTitle)) {
                             title_layout.setError(getString(R.string.field_required));
-                        } else if (StringUtils.isEmpty(bar.getText().toString())) {
+                        } else if (StringUtils.isEmpty(bar.getText().toString()) && typeMarkerRadio.isChecked()) {
                             bar_layout.setError(getString(R.string.field_required));
-                        } else if (StringUtils.isEmpty(beat.getText().toString())) {
+                        } else if (StringUtils.isEmpty(beat.getText().toString()) && typeMarkerRadio.isChecked()) {
                             beat.setError(getString(R.string.field_required));
                         } else {
-
-                            int mBar = Integer.parseInt(bar.getText().toString());
-                            int mBeat = Integer.parseInt(beat.getText().toString());
-
                             Marker m = new Marker();
                             m.setId(mId);
                             m.setTitle(mTitle);
-                            m.setNote(mNote);
-                            m.setBar(mBar);
-                            m.setBeat(mBeat);
                             m.setPage(mPage);
                             m.setOffsetX(mX);
                             m.setOffsetY(mY);
@@ -161,11 +165,20 @@ public class MarkerDialog extends DialogFragment {
                             m.setTextSize(markerTextSize);
                             m.setPrintTitle(markerDialogText.getSelectedItemPosition());
 
+                            SharedPreferencesManager.set(getActivity(), VARIABLES.SHARED_PREFERENCES_LAST_MARKER_COLOR, currentMarkerColor);
+                            SharedPreferencesManager.set(getActivity(), VARIABLES.SHARED_PREFERENCES_LAST_MARKER_SIZE, markerTextSize);
+
                             if (typeMarkerRadio.isChecked()) {
                                 m.setShowAlways(showAlways.isChecked());
                                 m.setPrintInCanvasOnMatch(printOnCanvas.isChecked());
                                 m.setNotify(notify.isChecked());
                                 m.setType(MarkerType.MARKER);
+
+                                int mBar = Integer.parseInt(bar.getText().toString());
+                                int mBeat = Integer.parseInt(beat.getText().toString());
+                                m.setBar(mBar);
+                                m.setBeat(mBeat);
+                                m.setNote(mNote);
                             } else {
                                 m.setNotify(false);
                                 m.setShowAlways(true);
@@ -223,7 +236,7 @@ public class MarkerDialog extends DialogFragment {
         color_picker.setBackgroundColor(originalMarkerColor);
 
         number_picker.setMinValue(5);
-        number_picker.setMaxValue(80);
+        number_picker.setMaxValue(100);
         number_picker.setValue(markerTextSize);
         number_picker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override

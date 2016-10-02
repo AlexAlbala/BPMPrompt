@@ -63,7 +63,7 @@ public class CreateActivity extends A2TActivity implements PDFDialog.PDFDialogRe
         View.OnClickListener radioTempoListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                switch(v.getId()){
+                switch (v.getId()) {
                     case R.id.create_tempo_34:
                         currentUpper = 3;
                         currentLower = 4;
@@ -120,10 +120,10 @@ public class CreateActivity extends A2TActivity implements PDFDialog.PDFDialogRe
         tr.setBar(1);
         tr.setBeat(1);
         tr.setBpm(Integer.parseInt(bpm.getText().toString()));
-        if(currentLower == -1 || currentUpper == -1) {
+        if (currentLower == -1 || currentUpper == -1) {
             tr.setUpper(Integer.parseInt(upper.getText().toString()));
             tr.setLower(Integer.parseInt(lower.getText().toString()));
-        } else{
+        } else {
             tr.setUpper(currentUpper);
             tr.setLower(currentLower);
         }
@@ -132,10 +132,11 @@ public class CreateActivity extends A2TActivity implements PDFDialog.PDFDialogRe
         promptSettings.setSetList(setList);
         promptSettings.setSetListPosition(setListPosition);
 
-        PromptManager.create(getApplicationContext(), promptSettings);
+        PromptManager.create(this, promptSettings);
+        PromptManager.reorderPromptInSetList(this, setList, -1, -1);
 
         //LAUNCH PROMPT EDIT ACTIVITY
-        Intent i = new Intent(getApplicationContext(), PromptActivity.class);
+        Intent i = new Intent(this, PromptActivity.class);
         i.putExtra("promptId", promptSettings.getId());
         i.putExtra("setListName", setList);
         i.putExtra("isEdit", true);
