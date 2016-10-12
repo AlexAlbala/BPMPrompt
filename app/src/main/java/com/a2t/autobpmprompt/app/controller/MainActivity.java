@@ -70,7 +70,7 @@ public class MainActivity extends A2TActivity implements SetListDialog.SetListDi
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
         SharedPreferencesManager.debug(this, false);
 
         Recorder r = new Recorder();

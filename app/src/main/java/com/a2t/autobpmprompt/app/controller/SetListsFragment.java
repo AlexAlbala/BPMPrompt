@@ -55,6 +55,7 @@ public class SetListsFragment extends A2TFragment {
         convertView = inflater.inflate(R.layout.row_setlist, parent, false);
 
         // well set up the ViewHolder
+        final LinearLayout container = (LinearLayout) convertView.findViewById(R.id.setlist_prompts_container);
         TextView setListItem = (TextView) convertView.findViewById(R.id.setlist_title);
         ImageButton renameBtn = (ImageButton) convertView.findViewById(R.id.setlist_rename_btn);
         ImageButton deleteBtn = (ImageButton) convertView.findViewById(R.id.setlist_delete_btn);
@@ -97,12 +98,30 @@ public class SetListsFragment extends A2TFragment {
             setListItem.setText(setList.getTitle());
 
             setListsView.addView(convertView);
+
+            convertView.findViewById(R.id.setlist_row).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int count = container.getChildCount();
+                    for (int i = 0; i < count; i++) {
+                        View child = container.getChildAt(i);
+
+                        if (child.getVisibility() == View.VISIBLE) {
+                            child.setVisibility(View.GONE);
+                        } else {
+                            child.setVisibility(View.VISIBLE);
+                        }
+                    }
+
+                }
+            });
+
             int promptPosition = 0;
             List<PromptSettings> ps = PromptManager.getAllPtomptsFromSetList(getActivity(), setList.getTitle());
             for (PromptSettings p : ps) {
-                inflateChildView(p, parent, false, setList.getTitle(), position, promptPosition++, ps.size(), inflater, mCallback);
+                inflateChildView(p, container, false, setList.getTitle(), position, promptPosition++, ps.size(), inflater, mCallback);
             }
-            inflateChildView(null, parent, true, setList.getTitle(), position, promptPosition, -1, inflater, mCallback);
+            inflateChildView(null, container, true, setList.getTitle(), position, promptPosition, -1, inflater, mCallback);
         }
     }
 
@@ -227,7 +246,7 @@ public class SetListsFragment extends A2TFragment {
             moveDown.setVisibility(View.GONE);
         }
 
-        setListsView.addView(convertView);
+        parent.addView(convertView);
     }
 
     private void reloadData() {

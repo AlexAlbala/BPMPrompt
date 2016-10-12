@@ -1,17 +1,17 @@
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="activity_horizontal_margin">32dp</dimen>
+    <dimen name="activity_vertical_margin">32dp</dimen>
 
     <!-- PROMPT ACTIVITY LAYOUT  -->
     <dimen name="activity_prompt_markers_bar">110dp</dimen>
     <dimen name="activity_prompt_marker_height">110dp</dimen>
     <dimen name="activity_prompt_markers_notification_bar">60dp</dimen>
-    <dimen name="activity_prompt_top_bar">45dp</dimen>
+    <dimen name="activity_prompt_top_bar">80dp</dimen>
     <dimen name="activity_prompt_ledsize">10dp</dimen>
     <dimen name="transport_left">100dp</dimen>
     <dimen name="transport_elem_margin">15dp</dimen>
-    <dimen name="transport_width">170dp</dimen>
+    <dimen name="transport_width">300dp</dimen>
     <dimen name="transport_height">60dp</dimen>
     <dimen name="prompt_control_width">140dp</dimen>
     <dimen name="prompt_pagers_size">140dp</dimen>
@@ -19,6 +19,7 @@
     <dimen name="prompt_set_list_width">400dp</dimen>
     <dimen name="prompt_reorder_buttons_padding">20dp</dimen>
     <dimen name="prompt_volume_seek">200dp</dimen>
+    <dimen name="activity_prompt_top_bar_actions_width">200dp</dimen>
 
     <!-- CREATE PROMPT LAYOUT -->
     <dimen name="create_prompt_pdf_preview_height">600dp</dimen>

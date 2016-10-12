@@ -19,6 +19,8 @@
     <dimen name="prompt_set_list_width">200dp</dimen>
     <dimen name="prompt_reorder_buttons_padding">10dp</dimen>
     <dimen name="prompt_volume_seek">80dp</dimen>
+    <dimen name="activity_prompt_top_bar_actions_width">200dp</dimen>
+
 
     <!-- CREATE PROMPT LAYOUT -->
     <dimen name="create_prompt_pdf_preview_height">300dp</dimen>

@@ -282,8 +282,8 @@ public class Prompt {
     }
 
     public void prepareSave() {
-        this.settings.setOffsetX(-1 * pdf.getCurrentXOffset());
-        this.settings.setOffsetY(-1 * pdf.getCurrentYOffset());
+        this.settings.setOffsetX(-1 * pdf.getCurrentXOffset() / pdf.getCurrentZoom());
+        this.settings.setOffsetY(-1 * pdf.getCurrentYOffset() / pdf.getCurrentZoom());
         this.settings.setZoom(pdf.getCurrentZoom());
     }
 }

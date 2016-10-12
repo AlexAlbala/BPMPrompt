@@ -16,7 +16,6 @@ import com.github.barteksc.pdfviewer.PDFView;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.graphics.Typeface;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -30,11 +29,9 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -51,6 +48,8 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
     boolean isClick = false;
     boolean addingMarker = false;
     boolean isSetListShown = false;
+    boolean showViewPager;
+    boolean isInViewMode = false;
 
     //MediaPlayer soundBeat;
     //MediaPlayer soundBar;
@@ -96,6 +95,7 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
 
     FloatingActionButton fab;
     FloatingActionButton fab_marker;
+    FloatingActionButton exit_view_mode;
 
     int surfaceOffsetX;
     int surfaceOffsetY;
@@ -181,6 +181,12 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
         @Override
         public void onLoaded() {
             ProgressDialogFactory.dismiss(progress);
+            boolean viewMode = SharedPreferencesManager.getBoolean(PromptActivity.this, getString(R.string.preference_initial_mode_view), false);
+            if (viewMode) {
+                promptViewMode(null);
+            } else{
+                exitViewMode(null);
+            }
         }
 
         @Override
@@ -203,19 +209,21 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
         public void onPageChanged(int page, int pageCount) {
             ldebug("page changed " + page);
 
-            if (page == 0) {
-                pagerLeft.setVisibility(View.GONE);
-                if (pageCount > 1) {
-                    pagerRight.setVisibility(View.VISIBLE);
-                } else {
-                    pagerRight.setVisibility(View.GONE);
-                }
-            } else if (page > 0) {
-                pagerLeft.setVisibility(View.VISIBLE);
-                if (pageCount > (page + 1)) {
-                    pagerRight.setVisibility(View.VISIBLE);
-                } else {
-                    pagerRight.setVisibility(View.GONE);
+            if (showViewPager) {
+                if (page == 0) {
+                    pagerLeft.setVisibility(View.GONE);
+                    if (pageCount > 1) {
+                        pagerRight.setVisibility(View.VISIBLE);
+                    } else {
+                        pagerRight.setVisibility(View.GONE);
+                    }
+                } else if (page > 0) {
+                    pagerLeft.setVisibility(View.VISIBLE);
+                    if (pageCount > (page + 1)) {
+                        pagerRight.setVisibility(View.VISIBLE);
+                    } else {
+                        pagerRight.setVisibility(View.GONE);
+                    }
                 }
             }
         }
@@ -272,6 +280,7 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
 
         fab = (FloatingActionButton) findViewById(R.id.fab_edit);
         fab_marker = (FloatingActionButton) findViewById(R.id.fab_add_marker);
+        exit_view_mode = (FloatingActionButton) findViewById(R.id.fab_exit_view_mode);
 
         setListPrompts = (ListView) findViewById(R.id.prompt_set_list_prompts);
 
@@ -452,8 +461,8 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
         }
 
 
-        boolean showPager = SharedPreferencesManager.getBoolean(this, "pref_show_pager", true);
-        if (showPager) {
+        showViewPager = SharedPreferencesManager.getBoolean(this, getString(R.string.preference_show_pager), true);
+        if (showViewPager) {
             pagerRight.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -533,13 +542,13 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
                 }
             });
 
-            showTopBar();
+            showNotification();
 
             Timer t = new Timer();
             t.schedule(new TimerTask() {
                 @Override
                 public void run() {
-                    hideTopBar();
+                    hideNotification();
                     currentPrompt.clearCanvas();
 
                     //if (f)
@@ -553,7 +562,7 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         if (hasFocus) {
-            hideTopBar();
+            hideNotification();
             topBarNotifiactions.setVisibility(View.VISIBLE);
         }
     }
@@ -805,7 +814,7 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
                         android.R.integer.config_shortAnimTime));
     }
 
-    private void showTopBar() {
+    private void showNotification() {
         runOnUiThread(new TimerTask() {
             @Override
             public void run() {
@@ -817,7 +826,7 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
         });
     }
 
-    private void hideTopBar() {
+    private void hideNotification() {
         runOnUiThread(new TimerTask() {
             @Override
             public void run() {
@@ -825,6 +834,26 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
                         .translationY(-1 * topBarNotifiactions.getHeight())
                         .setDuration(getResources().getInteger(
                                 android.R.integer.config_shortAnimTime));
+            }
+        });
+    }
+
+    private void showTopBar() {
+        topBarHeader.setVisibility(View.VISIBLE);
+        topBarHeader.animate()
+                .translationY(0)
+                .setDuration(getResources().getInteger(
+                        android.R.integer.config_shortAnimTime));
+    }
+
+    private void hideTopBar() {
+        topBarHeader.animate()
+                .translationY(-1 * controlsView.getHeight())
+                .setDuration(getResources().getInteger(
+                        android.R.integer.config_shortAnimTime)).withEndAction(new TimerTask() {
+            @Override
+            public void run() {
+                topBarHeader.setVisibility(View.GONE);
             }
         });
     }
@@ -938,5 +967,23 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
         }
         isSetListShown = !isSetListShown;
         currentPrompt.hideMarkers(isSetListShown);
+    }
+
+    public void promptViewMode(View view) {
+        hideFab();
+        hideRightBar();
+        hideTopBar();
+        isInViewMode = true;
+        currentPrompt.hideMarkers(true);
+        exit_view_mode.show();
+    }
+
+    public void exitViewMode(View view) {
+        showFab();
+        showRightBar();
+        showTopBar();
+        isInViewMode = false;
+        currentPrompt.hideMarkers(false);
+        exit_view_mode.hide();
     }
 }

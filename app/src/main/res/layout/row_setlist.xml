@@ -4,6 +4,8 @@
     android:orientation="vertical">
 
     <RelativeLayout
+        android:id="@+id/setlist_row"
+        android:background="?android:attr/selectableItemBackground"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
 
@@ -40,4 +42,10 @@
         </LinearLayout>
 
     </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/setlist_prompts_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
 </LinearLayout>

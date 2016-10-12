@@ -94,11 +94,18 @@
     <string name="prf_sheet_orientation_summary">Defines the orientation of the page scrolling</string>
     <string name="prf_sheet_orientation_horizontal">Horizontal</string>
     <string name="prf_sheet_orientation_vertical">Vertical</string>
+    <string name="prf_sheet_init_view_mode">Initialize in view mode</string>
+    <string name="prf_sheet_init_view_mode_summary">Enable if you want the view mode as the default mode</string>
 
     <string name="prf_grp_display">Display</string>
     <string name="prf_display_show_pager">Show pager</string>
     <string name="prf_display_show_pager_summary">Enable for showing pager navigation buttons</string>
     <string name="prf_display_show_markers">Show markers</string>
     <string name="prf_display_show_markers_summary">Enable if you want to see the markers in the prompt</string>
+
+    <!-- PREFERENECS NAMES -->
+    <string name="preference_orientation">prf_orientation</string>
+    <string name="preference_show_pager">prf_show_pager</string>
+    <string name="preference_initial_mode_view">prf_initial_mode</string>
 
 </resources>

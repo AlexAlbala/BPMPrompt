@@ -101,7 +101,7 @@ public class PromptViewManager {
     }
 
     public boolean loadPDF(File pdfFile, final PDFView pdfview, SurfaceView floatingCanvas, Activity mActivity) {
-        boolean vertical = SharedPreferencesManager.getString(mActivity, "pref_orientation").equals(mActivity.getResources().getString(R.string.prf_sheet_orientation_vertical));
+        boolean vertical = SharedPreferencesManager.getString(mActivity, mActivity.getString(R.string.preference_orientation)).equals(mActivity.getResources().getString(R.string.prf_sheet_orientation_vertical));
         pdfview.fromFile(pdfFile)
                 .enableSwipe(true)
                 .onDraw(new OnDrawListener() {
