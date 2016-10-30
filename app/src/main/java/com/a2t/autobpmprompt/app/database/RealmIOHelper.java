@@ -70,7 +70,7 @@ public class RealmIOHelper {
         SetList s = mSetLists.getOne(ctx, "title", setList);
         SetList updatedSetList = new SetList();
         CopySetList(s, updatedSetList);
-        updatedSetList.getPrompts().add(prompt);
+        ((RealmList) updatedSetList.getPrompts()).add(prompt);
         mSetLists.updateOne(ctx, updatedSetList);
     }
 
@@ -185,7 +185,7 @@ public class RealmIOHelper {
         for (PromptSettings ps : from.getPrompts()) {
             PromptSettings newPrompt = new PromptSettings();
             CopyPromptSettings(ps, newPrompt);
-            to.getPrompts().add(newPrompt);
+            ((RealmList) to.getPrompts()).add(newPrompt);
         }
         to.setTitle(from.getTitle());
     }
@@ -197,13 +197,13 @@ public class RealmIOHelper {
         for (Marker m : from.getMarkers()) {
             Marker newMarker = new Marker();
             CopyMarker(m, newMarker);
-            to.getMarkers().add(newMarker);
+            ((RealmList) to.getMarkers()).add(newMarker);
         }
 
         for (TempoRecord tr : from.getTempoTrack()) {
             TempoRecord newTr = new TempoRecord();
             CopyTempoRecord(tr, newTr);
-            to.getTempoTrack().add(newTr);
+            ((RealmList) to.getTempoTrack()).add(newTr);
         }
 
         //to.setMarkers(from.getMarkers());
@@ -288,6 +288,11 @@ public class RealmIOHelper {
         SetList set = new SetList();
         CopySetList(mSetLists.getOne(ctx, "title", title), set);
         set.setTitle(newTitle);
+
+        for (PromptSettings ps : set.getPrompts()) {
+            ps.setSetList(newTitle);
+            updatePrompt(ctx, ps);
+        }
 
         mSetLists.insertOne(ctx, set);
         mSetLists.deleteOne(ctx, "title", title);

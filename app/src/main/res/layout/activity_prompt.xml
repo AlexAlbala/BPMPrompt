@@ -47,8 +47,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="end"
-                        android:layout_marginEnd="@dimen/activity_horizontal_margin"
                         android:layout_marginBottom="@dimen/activity_vertical_margin"
+                        android:layout_marginEnd="@dimen/activity_horizontal_margin"
                         android:layout_marginTop="@dimen/activity_vertical_margin"
                         android:clickable="true"
                         android:onClick="exitViewMode"
@@ -108,68 +108,61 @@
             android:layout_gravity="end"
             android:layout_marginTop="@dimen/activity_prompt_top_bar">
 
-            <RelativeLayout
+            <LinearLayout
                 android:id="@+id/fullscreen_content_controls"
-                style="?metaButtonBarStyle"
-                android:layout_width="@dimen/prompt_control_width"
-                android:layout_height="match_parent"
-                android:background="@color/prompt_right_bar"
-                android:orientation="vertical"
-                tools:ignore="UselessParent">
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:orientation="vertical">
 
-                <LinearLayout
+                <android.support.design.widget.FloatingActionButton
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:paddingEnd="@dimen/activity_horizontal_margin"
-                    android:orientation="vertical">
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:clickable="true"
+                    android:onClick="promptPlay"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/play"
+                    android:tint="@android:color/black"
+                    app:backgroundTint="@android:color/white" />
 
-                    <android.support.design.widget.FloatingActionButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/activity_vertical_margin"
-                        android:clickable="true"
-                        android:onClick="promptPlay"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/play"
-                        android:tint="@android:color/black"
-                        app:backgroundTint="@android:color/white" />
+                <android.support.design.widget.FloatingActionButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:clickable="true"
+                    android:onClick="promptPause"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/pause"
+                    android:tint="@android:color/black"
+                    app:backgroundTint="@android:color/white" />
 
-                    <android.support.design.widget.FloatingActionButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/activity_vertical_margin"
-                        android:clickable="true"
-                        android:onClick="promptPause"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/pause"
-                        android:tint="@android:color/black"
-                        app:backgroundTint="@android:color/white" />
+                <android.support.design.widget.FloatingActionButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:clickable="true"
+                    android:onClick="promptStop"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/stop"
+                    android:tint="@android:color/holo_red_dark"
+                    app:backgroundTint="@android:color/white" />
 
-                    <android.support.design.widget.FloatingActionButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/activity_vertical_margin"
-                        android:clickable="true"
-                        android:onClick="promptStop"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/stop"
-                        android:tint="@android:color/holo_red_dark"
-                        app:backgroundTint="@android:color/white" />
-
-                    <android.support.design.widget.FloatingActionButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/activity_vertical_margin"
-                        android:clickable="true"
-                        android:onClick="promptViewMode"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/eye_open"
-                        android:tint="@android:color/black"
-                        app:backgroundTint="@android:color/white" />
-                </LinearLayout>
-            </RelativeLayout>
+                <android.support.design.widget.FloatingActionButton
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/activity_vertical_margin"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
+                    android:clickable="true"
+                    android:onClick="promptViewMode"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/eye_open"
+                    android:tint="@android:color/black"
+                    app:backgroundTint="@android:color/white" />
+            </LinearLayout>
 
         </FrameLayout>
 
@@ -234,7 +227,7 @@
             android:layout_gravity="top|center"
             android:visibility="invisible">
 
-            <include layout="@layout/alert_marker"/>
+            <include layout="@layout/alert_marker" />
 
         </FrameLayout>
 

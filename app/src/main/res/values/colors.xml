@@ -17,6 +17,8 @@
     <color name="prompt_set_list_translucent">#7d6b6b6b</color>
     <color name="prompt_disabled">#d6d6d6</color>
 
+    <color name="gray_separator">#bdbdbd</color>
+
 
 
 </resources>

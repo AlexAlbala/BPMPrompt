@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="@dimen/drawer_size"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/drawer_elements"
+        android:layout_width="@dimen/drawer_size"
+        android:layout_height="match_parent"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tab_setlists"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/big_text"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:background="@color/gray_separator" />
+
+        <com.a2t.a2tlib.views.ExpandedListView
+            android:id="@+id/bpm_drawer_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:choiceMode="singleChoice"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="0dp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:background="@color/gray_separator" />
+
+        <TextView
+            android:id="@+id/drawer_all_songs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:text="@string/tab_all_songs"
+            android:textSize="@dimen/big_text" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:background="@color/gray_separator" />
+
+        <TextView
+            android:id="@+id/drawer_settings"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/drawer_item_size"
+            android:background="?attr/selectableItemBackground"
+            android:drawableStart="@drawable/ic_settings_black_24dp"
+            android:gravity="center_vertical"
+            android:text="@string/action_settings"
+            android:textSize="@dimen/big_text" />
+    </LinearLayout>
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:clickable="true"
+        android:onClick="fabButton"
+        android:scaleType="centerCrop"
+        android:src="@android:drawable/ic_input_add"
+        android:tint="@color/primary_color"
+        app:backgroundTint="@android:color/white"
+        app:layout_anchor="@id/drawer_elements"
+        app:layout_anchorGravity="bottom|end" />
+</android.support.design.widget.CoordinatorLayout>

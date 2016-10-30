@@ -56,17 +56,4 @@ public class MainPagerAdapter extends FragmentStatePagerAdapter {
     public int getCount() {
         return 2;
     }
-
-    public void updateData(Context ctx) {
-        SetListsFragment slf = ((SetListsFragment) getRegisteredFragment(0));
-        if (slf != null) {
-            slf.loadSetLists(ctx);
-        }
-
-        AllSongsFragment alf = (AllSongsFragment) getRegisteredFragment(1);
-        if(alf != null) {
-            alf.reloadData();
-        }
-        //notifyDataSetChanged();
-    }
 }

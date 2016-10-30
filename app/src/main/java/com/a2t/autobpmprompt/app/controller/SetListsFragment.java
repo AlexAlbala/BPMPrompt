@@ -1,36 +1,41 @@
 package com.a2t.autobpmprompt.app.controller;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
-import android.support.v7.widget.CardView;
-import android.util.TypedValue;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.a2t.a2tlib.content.compat.A2TFragment;
+import com.a2t.a2tlib.tools.DisplayUtils;
 import com.a2t.autobpmprompt.R;
-import com.a2t.autobpmprompt.app.callback.SetListAdapterCallback;
+import com.a2t.autobpmprompt.app.adapter.PromptListAdapter;
+import com.a2t.autobpmprompt.app.callback.PromptCardCallbacks;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.app.model.SetList;
-import com.a2t.autobpmprompt.app.model.TempoRecord;
 import com.a2t.autobpmprompt.app.database.RealmIOHelper;
-import com.a2t.autobpmprompt.media.PromptManager;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import io.realm.RealmList;
-
 public class SetListsFragment extends A2TFragment {
-    boolean editMode = false;
-    LinearLayout setListsView;
+    RecyclerView recyclerView;
+    PromptListAdapter mAdapter;
+    List<PromptSettings> promptSettingsesList;
+    FloatingActionButton fab_create;
+    SetList currentSetList;
+    TextView setListTitle;
+    ImageView editSetList;
+    ImageView deleteSetList;
+    View setListContainer;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,286 +46,105 @@ public class SetListsFragment extends A2TFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_setlists, container, false);
-        if (setListsView == null) {
-            setListsView = (LinearLayout) rootView.findViewById(R.id.main_setlists);
-        }
-        loadSetLists(getActivity());
-        getActivity().registerForContextMenu(setListsView);
+
+        recyclerView = (RecyclerView) rootView.findViewById(R.id.setlist_song_recyclerview);
+        setListTitle = (TextView) rootView.findViewById(R.id.setlist_name);
+        editSetList = (ImageView) rootView.findViewById(R.id.setlist_edit);
+        deleteSetList = (ImageView) rootView.findViewById(R.id.setlist_delete);
+
+        setListContainer = rootView.findViewById(R.id.setlist_title_container);
+
+
+        promptSettingsesList = new ArrayList<>();
+        mAdapter = new PromptListAdapter(promptSettingsesList, new PromptCardCallbacks() {
+            @Override
+            public void onPromptSelected(PromptSettings prompt) {
+
+            }
+
+            @Override
+            public void onRemovePromptClicked(PromptSettings prompt) {
+                showSetList(RealmIOHelper.getInstance().getSetListByTitle(getActivity(), prompt.getSetList()));
+            }
+
+            @Override
+            public void onActivePromptChanged(PromptSettings prompt) {
+                showSetList(RealmIOHelper.getInstance().getSetListByTitle(getActivity(), prompt.getSetList()));
+            }
+        }, getActivity());
+        RecyclerView.LayoutManager mLayoutManager;
+
+        // if (DisplayUtils.isExtraLargeScreen(getActivity())) {
+        // on a large screen device ...
+        //     mLayoutManager = new GridLayoutManager(getActivity(), 3);
+        //} else {
+        mLayoutManager = new GridLayoutManager(getActivity(), 2);
+        //}
+
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(mAdapter);
+
+        recyclerView.setItemViewCacheSize(0);
+        fab_create = (FloatingActionButton) rootView.findViewById(R.id.fab_add_prompt);
+        fab_create.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mAdapter.recyclePdfs();
+                Intent i = new Intent(getActivity(), CreateActivity.class);
+                i.putExtra("setListName", currentSetList.getTitle());
+                i.putExtra("setListPosition", currentSetList.getPrompts().size());
+                startActivity(i);
+            }
+        });
+
+        fab_create.hide();
+        setListContainer.setVisibility(View.GONE);
+
+        editSetList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                renameSetList();
+            }
+        });
+
+        deleteSetList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deleteSetList();
+            }
+        });
+
         return rootView;
     }
 
-    private void inflateGroupView(final SetList setList, ViewGroup parent, final int position, LayoutInflater inflater, final SetListAdapterCallback mCallback) {
-        View convertView;
-
-        convertView = inflater.inflate(R.layout.row_setlist, parent, false);
-
-        // well set up the ViewHolder
-        final LinearLayout container = (LinearLayout) convertView.findViewById(R.id.setlist_prompts_container);
-        TextView setListItem = (TextView) convertView.findViewById(R.id.setlist_title);
-        ImageButton renameBtn = (ImageButton) convertView.findViewById(R.id.setlist_rename_btn);
-        ImageButton deleteBtn = (ImageButton) convertView.findViewById(R.id.setlist_delete_btn);
-
-
+    public void showSetList(SetList setList) {
         if (setList != null) {
-            //renameBtn.setVisibility(mEditMode ? View.VISIBLE : View.INVISIBLE);
-            //deleteBtn.setVisibility(mEditMode ? View.VISIBLE : View.INVISIBLE);
-
-
-            deleteBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mCallback.onRemoveSetListClicked(setList.getTitle());
-                }
-            });
-
-            renameBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mCallback.onSetListRenamedClicked(setList.getTitle());
-                }
-            });
-
-            final View finalConvertView = convertView;
-            MenuTag m = new MenuTag();
-            m.type = "setlist";
-            m.childPosition = -1;
-            m.groupPosition = position;
-            finalConvertView.setTag(m);
-            View.OnLongClickListener onLongClickListener = new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    getActivity().openContextMenu(finalConvertView);
-                    return true;
-                }
-            };
-            convertView.setOnLongClickListener(onLongClickListener);
-
-            setListItem.setText(setList.getTitle());
-
-            setListsView.addView(convertView);
-
-            convertView.findViewById(R.id.setlist_row).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int count = container.getChildCount();
-                    for (int i = 0; i < count; i++) {
-                        View child = container.getChildAt(i);
-
-                        if (child.getVisibility() == View.VISIBLE) {
-                            child.setVisibility(View.GONE);
-                        } else {
-                            child.setVisibility(View.VISIBLE);
-                        }
-                    }
-
-                }
-            });
-
-            int promptPosition = 0;
-            List<PromptSettings> ps = PromptManager.getAllPtomptsFromSetList(getActivity(), setList.getTitle());
-            for (PromptSettings p : ps) {
-                inflateChildView(p, container, false, setList.getTitle(), position, promptPosition++, ps.size(), inflater, mCallback);
+            setListContainer.setVisibility(View.VISIBLE);
+            currentSetList = setList;
+            fab_create.show();
+            promptSettingsesList.clear();
+            promptSettingsesList.addAll(setList.getPrompts());
+            mAdapter.notifyDataSetChanged();
+            setListTitle.setText(currentSetList.getTitle());
+        } else {
+            if (setListContainer != null && promptSettingsesList != null && mAdapter != null) {
+                setListContainer.setVisibility(View.GONE);
+                promptSettingsesList.clear();
+                mAdapter.notifyDataSetChanged();
             }
-            inflateChildView(null, container, true, setList.getTitle(), position, promptPosition, -1, inflater, mCallback);
         }
     }
 
-    private void inflateChildView(final PromptSettings prompt, ViewGroup parent, boolean last, final String setListTitle, final int setListPosition, final int positionInSetList, final int totalCount, LayoutInflater inflater, final SetListAdapterCallback mCallback) {
-
-        View convertView = inflater.inflate(R.layout.row_prompt, parent, false);
-        CardView card = (CardView) convertView.findViewById(R.id.card_view);
-        TextView pdfItem = (TextView) convertView.findViewById(R.id.row_prompt_name);
-        TextView barItem = (TextView) convertView.findViewById(R.id.row_prompt_beat);
-        TextView bpmItem = (TextView) convertView.findViewById(R.id.row_prompt_bpm);
-        TextView setListItem = (TextView) convertView.findViewById(R.id.row_prompt_setlist);
-        ImageButton deleteBtn = (ImageButton) convertView.findViewById(R.id.row_prompt_delete_btn);
-        //ImageView thumb = (ImageView) convertView.findViewById(R.id.row_prompt_thumb);
-        TextView pos = (TextView) convertView.findViewById(R.id.row_prompt_number);
-
-        ImageView moveUp = (ImageView) convertView.findViewById(R.id.row_prompt_move_up);
-        ImageView moveDown = (ImageView) convertView.findViewById(R.id.row_prompt_move_down);
-
-        final ImageView showHide = (ImageView) convertView.findViewById(R.id.row_prompt_show_hide_btn);
-
-        setListItem.setVisibility(View.GONE);
-
-        if (positionInSetList == 0) {
-            moveUp.setVisibility(View.INVISIBLE);
+    public void showAll() {
+        fab_create.hide();
+        final List<PromptSettings> promptSettings = RealmIOHelper.getInstance().getAllPrompts(getActivity());
+        promptSettingsesList.clear();
+        for (PromptSettings ps : promptSettings) {
+            promptSettingsesList.add(ps);
         }
-
-        if (positionInSetList == totalCount - 1) {
-            moveDown.setVisibility(View.INVISIBLE);
-        }
-
-        moveUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PromptManager.reorderPromptInSetList(getActivity(), setListTitle, positionInSetList, positionInSetList - 1);
-                reloadData();
-            }
-        });
-
-        moveDown.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PromptManager.reorderPromptInSetList(getActivity(), setListTitle, positionInSetList, positionInSetList + 1);
-                reloadData();
-            }
-        });
-
-        if (prompt != null) {
-            TempoRecord tr = prompt.getTempoTrack().get(0);
-            pdfItem.setText(prompt.getName());
-            bpmItem.setText(tr.getBpm() + " bpm");
-            barItem.setText(tr.getUpper() + " / " + tr.getLower());
-            pdfItem.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimensionPixelSize(R.dimen.heading3));
-
-            pos.setText(String.valueOf(prompt.getSetListPosition() + 1));
-
-            View.OnClickListener onClickListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mCallback.onPromptSelected(setListTitle, prompt);
-                }
-            };
-
-            deleteBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mCallback.onRemovePromptClicked(setListTitle, prompt, positionInSetList);
-                }
-            });
-
-            //pdfItem.setOnClickListener(onClickListener);
-            convertView.setOnClickListener(onClickListener);
-
-            final View finalConvertView = convertView;
-            MenuTag m = new MenuTag();
-            m.type = "prompt";
-            m.childPosition = positionInSetList;
-            m.groupPosition = setListPosition;
-            finalConvertView.setTag(m);
-            View.OnLongClickListener onLongClickListener = new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    getActivity().openContextMenu(finalConvertView);
-                    return true;
-                }
-            };
-            convertView.setOnLongClickListener(onLongClickListener);
-            //pdfItem.setOnLongClickListener(onLongClickListener);
-
-            showHide.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    PromptSettings copied = new PromptSettings();
-                    RealmIOHelper.getInstance().CopyPromptSettings(prompt, copied);
-                    copied.setEnabled(!prompt.isEnabled());
-                    PromptManager.update(getActivity(), copied);
-                    PromptManager.reorderPromptInSetList(getActivity(), setListTitle, -1, -1);
-                    reloadData();
-                }
-            });
-
-            showHide.setImageResource(prompt.isEnabled() ? R.drawable.eye_close : R.drawable.eye_open);
-            if (!prompt.isEnabled()) {
-                card.setCardBackgroundColor(getResources().getColor(R.color.prompt_disabled));
-                pos.setVisibility(View.INVISIBLE);
-            }
-        } else if (last) {
-            showHide.setVisibility(View.GONE);
-            pdfItem.setText(R.string.prompt_create_new);
-            pdfItem.setTextSize(TypedValue.COMPLEX_UNIT_PX, 2 * getResources().getDimensionPixelSize(R.dimen.normal_text));
-
-            convertView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mCallback.onCreatePromptClicked(setListTitle, positionInSetList);
-                }
-            });
-
-            deleteBtn.setVisibility(View.GONE);
-            pos.setVisibility(View.GONE);
-
-            moveUp.setVisibility(View.GONE);
-            moveDown.setVisibility(View.GONE);
-        }
-
-        parent.addView(convertView);
-    }
-
-    private void reloadData() {
-        MainActivity m = (MainActivity) getActivity();
-        m.reloadData();
-    }
-
-
-    public void loadSetLists(final Context ctx) {
-        List<SetList> setLists = RealmIOHelper.getInstance().getAllSetLists(ctx);
-
-        if (setLists.size() == 0) {
-            SetList s = new SetList();
-            s.setTitle(getString(R.string.first_set_list_title));
-            RealmIOHelper.getInstance().insertSetList(ctx, s);
-
-            //Set the first set list also in the local setlists list
-            s.setPrompts(new RealmList<PromptSettings>());
-            setLists.add(s);
-        }
-
-        LayoutInflater inflater = getActivity().getLayoutInflater();
-
-        setListsView.removeAllViews();
-        int position = 0;
-        for (SetList setList : setLists) {
-            SetListAdapterCallback scb = new SetListAdapterCallback() {
-                @Override
-                public void onPromptSelected(String setList, PromptSettings prompt) {
-                    PromptManager.openPrompt(getActivity(), setList, prompt.getId());
-                }
-
-                @Override
-                public void onCreatePromptClicked(String setList, int position) {
-                    Intent i = new Intent(ctx, CreateActivity.class);
-                    i.putExtra("setListName", setList);
-                    i.putExtra("setListPosition", position);
-                    startActivity(i);
-                }
-
-                @Override
-                public void onSetListRenamedClicked(String setList) {
-                    DialogFragment newFragment = new SetListDialog();
-                    Bundle args = new Bundle();
-                    args.putString("setListName", setList);
-                    newFragment.setArguments(args);
-                    newFragment.show(getFragmentManager(), "renamesetlist");
-                }
-
-                @Override
-                public void onRemoveSetListClicked(String setList) {
-                    DialogFragment newFragment = new AreYouSureDialog();
-                    Bundle b = new Bundle();
-                    b.putString("type", "setlist");
-                    b.putString("setListName", setList);
-                    newFragment.setArguments(b);
-                    newFragment.show(getFragmentManager(), "areyousuresetlist");
-                }
-
-                @Override
-                public void onRemovePromptClicked(String setList, PromptSettings prompt, int position) {
-                    DialogFragment newFragment = new AreYouSureDialog();
-                    Bundle b = new Bundle();
-                    b.putString("type", "prompt");
-                    b.putLong("promptId", prompt.getId());
-                    newFragment.setArguments(b);
-                    newFragment.show(getFragmentManager(), "areyousureprompt");
-                }
-            };
-
-            inflateGroupView(setList, setListsView, position++, inflater, scb);
-        }
-
-        setListsView.requestLayout();
+        mAdapter.notifyDataSetChanged();
+        setListContainer.setVisibility(View.GONE);
     }
 
     public void addSetList() {
@@ -328,7 +152,21 @@ public class SetListsFragment extends A2TFragment {
         newFragment.show(getFragmentManager(), "createsetlist");
     }
 
-    /*public SetListAdapter getSetListViewAdapter() {
-        return (SetListAdapter) setListsView.getExpandableListAdapter();
-    }*/
+    public void renameSetList() {
+        DialogFragment newFragment = new SetListDialog();
+        Bundle b = new Bundle();
+        b.putString("type", "setlist");
+        b.putString("setListName", currentSetList.getTitle());
+        newFragment.setArguments(b);
+        newFragment.show(getFragmentManager(), "renamesetlist");
+    }
+
+    public void deleteSetList() {
+        DialogFragment d = new AreYouSureDialog();
+        Bundle b = new Bundle();
+        b.putString("type", "setlist");
+        b.putString("setListName", currentSetList.getTitle());
+        d.setArguments(b);
+        d.show(getFragmentManager(), "deletesetlist");
+    }
 }

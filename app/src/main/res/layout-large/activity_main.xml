@@ -1,0 +1,28 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <!-- The navigation drawer -->
+    <fragment
+        android:id="@+id/drawer_fragment"
+        android:name="com.a2t.autobpmprompt.app.controller.BPMNavigationDrawerFragment"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent" />
+
+    <View
+        android:layout_width="3dp"
+        android:layout_height="match_parent"
+        android:background="@color/gray_separator"
+        android:elevation="3dp" />
+
+    <!-- The main content view -->
+    <FrameLayout
+        android:id="@+id/content_frame"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+
+</LinearLayout>

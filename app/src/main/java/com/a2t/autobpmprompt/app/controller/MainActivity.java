@@ -7,15 +7,24 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
+import com.a2t.a2tlib.content.DrawerHelper;
 import com.a2t.a2tlib.content.compat.A2TActivity;
+import com.a2t.a2tlib.content.compat.DrawerActivityCompat;
+import com.a2t.a2tlib.content.compat.NavigableFragmentActivityCompat;
+import com.a2t.a2tlib.content.compat.NavigationDrawerFragmentCompat;
 import com.a2t.a2tlib.tools.BuildUtils;
 import com.a2t.a2tlib.tools.SharedPreferencesManager;
 import com.a2t.autobpmprompt.R;
+import com.a2t.autobpmprompt.app.adapter.DrawerAdapter;
 import com.a2t.autobpmprompt.app.adapter.MainPagerAdapter;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.app.model.SetList;
@@ -24,73 +33,107 @@ import com.a2t.autobpmprompt.media.PromptManager;
 import com.a2t.autobpmprompt.media.audio.Recorder;
 import com.splunk.mint.Mint;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import io.realm.RealmList;
 
 
-public class MainActivity extends A2TActivity implements SetListDialog.SetListDialogListener, AreYouSureDialog.AreYouSureDialogListener, RenamePromptDialog.RenamePromptDialogListener {
-    ViewPager viewPager;
+public class MainActivity extends DrawerActivityCompat implements SetListDialog.SetListDialogListener, AreYouSureDialog.AreYouSureDialogListener, RenamePromptDialog.RenamePromptDialogListener {
     FloatingActionButton fab;
+    SetListsFragment contentFragment;
+    List<SetList> setlists;
+    DrawerAdapter mAdapter;
+
+    @Override
+    public void setUpDrawer() {
+        super.setUpDrawer();
+
+        final DrawerLayout view = getDrawerView();
+
+        findViewById(R.id.drawer_all_songs).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                contentFragment.showAll();
+                closeDrawer();
+                DrawerHelper.setCurrentPosition(-1);
+            }
+        });
+
+        findViewById(R.id.drawer_settings).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(i);
+                closeDrawer();
+                DrawerHelper.setCurrentPosition(-1);
+            }
+        });
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setlists = new ArrayList<>();
+        mAdapter = new DrawerAdapter(this, setlists);
+        configureDrawer(R.id.drawer_fragment, R.id.drawer_layout, R.layout.drawer_layout, R.id.bpm_drawer_list, mAdapter);
         setContentView(R.layout.activity_main);
+        setUpDrawer();
+
         fab = (FloatingActionButton) findViewById(R.id.fab_add);
 
-
-        //***** CONFIGURE TOOLBAR ********//
-        viewPager = (ViewPager) findViewById(R.id.main_pager);
-        viewPager.setAdapter(new MainPagerAdapter(getSupportFragmentManager()));
-
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        registerCallbacks(new NavigationDrawerFragmentCompat.NavigationDrawerCallbacks() {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
+            public void onNavigationDrawerItemSelected(int oldPosition, int position, Object item) {
+                SetList setList = (SetList) item;
+                contentFragment.showSetList(setList);
             }
 
             @Override
-            public void onPageSelected(int position) {
-                if (position == 0) {
-                    fab.show();
-                } else {
-                    fab.hide();
-                }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
+            public void onNavigationDrawerOpened() {
 
             }
         });
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(viewPager);
-        tabLayout.getTabAt(0).setText(R.string.tab_setlists);
-        tabLayout.getTabAt(1).setText(R.string.tab_all_songs);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        contentFragment = new SetListsFragment();
+        replaceFragment(R.id.content_frame, contentFragment, false);
+        // Set the list's click listener
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, true);
         SharedPreferencesManager.debug(this, false);
 
         Recorder r = new Recorder();
         r.findAudioRecord();
+
+        loadSetLists();
+    }
+
+    private void loadSetLists() {
+        List<SetList> tmpSetLists = RealmIOHelper.getInstance().getAllSetLists(this);
+        setlists.clear();
+        setlists.addAll(tmpSetLists);
+        mAdapter.notifyDataSetChanged();
+        contentFragment.showSetList(contentFragment.currentSetList);
     }
 
     public void fabButton(View view) {
-        if (viewPager.getCurrentItem() == 0) {
-            ((SetListsFragment) ((MainPagerAdapter) viewPager.getAdapter()).getRegisteredFragment(0)).addSetList();
-        }
+        contentFragment.addSetList();
     }
 
+
     public void reloadData() {
-        ((MainPagerAdapter) viewPager.getAdapter()).updateData(this);
+        if (contentFragment.currentSetList != null) {
+            contentFragment.currentSetList = RealmIOHelper.getInstance().getSetListByTitle(MainActivity.this, contentFragment.currentSetList.getTitle());
+        }
+        loadSetLists();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         reloadData();
+        //contentFragment.showAll();
     }
 
     @Override
@@ -100,7 +143,7 @@ public class MainActivity extends A2TActivity implements SetListDialog.SetListDi
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        //getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -119,6 +162,9 @@ public class MainActivity extends A2TActivity implements SetListDialog.SetListDi
         if (type != null) {
             if (type.equals("setlist")) {
                 RealmIOHelper.getInstance().deleteSetList(this, args.getString("setListName"));
+                contentFragment.currentSetList = null;
+                DrawerHelper.setCurrentPosition(-1);
+
             } else if (type.equals("prompt")) {
                 PromptManager.delete(this, args.getLong("promptId"));
             }
@@ -144,6 +190,7 @@ public class MainActivity extends A2TActivity implements SetListDialog.SetListDi
     @Override
     public void onSetListRenamed(DialogFragment dialog, String title, String newTitle) {
         RealmIOHelper.getInstance().renameSetList(this, title, newTitle);
+        contentFragment.currentSetList = RealmIOHelper.getInstance().getSetListByTitle(this, newTitle);
         reloadData();
     }
 

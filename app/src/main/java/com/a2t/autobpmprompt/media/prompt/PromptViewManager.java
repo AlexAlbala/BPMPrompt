@@ -1,17 +1,21 @@
 package com.a2t.autobpmprompt.media.prompt;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.ImageView;
 
 import com.a2t.a2tlib.tools.LogUtils;
 import com.a2t.a2tlib.tools.SharedPreferencesManager;
@@ -24,8 +28,12 @@ import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.listener.OnDrawListener;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
+import com.shockwave.pdfium.PdfDocument;
+import com.shockwave.pdfium.PdfiumCore;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Timer;
 
@@ -93,10 +101,10 @@ public class PromptViewManager {
                 .defaultPage(0)
                 .pages(0)
                 .enableSwipe(false)
+                .enableDoubletap(false)
                 .load();
 
         pdfview.useBestQuality(false);
-
         return true;
     }
 
@@ -151,6 +159,34 @@ public class PromptViewManager {
         this.activity = mActivity;
         this.mFloatingCanvas = floatingCanvas;
         return true;
+    }
+
+    public static String loadThumbnailImage(Context ctx, String path, ImageView iv) throws FileNotFoundException {
+        File f = new File(path);
+        ParcelFileDescriptor fd = ParcelFileDescriptor.open(f, ParcelFileDescriptor.MODE_READ_ONLY);
+        int pageNum = 0;
+        PdfiumCore pdfiumCore = new PdfiumCore(ctx);
+        try {
+            PdfDocument pdfDocument = pdfiumCore.newDocument(fd);
+
+            pdfiumCore.openPage(pdfDocument, pageNum);
+
+            int width = pdfiumCore.getPageWidthPoint(pdfDocument, pageNum);
+            int height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNum);
+
+            Bitmap bitmap = Bitmap.createBitmap(width, height,
+                    Bitmap.Config.ARGB_8888);
+            pdfiumCore.renderPageBitmap(pdfDocument, bitmap, pageNum, 0, 0,
+                    width, height);
+
+            iv.setImageBitmap(bitmap);
+
+            pdfiumCore.closeDocument(pdfDocument); // important!
+            return f.getName();
+        } catch(IOException ex) {
+            ex.printStackTrace();
+        }
+        return null;
     }
 
     public int getPageCount() {

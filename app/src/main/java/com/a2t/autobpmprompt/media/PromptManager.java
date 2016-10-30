@@ -37,6 +37,10 @@ public class PromptManager {
         return new Prompt(pdf, floatingCanvas, settings, context, callback);
     }
 
+    public static void openPrompt(Context ctx, PromptSettings promptSettings) {
+        openPrompt(ctx, promptSettings.getSetList(), promptSettings.getId());
+    }
+
     public static void openPrompt(Context ctx, String setList, long id) {
         Intent i = new Intent(ctx, PromptActivity.class);
         i.putExtra("setListName", setList);
@@ -47,7 +51,7 @@ public class PromptManager {
 
     public static void openPromptAtPosition(Context ctx, String setList, int position, boolean enabled) {
         PromptSettings p = RealmIOHelper.getInstance().getPromptBySetListAndPosition(ctx, setList, position, enabled);
-        if(p!= null) {
+        if (p != null) {
             openPrompt(ctx, setList, p.getId());
         }
     }
@@ -115,9 +119,11 @@ public class PromptManager {
     public static void delete(Context ctx, long promptId) {
         //Remove saved file
         PromptSettings ps = RealmIOHelper.getInstance().getPrompt(ctx, promptId);
+        String s = ps.getSetList();
         File f = new File(ps.getPdfFullPath());
         f.delete();
         RealmIOHelper.getInstance().deletePrompt(ctx, promptId);
+        reorderPromptInSetList(ctx, s, -1, -1);
     }
 
     public static List<PromptSettings> getAllPtomptsFromSetList(Context ctx, String setList) {
@@ -148,7 +154,7 @@ public class PromptManager {
         int position = 0;
         for (PromptSettings ps : copiedPrompts) {
             ps.setSetListPosition(position);
-            if(ps.isEnabled()){
+            if (ps.isEnabled()) {
                 position++;
             }
             update(ctx, ps);

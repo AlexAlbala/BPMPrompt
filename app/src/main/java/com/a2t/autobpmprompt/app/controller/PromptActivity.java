@@ -37,6 +37,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import io.realm.RealmList;
+
 
 public class PromptActivity extends A2TActivity implements EditPromptDialog.PromptDialogListener, MarkerDialog.MarkerDialogListener, RenamePromptDialog.RenamePromptDialogListener {
     private static final int NOTIFICATION_TIME_MS = 5000;
@@ -184,7 +186,7 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
             boolean viewMode = SharedPreferencesManager.getBoolean(PromptActivity.this, getString(R.string.preference_initial_mode_view), false);
             if (viewMode) {
                 promptViewMode(null);
-            } else{
+            } else {
                 exitViewMode(null);
             }
         }
@@ -664,7 +666,6 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
         if (isSetListShown) {
             toggleSetlist(null);
         } else {
-            currentPrompt.stop();
             super.onBackPressed();
         }
     }
@@ -868,7 +869,7 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
         ldebug("Marker created: " + m.getOffsetX() + ":" + m.getOffsetY());
         m.setId((int) System.currentTimeMillis());
 
-        currentPrompt.settings.getMarkers().add(m);
+        ((RealmList) currentPrompt.settings.getMarkers()).add(m);
         promptSave(null);
         //requestPromptLayout();
     }
@@ -880,7 +881,7 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
         for (int i = 0; i < currentPrompt.settings.getMarkers().size(); i++) {
             Marker m = currentPrompt.settings.getMarkers().get(i);
             if (m.getId() == em.getId()) {
-                currentPrompt.settings.getMarkers().set(i, em);
+                ((RealmList) currentPrompt.settings.getMarkers()).set(i, em);
                 PromptManager.update(this, currentPrompt);
                 currentPrompt.setCurrentMarkers(currentPrompt.settings.getMarkers());
                 return;

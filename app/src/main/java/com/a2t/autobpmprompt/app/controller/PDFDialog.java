@@ -49,7 +49,7 @@ public class PDFDialog extends DialogFragment implements PDFGridCallback {
 
     @Override
     public void onPDFSelected(String fullPath, int position) {
-        Toast.makeText(getActivity(), "Selected file " + fullPath, Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getActivity(), "Selected file " + fullPath, Toast.LENGTH_SHORT).show();
         mListener.onPDFSelected(PDFDialog.this, fullPath);
     }
 
