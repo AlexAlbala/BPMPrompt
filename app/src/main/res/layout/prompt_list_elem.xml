@@ -68,13 +68,6 @@
             </LinearLayout>
         </LinearLayout>
 
-        <FrameLayout
-            android:id="@+id/prompt_item_clickable"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-        </FrameLayout>
-
         <android.support.v7.widget.Toolbar
             android:id="@+id/prompt_item_toolbar"
             android:layout_width="match_parent"

@@ -20,7 +20,9 @@ import com.a2t.a2tlib.tools.LogUtils;
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.callback.PromptCardCallbacks;
 import com.a2t.autobpmprompt.app.controller.AreYouSureDialog;
+import com.a2t.autobpmprompt.app.controller.MainActivity;
 import com.a2t.autobpmprompt.app.database.RealmIOHelper;
+import com.a2t.autobpmprompt.app.helpers.ItemTouchHelperAdapter;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.media.PromptManager;
 import com.a2t.autobpmprompt.media.prompt.PromptViewManager;
@@ -32,19 +34,40 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class PromptListAdapter extends RecyclerView.Adapter<PromptListAdapter.MyViewHolder> {
+public class PromptListAdapter extends RecyclerView.Adapter<PromptListAdapter.MyViewHolder> implements ItemTouchHelperAdapter {
 
     private List<PromptSettings> promptsList;
     private PromptCardCallbacks mCallback;
     private A2TActivity mContext;
     private List<MyViewHolder> items;
 
+    @Override
+    public boolean onItemMove(int fromPosition, int toPosition) {
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
+                Collections.swap(promptsList, i, i + 1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                Collections.swap(promptsList, i, i - 1);
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition);
+        if (promptsList.size() > 0) {
+            PromptManager.reorderPromptInSetList(mContext, promptsList.get(0).getSetList(), fromPosition, toPosition);
+            MainActivity ma = (MainActivity) mContext;
+            ma.reloadData();
+        }
+        return true;
+    }
+
     public class MyViewHolder extends RecyclerView.ViewHolder {
         public CardView root;
         public View mask;
-        public View clickArea;
+        //public View clickArea;
         //public PDFView pdf;
         public ImageView pdfThumb;
         public TextView title;
@@ -56,7 +79,7 @@ public class PromptListAdapter extends RecyclerView.Adapter<PromptListAdapter.My
             super(view);
             root = (CardView) view.findViewById(R.id.prompt_item_card_view);
             mask = view.findViewById(R.id.prompt_item_mask);
-            clickArea = view.findViewById(R.id.prompt_item_clickable);
+            //clickArea = view.findViewById(R.id.prompt_item_clickable);
             //pdf = (PDFView) view.findViewById(R.id.prompt_item_pdf);
             title = (TextView) view.findViewById(R.id.prompt_item_name);
             setList = (TextView) view.findViewById(R.id.prompt_item_setlist);
@@ -65,7 +88,7 @@ public class PromptListAdapter extends RecyclerView.Adapter<PromptListAdapter.My
 
             pdfThumb = (ImageView) view.findViewById(R.id.prompt_item_thumb);
 
-            clickArea.setOnClickListener(new View.OnClickListener() {
+            root.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     recyclePdfs();

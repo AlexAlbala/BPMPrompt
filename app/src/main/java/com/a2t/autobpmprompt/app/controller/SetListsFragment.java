@@ -8,6 +8,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import com.a2t.a2tlib.tools.DisplayUtils;
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.adapter.PromptListAdapter;
 import com.a2t.autobpmprompt.app.callback.PromptCardCallbacks;
+import com.a2t.autobpmprompt.app.callback.SimpleItemTouchHelperCallback;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.app.model.SetList;
 import com.a2t.autobpmprompt.app.database.RealmIOHelper;
@@ -36,6 +38,8 @@ public class SetListsFragment extends A2TFragment {
     ImageView editSetList;
     ImageView deleteSetList;
     View setListContainer;
+
+    SimpleItemTouchHelperCallback callback;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -115,11 +119,16 @@ public class SetListsFragment extends A2TFragment {
             }
         });
 
+        callback = new SimpleItemTouchHelperCallback(mAdapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(recyclerView);
+
         return rootView;
     }
 
     public void showSetList(SetList setList) {
         if (setList != null) {
+            callback.setDragEnabled(true);
             setListContainer.setVisibility(View.VISIBLE);
             currentSetList = setList;
             fab_create.show();
@@ -137,6 +146,7 @@ public class SetListsFragment extends A2TFragment {
     }
 
     public void showAll() {
+        callback.setDragEnabled(false);
         fab_create.hide();
         final List<PromptSettings> promptSettings = RealmIOHelper.getInstance().getAllPrompts(getActivity());
         promptSettingsesList.clear();
