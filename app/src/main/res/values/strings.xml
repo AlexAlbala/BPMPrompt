@@ -19,6 +19,7 @@
     <!-- MAIN -->
     <string name="tab_setlists">SetLists</string>
     <string name="tab_all_songs">All</string>
+    <string name="search">Search</string>
 
     <!-- CREATE PROMPT -->
     <string name="placeholder_title">Title</string>

@@ -5,10 +5,14 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import android.util.TypedValue;
@@ -161,32 +165,44 @@ public class PromptViewManager {
         return true;
     }
 
-    public static String loadThumbnailImage(Context ctx, String path, ImageView iv) throws FileNotFoundException {
+    public static String loadThumbnailImage(final Context ctx, String path, final ImageView iv, int mWidth, int mHeight) throws FileNotFoundException {
         File f = new File(path);
-        ParcelFileDescriptor fd = ParcelFileDescriptor.open(f, ParcelFileDescriptor.MODE_READ_ONLY);
-        int pageNum = 0;
-        PdfiumCore pdfiumCore = new PdfiumCore(ctx);
-        try {
-            PdfDocument pdfDocument = pdfiumCore.newDocument(fd);
+        final ParcelFileDescriptor fd = ParcelFileDescriptor.open(f, ParcelFileDescriptor.MODE_READ_ONLY);
+        final int pageNum = 0;
+        final PdfiumCore pdfiumCore = new PdfiumCore(ctx);
 
+
+        PdfDocument pdfDocument = null;
+        try {
+            pdfDocument = pdfiumCore.newDocument(fd);
             pdfiumCore.openPage(pdfDocument, pageNum);
 
-            int width = pdfiumCore.getPageWidthPoint(pdfDocument, pageNum);
-            int height = pdfiumCore.getPageHeightPoint(pdfDocument, pageNum);
+            if (mWidth == 0 || mHeight == 0) {
+                mWidth = pdfiumCore.getPageWidthPoint(pdfDocument, pageNum);
+                mHeight = pdfiumCore.getPageHeightPoint(pdfDocument, pageNum);
+            }
 
-            Bitmap bitmap = Bitmap.createBitmap(width, height,
+            Bitmap bitmap = Bitmap.createBitmap(mWidth, mHeight,
                     Bitmap.Config.ARGB_8888);
             pdfiumCore.renderPageBitmap(pdfDocument, bitmap, pageNum, 0, 0,
-                    width, height);
+                    mWidth, mHeight);
 
-            iv.setImageBitmap(bitmap);
-
+            final TransitionDrawable td =
+                    new TransitionDrawable(new Drawable[]{
+                            new ColorDrawable(Color.TRANSPARENT),
+                            new BitmapDrawable(ctx.getResources(), bitmap)
+                    });
+            iv.setImageDrawable(td);
+            td.startTransition(500);
             pdfiumCore.closeDocument(pdfDocument); // important!
-            return f.getName();
-        } catch(IOException ex) {
-            ex.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch(OutOfMemoryError ooe){
+            ooe.printStackTrace();
+            System.gc();
         }
-        return null;
+
+        return f.getName();
     }
 
     public int getPageCount() {

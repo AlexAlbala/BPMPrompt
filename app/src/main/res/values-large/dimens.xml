@@ -21,7 +21,7 @@
     <dimen name="prompt_volume_seek">200dp</dimen>
     <dimen name="activity_prompt_top_bar_actions_width">200dp</dimen>
 
-    <dimen name="drawer_size">180dp</dimen>
+    <dimen name="drawer_size">200dp</dimen>
     <dimen name="drawer_item_size">43dp</dimen>
 
 

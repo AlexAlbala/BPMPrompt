@@ -162,7 +162,7 @@ public class CreateActivity extends A2TActivity implements PDFDialog.PDFDialogRe
 
         String pdfName = null;
         try {
-            pdfName = PromptViewManager.loadThumbnailImage(this, fullPath, pdfPreviewImage);
+            pdfName = PromptViewManager.loadThumbnailImage(this, fullPath, pdfPreviewImage, 0, 0);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

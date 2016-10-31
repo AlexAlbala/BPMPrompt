@@ -2,6 +2,8 @@ package com.a2t.autobpmprompt.app.adapter;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.support.v4.app.DialogFragment;
@@ -43,6 +45,9 @@ public class PromptListAdapter extends RecyclerView.Adapter<PromptListAdapter.My
     private PromptCardCallbacks mCallback;
     private A2TActivity mContext;
     private List<MyViewHolder> items;
+
+    private int imageWidth = 0;
+    private int imageHeight = 0;
 
     @Override
     public boolean onItemMove(int fromPosition, int toPosition) {
@@ -133,7 +138,7 @@ public class PromptListAdapter extends RecyclerView.Adapter<PromptListAdapter.My
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
+    public void onBindViewHolder(final MyViewHolder holder, int position) {
         final PromptSettings prompt = promptsList.get(position);
 
         holder.title.setText(prompt.getName());
@@ -142,11 +147,21 @@ public class PromptListAdapter extends RecyclerView.Adapter<PromptListAdapter.My
 
         //PromptViewManager.loadThumbnail(new File(prompt.getPdfFullPath()), holder.pdf);
 
-        try {
-            PromptViewManager.loadThumbnailImage(mContext, prompt.getPdfFullPath(), holder.pdfThumb);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        holder.pdfThumb.post(new Runnable() {
+            @Override
+            public void run() {
+                if (imageHeight == 0 || imageWidth == 0) {
+                    imageHeight = holder.pdfThumb.getMeasuredHeight();
+                    imageWidth = holder.pdfThumb.getMeasuredWidth();
+                    LogUtils.v("RecyclerView", "New measured size : " + imageWidth + " : " + imageHeight);
+                }
+                try {
+                    PromptViewManager.loadThumbnailImage(mContext, prompt.getPdfFullPath(), holder.pdfThumb, imageWidth, imageHeight);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         holder.toolbar.getMenu().clear();
         holder.toolbar.inflateMenu(R.menu.prompt_card_menu);
@@ -200,6 +215,14 @@ public class PromptListAdapter extends RecyclerView.Adapter<PromptListAdapter.My
     @Override
     public void onViewRecycled(MyViewHolder holder) {
         super.onViewRecycled(holder);
+
+        Drawable drawable = holder.pdfThumb.getDrawable();
+        if (drawable instanceof BitmapDrawable) {
+            BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
+            Bitmap bitmap = bitmapDrawable.getBitmap();
+            bitmap.recycle();
+        }
+
         //LogUtils.v("ADAPTER", "RECYCLE " + holder.pdf);
         //holder.pdf.recycle();
     }

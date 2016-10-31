@@ -10,14 +10,14 @@
         android:id="@+id/drawer_elements"
         android:layout_width="@dimen/drawer_size"
         android:layout_height="match_parent"
-        android:layout_marginEnd="@dimen/activity_horizontal_margin"
-        android:layout_marginStart="@dimen/activity_horizontal_margin"
         android:layout_marginTop="@dimen/activity_vertical_margin"
         android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingEnd="@dimen/activity_horizontal_margin"
+            android:paddingStart="@dimen/activity_horizontal_margin"
             android:text="@string/tab_setlists"
             android:textColor="@android:color/black"
             android:textSize="@dimen/big_text"
@@ -27,6 +27,8 @@
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:background="@color/gray_separator" />
 
         <com.a2t.a2tlib.views.ExpandedListView
@@ -41,21 +43,40 @@
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:layout_marginTop="@dimen/activity_vertical_margin"
             android:background="@color/gray_separator" />
 
         <TextView
             android:id="@+id/drawer_all_songs"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
+            android:layout_height="@dimen/drawer_item_size"
+            android:background="@drawable/drawer_item_bg"
+            android:paddingEnd="@dimen/activity_horizontal_margin"
+            android:paddingStart="@dimen/activity_horizontal_margin"
             android:text="@string/tab_all_songs"
+            android:textColor="@color/drawer_item_fg"
+            android:textSize="@dimen/big_text" />
+
+        <TextView
+            android:id="@+id/drawer_search"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/drawer_item_size"
+            android:background="?attr/selectableItemBackground"
+            android:drawableStart="@drawable/ic_search_black_24dp"
+            android:gravity="center_vertical"
+            android:paddingEnd="@dimen/activity_horizontal_margin"
+            android:paddingStart="@dimen/activity_horizontal_margin"
+            android:text="@string/search"
             android:textSize="@dimen/big_text" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="2dp"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginEnd="@dimen/activity_horizontal_margin"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:layout_marginTop="@dimen/activity_vertical_margin"
             android:background="@color/gray_separator" />
 
@@ -66,6 +87,8 @@
             android:background="?attr/selectableItemBackground"
             android:drawableStart="@drawable/ic_settings_black_24dp"
             android:gravity="center_vertical"
+            android:paddingEnd="@dimen/activity_horizontal_margin"
+            android:paddingStart="@dimen/activity_horizontal_margin"
             android:text="@string/action_settings"
             android:textSize="@dimen/big_text" />
     </LinearLayout>

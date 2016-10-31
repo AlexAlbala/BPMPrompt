@@ -46,18 +46,22 @@ public class MainActivity extends DrawerActivityCompat implements SetListDialog.
     List<SetList> setlists;
     DrawerAdapter mAdapter;
 
+    View drawerAllSongs;
+
     @Override
     public void setUpDrawer() {
         super.setUpDrawer();
 
         final DrawerLayout view = getDrawerView();
 
-        findViewById(R.id.drawer_all_songs).setOnClickListener(new View.OnClickListener() {
+        drawerAllSongs = findViewById(R.id.drawer_all_songs);
+        drawerAllSongs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 contentFragment.showAll();
                 closeDrawer();
-                DrawerHelper.setCurrentPosition(-1);
+                setCurrentPosition(-1);
+                drawerAllSongs.setSelected(true);
             }
         });
 
@@ -67,9 +71,12 @@ public class MainActivity extends DrawerActivityCompat implements SetListDialog.
                 Intent i = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(i);
                 closeDrawer();
-                DrawerHelper.setCurrentPosition(-1);
+                setCurrentPosition(-1);
+                drawerAllSongs.setSelected(false);
             }
         });
+
+        setCurrentPosition(-1);
     }
 
     @Override
@@ -88,6 +95,7 @@ public class MainActivity extends DrawerActivityCompat implements SetListDialog.
             public void onNavigationDrawerItemSelected(int oldPosition, int position, Object item) {
                 SetList setList = (SetList) item;
                 contentFragment.showSetList(setList);
+                drawerAllSongs.setSelected(false);
             }
 
             @Override
