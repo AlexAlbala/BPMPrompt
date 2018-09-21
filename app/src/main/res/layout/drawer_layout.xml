@@ -31,7 +31,7 @@
             android:layout_marginStart="@dimen/activity_horizontal_margin"
             android:background="@color/gray_separator" />
 
-        <com.a2t.a2tlib.views.ExpandedListView
+        <com.a2t.autobpmprompt.app.lib.views.ExpandedListView
             android:id="@+id/bpm_drawer_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

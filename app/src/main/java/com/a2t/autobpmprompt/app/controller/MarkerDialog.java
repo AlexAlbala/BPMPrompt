@@ -19,11 +19,11 @@ import android.widget.NumberPicker;
 import android.widget.RadioButton;
 import android.widget.Spinner;
 
-import com.a2t.a2tlib.tools.LogUtils;
-import com.a2t.a2tlib.tools.PhoneUtils;
-import com.a2t.a2tlib.tools.SharedPreferencesManager;
-import com.a2t.a2tlib.tools.StringUtils;
-import com.a2t.a2tlib.tools.VersionUtils;
+import com.a2t.autobpmprompt.app.lib.LogUtils;
+import com.a2t.autobpmprompt.app.lib.PhoneUtils;
+import com.a2t.autobpmprompt.app.lib.SharedPreferencesManager;
+import com.a2t.autobpmprompt.app.lib.StringUtils;
+import com.a2t.autobpmprompt.app.lib.VersionUtils;
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.VARIABLES;
 import com.a2t.autobpmprompt.app.model.Marker;

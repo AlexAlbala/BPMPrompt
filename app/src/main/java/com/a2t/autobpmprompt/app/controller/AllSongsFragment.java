@@ -12,8 +12,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.a2t.a2tlib.content.compat.A2TFragment;
-import com.a2t.a2tlib.tools.DisplayUtils;
+import com.a2t.autobpmprompt.app.lib.A2TFragment;
+import com.a2t.autobpmprompt.app.lib.DisplayUtils;
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.adapter.PromptListAdapter;
 import com.a2t.autobpmprompt.app.adapter.PromptsAdapter;

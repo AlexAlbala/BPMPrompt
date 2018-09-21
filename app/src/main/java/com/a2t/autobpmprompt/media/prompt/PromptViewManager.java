@@ -8,11 +8,13 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
+import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
+import android.os.AsyncTask;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import android.util.TypedValue;
@@ -21,11 +23,11 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
 
-import com.a2t.a2tlib.tools.LogUtils;
-import com.a2t.a2tlib.tools.SharedPreferencesManager;
+import com.a2t.autobpmprompt.app.lib.LogUtils;
+import com.a2t.autobpmprompt.app.lib.SharedPreferencesManager;
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.callback.PromptViewCallback;
-import com.a2t.a2tlib.tools.SimpleCallback;
+import com.a2t.autobpmprompt.app.lib.SimpleCallback;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.MarkerType;
 import com.github.barteksc.pdfviewer.PDFView;
@@ -71,6 +73,9 @@ public class PromptViewManager {
     private boolean drawMarkers = true;
     private boolean hideMarkers = false;
 
+    private float markerCorrectionFactorX = 1.0f;
+    private float markerCorrectionFactorY = 1.0f;
+
     //private final int MOVEMENT_PX = 1;
 
     public PromptViewManager(File pdf, final PDFView pdfview, SurfaceView floatingCanvas, Activity activity, PromptViewCallback callback) {
@@ -86,6 +91,11 @@ public class PromptViewManager {
 
     public boolean isMarkerClick(float x, float y) {
         return getClickedMarker(x, y) != null;
+    }
+
+    public void setCorrectionFactorMarkers(float x, float y){
+        this.markerCorrectionFactorX = x;
+        this.markerCorrectionFactorY = y;
     }
 
     public Marker getClickedMarker(float x, float y) {
@@ -159,50 +169,82 @@ public class PromptViewManager {
         floatingCanvas.setZOrderOnTop(true);
         floatingCanvas.getHolder().setFormat(PixelFormat.TRANSPARENT);
 
+        pdfview.jumpTo(0);
         this.pdfview = pdfview;
         this.activity = mActivity;
         this.mFloatingCanvas = floatingCanvas;
         return true;
     }
 
-    public static String loadThumbnailImage(final Context ctx, String path, final ImageView iv, int mWidth, int mHeight) throws FileNotFoundException {
-        File f = new File(path);
-        final ParcelFileDescriptor fd = ParcelFileDescriptor.open(f, ParcelFileDescriptor.MODE_READ_ONLY);
-        final int pageNum = 0;
-        final PdfiumCore pdfiumCore = new PdfiumCore(ctx);
+    public static String loadThumbnailImage(final Context ctx, String path, final ImageView iv, int width, int height) {
+        File file = new File(path);
+
+        new AsyncTask<Object, Void, Bitmap>() {
+
+            @Override
+            protected Bitmap doInBackground(Object... objects) {
+                System.gc();
+                File f = (File) objects[0];
+                int mWidth = (int) objects[1];
+                int mHeight = (int) objects[2];
+                ParcelFileDescriptor fd = null;
+                try {
+                    fd = ParcelFileDescriptor.open(f, ParcelFileDescriptor.MODE_READ_ONLY);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                final int pageNum = 0;
+                final PdfiumCore pdfiumCore = new PdfiumCore(ctx);
 
 
-        PdfDocument pdfDocument = null;
-        try {
-            pdfDocument = pdfiumCore.newDocument(fd);
-            pdfiumCore.openPage(pdfDocument, pageNum);
+                PdfDocument pdfDocument = null;
+                try {
+                    pdfDocument = pdfiumCore.newDocument(fd);
+                    pdfiumCore.openPage(pdfDocument, pageNum);
 
-            if (mWidth == 0 || mHeight == 0) {
-                mWidth = pdfiumCore.getPageWidthPoint(pdfDocument, pageNum);
-                mHeight = pdfiumCore.getPageHeightPoint(pdfDocument, pageNum);
+                    if (mWidth == 0 || mHeight == 0) {
+                        mWidth = pdfiumCore.getPageWidthPoint(pdfDocument, pageNum);
+                        mHeight = pdfiumCore.getPageHeightPoint(pdfDocument, pageNum);
+                    }
+
+                    mWidth *= 0.8;
+                    mHeight *= 0.8;
+
+                    Bitmap bitmap = Bitmap.createBitmap(mWidth, mHeight,
+                            Bitmap.Config.ARGB_8888);
+                    pdfiumCore.renderPageBitmap(pdfDocument, bitmap, pageNum, 0, 0,
+                            mWidth, mHeight);
+                    pdfiumCore.closeDocument(pdfDocument); // important!
+
+                    return bitmap;
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (OutOfMemoryError ooe) {
+                    ooe.printStackTrace();
+                    //cdoInBackground(objects, mWidth / 2, mHeight / 2);
+                }
+
+                return null;
+
             }
 
-            Bitmap bitmap = Bitmap.createBitmap(mWidth, mHeight,
-                    Bitmap.Config.ARGB_8888);
-            pdfiumCore.renderPageBitmap(pdfDocument, bitmap, pageNum, 0, 0,
-                    mWidth, mHeight);
+            @Override
+            protected void onPostExecute(Bitmap bitmap) {
+                if (bitmap != null) {
+                    final TransitionDrawable td =
+                            new TransitionDrawable(new Drawable[]{
+                                    new ColorDrawable(Color.TRANSPARENT),
+                                    new BitmapDrawable(ctx.getResources(), bitmap)
+                            });
+                    iv.setImageDrawable(td);
+                    td.startTransition(500);
+                }
+            }
+        }.execute(file, width, height);
 
-            final TransitionDrawable td =
-                    new TransitionDrawable(new Drawable[]{
-                            new ColorDrawable(Color.TRANSPARENT),
-                            new BitmapDrawable(ctx.getResources(), bitmap)
-                    });
-            iv.setImageDrawable(td);
-            td.startTransition(500);
-            pdfiumCore.closeDocument(pdfDocument); // important!
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch(OutOfMemoryError ooe){
-            ooe.printStackTrace();
-            System.gc();
-        }
+        return file.getName();
 
-        return f.getName();
     }
 
     public int getPageCount() {
@@ -394,9 +436,10 @@ public class PromptViewManager {
 
     private void paintMarker(Canvas canvas, Marker marker, boolean highlighted) {
         //canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
-        float x = marker.getOffsetX() * getCurrentZoom() + getCurrentXOffset();
-        float y = marker.getOffsetY() * getCurrentZoom() + getCurrentYOffset();
-        LogUtils.v(TAG, "Draw marker " + x + ":" + y);
+        float[] positions = getMarkerPixelPosition(marker);
+        float x = positions[0];
+        float y = positions[1];
+        LogUtils.v(TAG, "Draw marker " + x + ":" + y + " FACTOR CONVERSION: " + markerCorrectionFactorX + " : " + markerCorrectionFactorY);
         if (x >= 1 && y >= 1) {
 
             drawClickOnCanvas(canvas, marker.getColor(), x, y);
@@ -434,11 +477,22 @@ public class PromptViewManager {
         }
     }
 
+    private float[] getMarkerPixelPosition(Marker marker){
+        float x = marker.getOffsetX() * markerCorrectionFactorX * getCurrentZoom() + getCurrentXOffset();
+        float y = marker.getOffsetY() * markerCorrectionFactorY * getCurrentZoom() + getCurrentYOffset();
+        //x = x * markerCorrectionFactorX;
+        //y = y * markerCorrectionFactorY;
+
+        return new float[]{x, y};
+    }
+
     private void paintTextMarker(Canvas canvas, Marker marker, boolean highlighted) {
         //canvas.drawColor(clickMarkerColor, PorterDuff.Mode.CLEAR);
-        float x = marker.getOffsetX() * getCurrentZoom() + getCurrentXOffset();
-        float y = marker.getOffsetY() * getCurrentZoom() + getCurrentYOffset();
-        LogUtils.v(TAG, "Draw text marker " + x + ":" + y);
+        float[] positions = getMarkerPixelPosition(marker);
+        float x = positions[0];
+        float y = positions[1];
+        LogUtils.v(TAG, "Draw text marker " + x + ":" + y + " FACTOR CONVERSION: " + markerCorrectionFactorX + " : " + markerCorrectionFactorY);
+
         if (x >= 1 && y >= 1) {
 
             Paint markerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);

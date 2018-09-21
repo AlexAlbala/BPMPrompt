@@ -5,10 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.view.SurfaceView;
 
-import com.a2t.a2tlib.database.RealmFactory;
-import com.a2t.a2tlib.tools.LogUtils;
+import com.a2t.autobpmprompt.app.lib.LogUtils;
 import com.a2t.autobpmprompt.app.callback.PromptEventsCallback;
 import com.a2t.autobpmprompt.app.controller.PromptActivity;
+import com.a2t.autobpmprompt.app.lib.database.RealmFactory;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.app.database.RealmIOHelper;
@@ -42,17 +42,21 @@ public class PromptManager {
     }
 
     public static void openPrompt(Context ctx, String setList, long id) {
+        openPrompt(ctx, setList, id, true);
+    }
+
+    public static void openPrompt(Context ctx, String setList, long id, boolean isEdit) {
         Intent i = new Intent(ctx, PromptActivity.class);
         i.putExtra("setListName", setList);
         i.putExtra("promptId", id);
-        i.putExtra("isEdit", false);
+        i.putExtra("isEdit", isEdit);
         ctx.startActivity(i);
     }
 
-    public static void openPromptAtPosition(Context ctx, String setList, int position, boolean enabled) {
+    public static void openPromptAtPosition(Context ctx, String setList, int position, boolean enabled, boolean isEdit) {
         PromptSettings p = RealmIOHelper.getInstance().getPromptBySetListAndPosition(ctx, setList, position, enabled);
         if (p != null) {
-            openPrompt(ctx, setList, p.getId());
+            openPrompt(ctx, setList, p.getId(), isEdit);
         }
     }
 
@@ -132,7 +136,7 @@ public class PromptManager {
 
     public static void reorderPromptInSetList(Context ctx, String setListTitle, int from, int to) {
         LogUtils.v(TAG, "moving prompt of setList " + setListTitle + " from " + from + " to " + to);
-        Realm r = RealmFactory.getRealm(ctx);
+        Realm r = RealmFactory.getRealm();
 
         SetList s = r.where(SetList.class).equalTo("title", setListTitle).findFirst();
         List<PromptSettings> copiedPrompts = new ArrayList<>();
@@ -159,5 +163,15 @@ public class PromptManager {
             }
             update(ctx, ps);
         }
+    }
+
+    public String exportPromptToZip(Context ctx, long promptId){
+        PromptSettings ps = RealmIOHelper.getInstance().getPrompt(ctx, promptId);
+
+        return "";
+    }
+
+    public void importPromptZipToDatabase(Context ctx, String zipFile){
+
     }
 }

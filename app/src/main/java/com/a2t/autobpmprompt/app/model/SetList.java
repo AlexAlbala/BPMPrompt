@@ -3,9 +3,11 @@ package com.a2t.autobpmprompt.app.model;
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
+import io.realm.annotations.Required;
 
 public class SetList extends RealmObject {
     @PrimaryKey
+    @Required
     private String title;
 
     private RealmList<PromptSettings> prompts;

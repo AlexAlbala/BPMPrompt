@@ -3,8 +3,8 @@ package com.a2t.autobpmprompt.app.controller;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 
-import com.a2t.a2tlib.content.compat.A2TActivity;
 import com.a2t.autobpmprompt.R;
+import com.a2t.autobpmprompt.app.lib.A2TActivity;
 
 public class SettingsActivity extends A2TActivity {
     @Override

@@ -1,8 +1,8 @@
 package com.a2t.autobpmprompt.app.controller;
 
-import com.a2t.a2tlib.content.ProgressDialogFactory;
-import com.a2t.a2tlib.content.compat.A2TActivity;
-import com.a2t.a2tlib.tools.SharedPreferencesManager;
+import com.a2t.autobpmprompt.app.lib.ProgressDialogFactory;
+import com.a2t.autobpmprompt.app.lib.A2TActivity;
+import com.a2t.autobpmprompt.app.lib.SharedPreferencesManager;
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.adapter.SimplePromptListAdapter;
 import com.a2t.autobpmprompt.app.callback.PromptEventsCallback;
@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Handler;
 
 import io.realm.RealmList;
 
@@ -98,6 +99,10 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
     FloatingActionButton fab;
     FloatingActionButton fab_marker;
     FloatingActionButton exit_view_mode;
+    FloatingActionButton fab_next;
+    FloatingActionButton fab_prev;
+
+    List<PromptSettings> activePrompts;
 
     int surfaceOffsetX;
     int surfaceOffsetY;
@@ -283,6 +288,8 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
         fab = (FloatingActionButton) findViewById(R.id.fab_edit);
         fab_marker = (FloatingActionButton) findViewById(R.id.fab_add_marker);
         exit_view_mode = (FloatingActionButton) findViewById(R.id.fab_exit_view_mode);
+        fab_next = (FloatingActionButton) findViewById(R.id.fab_next_prompt);
+        fab_prev = (FloatingActionButton) findViewById(R.id.fab_prev_prompt);
 
         setListPrompts = (ListView) findViewById(R.id.prompt_set_list_prompts);
 
@@ -292,14 +299,15 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
         /**********************************************************************************/
 
         /******************* RETRIEVE VARIABLES ********************************************/
-        //this.isEdit = getIntent().getBooleanExtra("isEdit", false);
+        isInViewMode = !getIntent().getBooleanExtra("isEdit", true);
         long idPrompt = getIntent().getLongExtra("promptId", -1);
         /***********************************************************************************/
 
         /******************* INITIALIZE DIMENSIONS && COLORS *******************************/
         //surfaceOffsetX = (int) getResources().getDimension(R.dimen.activity_prompt_markers_bar);
         surfaceOffsetX = 0;
-        surfaceOffsetY = (int) getResources().getDimension(R.dimen.activity_prompt_top_bar) + getStatusBarHeight();
+        surfaceOffsetY = (int) getResources().getDimensionPixelSize(R.dimen.activity_prompt_top_bar) + getStatusBarHeight();
+
         /***********************************************************************************/
         /******************* SOUND *******************************/
 
@@ -399,7 +407,7 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
 //                new int[]{R.id.row_simple_prompt_title},
 //                R.id.row_simple_prompt_title);
 //
-        final List<PromptSettings> activePrompts = new ArrayList<>();
+        activePrompts = new ArrayList<>();
         for (PromptSettings p : promptsFromCurrentSetList) {
             if (p.isEnabled()) {
                 activePrompts.add(p);
@@ -409,7 +417,7 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
         setListPrompts.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                PromptManager.openPrompt(PromptActivity.this, fromSetList, activePrompts.get(position).getId());
+                PromptManager.openPrompt(PromptActivity.this, fromSetList, activePrompts.get(position).getId(), !isInViewMode);
                 finish();
             }
         });
@@ -426,38 +434,35 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
         ImageView setlist_next = (ImageView) findViewById(R.id.prompt_setlist_next);
         ImageView setlist_previous = (ImageView) findViewById(R.id.prompt_setlist_previous);
 
-        final int currentPropmtPosition = currentPrompt.settings.getSetListPosition();
 
-        int positionInActive = 0;
-        for (PromptSettings ps : activePrompts) {
-            if (ps.getSetListPosition() == currentPropmtPosition) {
-                break;
-            } else {
-                positionInActive++;
+        View.OnClickListener nextListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PromptManager.openPromptAtPosition(PromptActivity.this, fromSetList, currentPrompt.settings.getSetListPosition() + 1, true, !isInViewMode);
+                finish();
             }
-        }
-        if (positionInActive < (activePrompts.size() - 1)) {
+        };
+
+        View.OnClickListener prevListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PromptManager.openPromptAtPosition(PromptActivity.this, fromSetList, currentPrompt.settings.getSetListPosition() - 1, true, !isInViewMode);
+                finish();
+            }
+        };
+
+        fab_next.setOnClickListener(nextListener);
+        fab_prev.setOnClickListener(prevListener);
+        if (hasNextPrompt()) {
             setlist_next.setVisibility(View.VISIBLE);
-            setlist_next.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    PromptManager.openPromptAtPosition(PromptActivity.this, fromSetList, currentPrompt.settings.getSetListPosition() + 1, true);
-                    finish();
-                }
-            });
+            setlist_next.setOnClickListener(nextListener);
         } else {
             setlist_next.setVisibility(View.INVISIBLE);
         }
 
-        if (positionInActive > 0) {
+        if (hasPreviousPrompt()) {
             setlist_previous.setVisibility(View.VISIBLE);
-            setlist_previous.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    PromptManager.openPromptAtPosition(PromptActivity.this, fromSetList, currentPrompt.settings.getSetListPosition() - 1, true);
-                    finish();
-                }
-            });
+            setlist_previous.setOnClickListener(prevListener);
         } else {
             setlist_previous.setVisibility(View.INVISIBLE);
         }
@@ -484,6 +489,46 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
             pagerRight.setVisibility(View.GONE);
             pagerLeft.setVisibility(View.GONE);
         }
+
+        if (isInViewMode) {
+            Timer t = new Timer();
+            t.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            promptViewMode(null);
+                        }
+                    });
+                }
+            }, 1000);
+        }
+    }
+
+    private int getPositionInSetList() {
+        final int currentPropmtPosition = currentPrompt.settings.getSetListPosition();
+
+        int positionInActive = 0;
+        for (PromptSettings ps : activePrompts) {
+            if (ps.getSetListPosition() == currentPropmtPosition) {
+                break;
+            } else {
+                positionInActive++;
+            }
+        }
+
+        return positionInActive;
+    }
+
+    private boolean hasNextPrompt() {
+        int positionInActive = getPositionInSetList();
+        return positionInActive < (activePrompts.size() - 1);
+    }
+
+    private boolean hasPreviousPrompt() {
+        int positionInActive = getPositionInSetList();
+        return positionInActive > 0;
     }
 
     private void blinkLed() {
@@ -763,14 +808,16 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
                         boolean isNextPageClick = x > npx && x < npx + npwidth && y > npy && y < npy + npheight;
 
                         if (!isControlsClick && !isMarkerClick && !isTopBarClick && !isTopNotificationClick && !isPreviousPageClick && !isNextPageClick) {
-                            if (contentVisible) {
-                                hideRightBar();
-                                hideFab();
-                            } else {
-                                showRightBar();
-                                showFab();
+                            if (!isInViewMode) {
+                                if (contentVisible) {
+                                    hideRightBar();
+                                    hideFab();
+                                } else {
+                                    showRightBar();
+                                    showFab();
+                                }
+                                contentVisible = !contentVisible;
                             }
-                            contentVisible = !contentVisible;
                         } else if (isMarkerClick) {
                             ldebug("Marker clicked " + mClicked.getTitle());
                             if (currentPrompt.getStatus() != Prompt.Status.PLAYING) {
@@ -880,11 +927,13 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
 
         for (int i = 0; i < currentPrompt.settings.getMarkers().size(); i++) {
             Marker m = currentPrompt.settings.getMarkers().get(i);
-            if (m.getId() == em.getId()) {
-                ((RealmList) currentPrompt.settings.getMarkers()).set(i, em);
-                PromptManager.update(this, currentPrompt);
-                currentPrompt.setCurrentMarkers(currentPrompt.settings.getMarkers());
-                return;
+            if (m != null) {
+                if (m.getId() == em.getId()) {
+                    ((RealmList) currentPrompt.settings.getMarkers()).set(i, em);
+                    PromptManager.update(this, currentPrompt);
+                    currentPrompt.setCurrentMarkers(currentPrompt.settings.getMarkers());
+                    return;
+                }
             }
         }
     }
@@ -900,12 +949,14 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
 
         for (int i = 0; i < currentPrompt.settings.getMarkers().size(); i++) {
             Marker m = currentPrompt.settings.getMarkers().get(i);
-            if (m.getTitle().equals(title)) {
-                currentPrompt.settings.getMarkers().remove(i);
-                PromptManager.deleteMarkerFromPrompt(getApplicationContext(), currentPrompt, m);
-                currentPrompt.setCurrentMarkers(currentPrompt.settings.getMarkers());
-                //currentPrompt.drawMarkers();
-                return;
+            if (m != null) {
+                if (m.getTitle().equals(title)) {
+                    currentPrompt.settings.getMarkers().remove(i);
+                    PromptManager.deleteMarkerFromPrompt(getApplicationContext(), currentPrompt, m);
+                    currentPrompt.setCurrentMarkers(currentPrompt.settings.getMarkers());
+                    //currentPrompt.drawMarkers();
+                    return;
+                }
             }
         }
     }
@@ -971,20 +1022,37 @@ public class PromptActivity extends A2TActivity implements EditPromptDialog.Prom
     }
 
     public void promptViewMode(View view) {
+        int currentHeight = pdfview.getMeasuredHeight();
+        int newHeight = currentHeight + getResources().getDimensionPixelSize(R.dimen.activity_prompt_top_bar);
+        float factor = (float) newHeight / (float) currentHeight;
+        linfo("VIEW MODE - CORRECTION: " + factor + " ( " + newHeight + " / " + currentHeight + " )");
+
+        currentPrompt.setFactorCorrectionMarker(factor, factor);
+
         hideFab();
         hideRightBar();
         hideTopBar();
         isInViewMode = true;
-        currentPrompt.hideMarkers(true);
+        currentPrompt.hideMarkers(false);
         exit_view_mode.show();
+        if (hasPreviousPrompt()) {
+            fab_prev.show();
+        }
+
+        if (hasNextPrompt()) {
+            fab_next.show();
+        }
     }
 
     public void exitViewMode(View view) {
+        currentPrompt.setFactorCorrectionMarker(1.0f, 1.0f);
         showFab();
         showRightBar();
         showTopBar();
         isInViewMode = false;
         currentPrompt.hideMarkers(false);
         exit_view_mode.hide();
+        fab_prev.hide();
+        fab_next.hide();
     }
 }

@@ -2,8 +2,8 @@ package com.a2t.autobpmprompt.app;
 
 import android.app.Application;
 
-import com.a2t.a2tlib.tools.BuildUtils;
-import com.a2t.a2tlib.tools.SharedPreferencesManager;
+import com.a2t.autobpmprompt.app.lib.BuildUtils;
+import com.a2t.autobpmprompt.app.lib.SharedPreferencesManager;
 import com.a2t.autobpmprompt.app.database.RealmIOHelper;
 import com.splunk.mint.Mint;
 

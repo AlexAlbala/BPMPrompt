@@ -9,7 +9,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.a2t.a2tlib.content.adapter.CustomArrayAdapter;
+import com.a2t.autobpmprompt.app.lib.CustomArrayAdapter;
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.callback.PDFGridCallback;
 import com.a2t.autobpmprompt.media.prompt.PromptPDFFile;

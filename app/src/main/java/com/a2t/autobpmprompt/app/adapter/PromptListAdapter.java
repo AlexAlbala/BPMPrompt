@@ -10,6 +10,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.DragEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,8 +18,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.a2t.a2tlib.content.compat.A2TActivity;
-import com.a2t.a2tlib.tools.LogUtils;
+import com.a2t.autobpmprompt.app.lib.A2TActivity;
+import com.a2t.autobpmprompt.app.lib.LogUtils;
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.callback.PromptCardCallbacks;
 import com.a2t.autobpmprompt.app.controller.AreYouSureDialog;
@@ -44,7 +45,6 @@ public class PromptListAdapter extends RecyclerView.Adapter<PromptListAdapter.My
     private List<PromptSettings> promptsList;
     private PromptCardCallbacks mCallback;
     private A2TActivity mContext;
-    private List<MyViewHolder> items;
 
     private int imageWidth = 0;
     private int imageHeight = 0;
@@ -61,12 +61,18 @@ public class PromptListAdapter extends RecyclerView.Adapter<PromptListAdapter.My
             }
         }
         notifyItemMoved(fromPosition, toPosition);
+
+        return true;
+    }
+
+    @Override
+    public void onItemDropped(int fromPosition, int toPosition) {
+        LogUtils.d("ADAPTER", "DROPPED: " + fromPosition + " -> " + toPosition);
         if (promptsList.size() > 0) {
             PromptManager.reorderPromptInSetList(mContext, promptsList.get(0).getSetList(), fromPosition, toPosition);
             MainActivity ma = (MainActivity) mContext;
             ma.reloadData();
         }
-        return true;
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -106,10 +112,6 @@ public class PromptListAdapter extends RecyclerView.Adapter<PromptListAdapter.My
                     }
                 }
             });
-
-            if (!items.contains(this)) {
-                items.add(this);
-            }
         }
     }
 
@@ -126,7 +128,6 @@ public class PromptListAdapter extends RecyclerView.Adapter<PromptListAdapter.My
         this.promptsList = moviesList;
         this.mCallback = mCallback;
         this.mContext = (A2TActivity) mContext;
-        items = new ArrayList<>();
     }
 
     @Override
@@ -155,11 +156,7 @@ public class PromptListAdapter extends RecyclerView.Adapter<PromptListAdapter.My
                     imageWidth = holder.pdfThumb.getMeasuredWidth();
                     LogUtils.v("RecyclerView", "New measured size : " + imageWidth + " : " + imageHeight);
                 }
-                try {
-                    PromptViewManager.loadThumbnailImage(mContext, prompt.getPdfFullPath(), holder.pdfThumb, imageWidth, imageHeight);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
+                PromptViewManager.loadThumbnailImage(mContext, prompt.getPdfFullPath(), holder.pdfThumb, imageWidth, imageHeight);
             }
         });
 
@@ -221,6 +218,7 @@ public class PromptListAdapter extends RecyclerView.Adapter<PromptListAdapter.My
             BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
             Bitmap bitmap = bitmapDrawable.getBitmap();
             bitmap.recycle();
+            System.gc();
         }
 
         //LogUtils.v("ADAPTER", "RECYCLE " + holder.pdf);

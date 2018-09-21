@@ -1,32 +1,48 @@
 apply plugin: 'com.android.application'
+apply plugin: 'realm-android'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.0"
-
+    signingConfigs {
+        release_sign {
+            keyAlias 'autobpmprompt'
+            keyPassword 'c0030da668b2c'
+            storeFile file('/Users/Alex/.android/bpmprompt-keystore.jks')
+            storePassword 'c0030da668b2c'
+        }
+    }
+    compileSdkVersion 27
+    buildToolsVersion "27.0.3"
     defaultConfig {
         applicationId "com.a2t.autobpmprompt"
         minSdkVersion 19
-        targetSdkVersion 25
-        versionCode 22
-        versionName "0.2.2"
+        targetSdkVersion 27
+        versionCode 27
+        versionName "0.3.0"
         multiDexEnabled true
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release_sign
         }
+    }
+    repositories {
+        maven {
+            url 'https://maven.google.com/'
+            name 'Google'
+        }
+        mavenCentral()
+        jcenter()
     }
 }
 
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:design:25.0.0'
-    compile 'com.github.barteksc:pdfium-android:1.4.0'
-    compile 'com.github.QuadFlask:colorpicker:0.0.11'
-    compile 'com.github.barteksc:android-pdf-viewer:2.1.0'
-    compile 'com.android.support:cardview-v7:25.0.0'
-    compile project(':a2tlib')
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:design:27.1.1'
+    implementation 'com.github.barteksc:pdfium-android:1.7.1'
+    implementation 'com.github.QuadFlask:colorpicker:0.0.13'
+    implementation 'com.github.barteksc:android-pdf-viewer:2.8.2'
+    implementation 'com.android.support:cardview-v7:27.1.1'
 }

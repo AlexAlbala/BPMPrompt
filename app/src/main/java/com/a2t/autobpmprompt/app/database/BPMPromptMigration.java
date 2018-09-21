@@ -1,9 +1,10 @@
 package com.a2t.autobpmprompt.app.database;
 
-import com.a2t.a2tlib.tools.LogUtils;
+import com.a2t.autobpmprompt.app.lib.LogUtils;
 
 import io.realm.DynamicRealm;
 import io.realm.RealmMigration;
+import io.realm.RealmObjectSchema;
 import io.realm.RealmSchema;
 
 /**
@@ -14,23 +15,12 @@ public class BPMPromptMigration implements RealmMigration{
     public void migrate(DynamicRealm realm, long oldVersion, long newVersion) {
         LogUtils.v("REALMMIGRATION", "migrating from " + oldVersion + " to " + newVersion);
         RealmSchema schema = realm.getSchema();
+        if(oldVersion == 1) {
+            /*RealmObjectSchema s = schema.get("SetList");
+            if(s.isPrimaryKey("title") && !s.isRequired("title")){
 
-        /*if (oldVersion == 0) {
-            schema.get("PromptSettings")
-                    .addField("objectPosition", String.class);
-
-            oldVersion++;
-        }*/
-
-        /*if (oldVersion == 1) {
-            schema.create("ContactID")
-                    .addField("lookup_contact_id", String.class)
-                    .setNullable("lookup_contact_id", false)
-                    .addIndex("lookup_contact_id")
-                    .addPrimaryKey("lookup_contact_id");
-
-            oldVersion++;
-        }*/
-        LogUtils.v("REALMMIGRATION", "migration done");
+            }*/
+            LogUtils.v("REALMMIGRATION", "migration done");
+        }
     }
 }

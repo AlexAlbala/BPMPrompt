@@ -1,2 +1,1 @@
-include ':app', ':a2tlib'
-project(':a2tlib').projectDir = new File(settingsDir, '../../Android/a2tlib')
+include ':app'

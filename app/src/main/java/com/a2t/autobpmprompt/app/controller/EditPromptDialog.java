@@ -10,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
-import com.a2t.a2tlib.tools.StringUtils;
+import com.a2t.autobpmprompt.app.lib.StringUtils;
 import com.a2t.autobpmprompt.R;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.PromptSettings;

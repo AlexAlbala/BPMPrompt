@@ -42,20 +42,52 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent" />
 
-                    <android.support.design.widget.FloatingActionButton
-                        android:id="@+id/fab_exit_view_mode"
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="end"
-                        android:layout_marginBottom="@dimen/activity_vertical_margin"
                         android:layout_marginEnd="@dimen/activity_horizontal_margin"
                         android:layout_marginTop="@dimen/activity_vertical_margin"
-                        android:clickable="true"
-                        android:onClick="exitViewMode"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/edit"
-                        android:tint="@android:color/black"
-                        app:backgroundTint="@android:color/white" />
+                        android:orientation="vertical">
+                        <android.support.design.widget.FloatingActionButton
+                            android:id="@+id/fab_exit_view_mode"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="10dp"
+                            android:clickable="true"
+                            android:onClick="exitViewMode"
+                            android:scaleType="centerCrop"
+                            android:src="@drawable/edit"
+                            android:tint="@android:color/black"
+                            app:backgroundTint="@android:color/white" />
+
+                        <android.support.design.widget.FloatingActionButton
+                            android:id="@+id/fab_next_prompt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:layout_marginBottom="10dp"
+                            android:clickable="true"
+                            android:onClick="exitViewMode"
+                            android:scaleType="centerCrop"
+                            android:src="@android:drawable/ic_media_next"
+                            android:tint="@android:color/black"
+                            app:backgroundTint="@android:color/white" />
+
+                        <android.support.design.widget.FloatingActionButton
+                            android:id="@+id/fab_prev_prompt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:layout_marginBottom="10dp"
+                            android:clickable="true"
+                            android:onClick="exitViewMode"
+                            android:scaleType="centerCrop"
+                            android:src="@android:drawable/ic_media_previous"
+                            android:tint="@android:color/black"
+                            app:backgroundTint="@android:color/white" />
+                    </LinearLayout>
+
 
                 </FrameLayout>
 

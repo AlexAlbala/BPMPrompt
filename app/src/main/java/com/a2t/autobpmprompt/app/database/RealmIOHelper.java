@@ -3,10 +3,10 @@ package com.a2t.autobpmprompt.app.database;
 import android.content.Context;
 import android.util.Log;
 
-import com.a2t.a2tlib.database.RealmDriver;
-import com.a2t.a2tlib.database.RealmFactory;
-import com.a2t.a2tlib.tools.BuildUtils;
-import com.a2t.a2tlib.tools.LogUtils;
+import com.a2t.autobpmprompt.app.lib.BuildUtils;
+import com.a2t.autobpmprompt.app.lib.LogUtils;
+import com.a2t.autobpmprompt.app.lib.database.RealmDriver;
+import com.a2t.autobpmprompt.app.lib.database.RealmFactory;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.SetList;
@@ -15,6 +15,7 @@ import com.a2t.autobpmprompt.app.model.TempoRecord;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmList;
 import io.realm.RealmResults;
@@ -45,9 +46,10 @@ public class RealmIOHelper {
 
     public void configureDatabase(Context ctx) {
         LogUtils.i(TAG, "INIT DB");
-        RealmConfiguration rc = new RealmConfiguration.Builder(ctx)
-                .schemaVersion(1)
-                .setModules(new BPMPromptModule())
+        Realm.init(ctx);
+        RealmConfiguration rc = new RealmConfiguration.Builder( )
+                .schemaVersion(2)
+                .modules(new BPMPromptModule())
                 .migration(new BPMPromptMigration())
                 .build();
         RealmFactory.setRealmConfiguration(rc);
@@ -98,7 +100,7 @@ public class RealmIOHelper {
     }
 
     public PromptSettings getPromptBySetListAndPosition(Context ctx, String setList, int position, boolean enabled) {
-        PromptSettings prompt = mPromptSettings.getOneByQuery(ctx, mPromptSettings.getRealm(ctx).where(PromptSettings.class).equalTo("setList", setList).equalTo("setListPosition", position).equalTo("enabled", enabled));
+        PromptSettings prompt = mPromptSettings.getOneByQuery(ctx, mPromptSettings.getRealm().where(PromptSettings.class).equalTo("setList", setList).equalTo("setListPosition", position).equalTo("enabled", enabled));
 
         /*List<PromptSettings> allPrompts = new ArrayList<>();
         List<SetList> setLists = getAllSetLists(ctx);

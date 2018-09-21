@@ -2,7 +2,7 @@ package com.a2t.autobpmprompt.media.audiotools;
 
 import android.util.Log;
 
-import com.a2t.a2tlib.tools.LogUtils;
+import com.a2t.autobpmprompt.app.lib.LogUtils;
 
 import java.util.Timer;
 import java.util.TimerTask;

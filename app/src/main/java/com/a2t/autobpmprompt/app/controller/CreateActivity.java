@@ -10,9 +10,9 @@ import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
-import com.a2t.a2tlib.content.compat.A2TActivity;
-import com.a2t.a2tlib.tools.StringUtils;
 import com.a2t.autobpmprompt.R;
+import com.a2t.autobpmprompt.app.lib.A2TActivity;
+import com.a2t.autobpmprompt.app.lib.StringUtils;
 import com.a2t.autobpmprompt.app.model.TempoRecord;
 import com.a2t.autobpmprompt.media.PromptManager;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
@@ -158,14 +158,9 @@ public class CreateActivity extends A2TActivity implements PDFDialog.PDFDialogRe
 
     @Override
     public void onPDFSelected(DialogFragment dialog, String fullPath) {
-        //pdfFile = new File(fullPath);
+        pdfFile = new File(fullPath);
 
-        String pdfName = null;
-        try {
-            pdfName = PromptViewManager.loadThumbnailImage(this, fullPath, pdfPreviewImage, 0, 0);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+        String pdfName = PromptViewManager.loadThumbnailImage(this, fullPath, pdfPreviewImage, 0, 0);
         dialog.dismiss();
         if (StringUtils.isEmpty(name.getText().toString()) && StringUtils.isNotEmpty(pdfName)) {
             name.setText(pdfName.replace(".pdf", ""));

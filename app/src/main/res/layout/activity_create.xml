@@ -68,35 +68,36 @@
                 android:id="@+id/create_tempo_group"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:orientation="horizontal">
 
                 <RadioButton
                     android:id="@+id/create_tempo_44"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="2"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
                     android:checked="true"
                     android:drawableEnd="@drawable/bar_44" />
 
                 <RadioButton
                     android:id="@+id/create_tempo_34"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="2"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
                     android:drawableEnd="@drawable/bar_34" />
 
                 <RadioButton
                     android:id="@+id/create_tempo_68"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="2"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
                     android:drawableEnd="@drawable/bar_68" />
 
                 <RadioButton
                     android:id="@+id/create_tempo_other"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="3"
+                    android:layout_marginEnd="@dimen/activity_horizontal_margin"
                     android:text="@string/other" />
             </RadioGroup>
 
@@ -146,7 +147,7 @@
 
             <FrameLayout
                 android:layout_width="wrap_content"
-                android:layout_height="@dimen/create_prompt_pdf_preview_height"
+                android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal">
 
                 <!-- pdf preview -->
@@ -159,8 +160,8 @@
                 <ImageView
                     android:id="@+id/create_pdfpreview_image"
                     android:layout_width="match_parent"
-                    android:scaleType="centerCrop"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:scaleType="centerCrop" />
             </FrameLayout>
 
             <Button

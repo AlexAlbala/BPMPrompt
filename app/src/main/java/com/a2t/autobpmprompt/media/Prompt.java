@@ -5,11 +5,11 @@ import android.graphics.Canvas;
 import android.util.Log;
 import android.view.SurfaceView;
 
-import com.a2t.a2tlib.tools.LogUtils;
-import com.a2t.a2tlib.tools.SharedPreferencesManager;
+import com.a2t.autobpmprompt.app.lib.LogUtils;
+import com.a2t.autobpmprompt.app.lib.SharedPreferencesManager;
 import com.a2t.autobpmprompt.app.callback.PromptEventsCallback;
 import com.a2t.autobpmprompt.app.callback.PromptViewCallback;
-import com.a2t.a2tlib.tools.SimpleCallback;
+import com.a2t.autobpmprompt.app.lib.SimpleCallback;
 import com.a2t.autobpmprompt.app.model.Marker;
 import com.a2t.autobpmprompt.app.model.MarkerType;
 import com.a2t.autobpmprompt.app.model.PromptSettings;
@@ -81,6 +81,10 @@ public class Prompt {
         mCallback.onBar(1);
         mCallback.onTempoChanged(getInitialTempo());
         mStatus = Status.STOPPED;
+    }
+
+    public void setFactorCorrectionMarker(float x, float y){
+        pdf.setCorrectionFactorMarkers(x, y);
     }
 
     private void updatePosition() {

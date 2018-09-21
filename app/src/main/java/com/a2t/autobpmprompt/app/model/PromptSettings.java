@@ -26,7 +26,6 @@ public class PromptSettings extends RealmObject {
 
     private RealmList<TempoRecord> tempoTrack;
 
-
     public RealmList<TempoRecord> getTempoTrack() {
         return tempoTrack;
     }
